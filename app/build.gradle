@@ -5,16 +5,25 @@ android {
     flavorDimensions "default"
     defaultConfig {
         applicationId "info.weigandt.goalacademy"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    signingConfigs {
+        release {
+            keyAlias 'key0'
+            keyPassword 'goalacademy'
+            storeFile file('C:/owncloud/Udacity/Projects/CapstoneProject/keystore.jks')
+            storePassword 'goalacademy'
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     productFlavors {
@@ -32,9 +41,23 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.android.support:support-v4:26.1.0'
+    implementation 'com.google.android.gms:play-services-plus:15.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    // Butterknife
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    // Timber
+    implementation 'com.jakewharton.timber:timber:4.7.0'
+    // TODO Reminder: add gson if needed
+    // Firebase
+    implementation 'com.google.firebase:firebase-database:15.0.0'
+    implementation 'com.google.firebase:firebase-auth:15.0.0'
+    // FirebaseUI
+    implementation 'com.firebaseui:firebase-ui-auth:3.3.1'
+    // Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    // TODO check if needed compile 'com.squareup.retrofit2:converter-gson:2.1.0'
 }
