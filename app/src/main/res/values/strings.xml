@@ -4,4 +4,11 @@
     <string name="category_track">Track</string>
     <string name="tv_fallback_week_number">Week #</string>
     <string name="tv_fallback_trackname">Goal X</string>
+    <string name="tv_monday_short">Mon</string>
+    <string name="tv_tuesday_short">Tue</string>
+    <string name="tv_wednesday_short">Wen</string>
+    <string name="tv_thursday_short">Thu</string>
+    <string name="tv_friday_short">Fri</string>
+    <string name="tv_saturday_short">Sat</string>
+    <string name="tv_sunday_short">Sun</string>
 </resources>

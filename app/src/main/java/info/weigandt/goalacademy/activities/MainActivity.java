@@ -1,4 +1,4 @@
-package info.weigandt.goalacademy;
+package info.weigandt.goalacademy.activities;
 
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -6,13 +6,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 
+import java.util.ArrayList;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import info.weigandt.goalacademy.BuildConfig;
+import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.FixedTabsFragmentPagerAdapter;
+import info.weigandt.goalacademy.classes.Goal;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
-    FixedTabsFragmentPagerAdapter mFixedTabsFragmentPagerAdapter;
+    public FixedTabsFragmentPagerAdapter mFixedTabsFragmentPagerAdapter;
+    public static ArrayList<Goal> goalList;
     @BindView(R.id.viewpager) ViewPager mViewPager;
     @BindView(R.id.tablayout) TabLayout mTabLayout;
 

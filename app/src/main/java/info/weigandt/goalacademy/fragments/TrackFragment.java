@@ -4,11 +4,16 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
+import info.weigandt.goalacademy.adapters.TrackListAdapter;
 
 import com.google.android.gms.plus.PlusOneButton;
 
@@ -28,6 +33,13 @@ public class TrackFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    @BindView(R.id.rv_track) RecyclerView mRecyclerView;
+    //private TrackListAdapter mAdapter;
+    private RecyclerView.Adapter mAdapter;  // TODO is this sup  class enough?
+    private RecyclerView.LayoutManager mLayoutManager;
+
+
+
 
     // private OnFragmentInteractionListener mListener; TODO keep only if...
 
@@ -67,8 +79,21 @@ public class TrackFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_track, container, false);
+        ButterKnife.bind(this, view);
+        initializeAdapter();
+
 
         return view;
+    }
+
+    private void initializeAdapter() {
+        mAdapter = new TrackListAdapter();  // TODO change signature later
+        mRecyclerView.setAdapter(mAdapter);
+        // Using a linear layout manager
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        // Set only if rv doesn't change size // TODO check if this setting is right
+        mRecyclerView.setHasFixedSize(true);
     }
 
     @Override

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.support.v7.widget.AppCompatImageButton;
 import android.util.AttributeSet;
 
+import info.weigandt.goalacademy.R;
+
 public class ThreeStatesButton extends AppCompatImageButton {
 
     public enum StatesEnum {
