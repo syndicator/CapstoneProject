@@ -1,13 +1,39 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="#1CB4B5"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     tools:context=".fragments.TrackFragment">
-<TextView
-    android:layout_width="match_parent"
-    android:layout_marginTop="5dp"
-    android:gravity="center_horizontal"
-    android:layout_height="match_parent"
-    android:text="Week 42"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/fragment_week_margin_top"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/button_week_decrease"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_chevron_left" />
+
+        <Button
+            android:id="@+id/button_week_current"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tv_fallback_week_number"
+            android:textSize="@dimen/font_size_week_number" />
+
+        <ImageButton
+            android:id="@+id/button_week_increase"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_chevron_right" />
+    </LinearLayout>
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/rv_track"
+        android:background="#444444"></android.support.v7.widget.RecyclerView>
 </LinearLayout>

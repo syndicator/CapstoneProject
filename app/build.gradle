@@ -60,4 +60,6 @@ dependencies {
     // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     // TODO check if needed compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+    // Recyclerview
+    implementation 'com.android.support:recyclerview-v7:26.+'
 }

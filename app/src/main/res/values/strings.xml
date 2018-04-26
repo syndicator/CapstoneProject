@@ -2,4 +2,6 @@
     <string name="app_name">GoalAcademy</string>
     <!-- Category name for track tab [CHAR LIMIT=20] -->
     <string name="category_track">Track</string>
+    <string name="tv_fallback_week_number">Week #</string>
+    <string name="tv_fallback_trackname">Goal X</string>
 </resources>
