@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize Butterknife
         ButterKnife.bind(this);
-
+        fillGoalListWithDummyData();
         // Initialize Timber
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
@@ -54,5 +54,15 @@ public class MainActivity extends AppCompatActivity {
         //tab1 = (Fragment1) adapter.instantiateItem(viewPager, 1);
         //adapter.finishUpdate(viewPager);
 
+    }
+
+    private void fillGoalListWithDummyData() {
+        goalList = new ArrayList<Goal>();
+        Goal goal = new Goal();
+        goal.setName("Go running every day!");
+        goalList.add(goal);
+        Goal goal2 = new Goal();
+        goal2.setName("Drink water daily.");
+        goalList.add(goal2);
     }
 }

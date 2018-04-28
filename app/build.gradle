@@ -29,11 +29,14 @@ android {
     productFlavors {
         paid {
             versionNameSuffix '-paid'
-
         }
         free {
             versionNameSuffix '-free'
         }
+    }
+    sourceSets {
+        paid { java.srcDirs = ['src/paid/java', 'src/paid/java/'] }
+        free { java.srcDirs = ['src/free/java', 'src/free/java/'] }
     }
 }
 
@@ -62,4 +65,6 @@ dependencies {
     // TODO check if needed compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     // Recyclerview
     implementation 'com.android.support:recyclerview-v7:26.+'
+    // Google Ads
+    freeImplementation 'com.google.android.gms:play-services-ads:15.0.0'
 }

@@ -11,4 +11,18 @@
     <string name="tv_friday_short">Fri</string>
     <string name="tv_saturday_short">Sat</string>
     <string name="tv_sunday_short">Sun</string>
+    <string name="tv_fallback_motivation">Keep it up!</string>
+    <!-- TODO This is the test ad id!!!  -->
+    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="tv_fallback_streak">250</string>
+    <string name="tv_fallback_finished">10</string>
+    <string name="tv_fallback_next_level">Bronce</string>
+    <string name="tv_streak">Streak</string>
+    <string name="tv_completion">Completion</string>
+    <string name="tv_next_level">Next Level</string>
+    <string name="tv_goal">Goal</string>
+    <string name="tv_award">Award</string>
+    <string name="tv_date">Date</string>
+    <string name="tv_share">Share</string>
+
 </resources>

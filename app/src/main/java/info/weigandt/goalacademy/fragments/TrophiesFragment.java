@@ -1,7 +1,6 @@
 package info.weigandt.goalacademy.fragments;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,20 +12,17 @@ import android.view.ViewGroup;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
-import info.weigandt.goalacademy.adapters.TrackListAdapter;
-import info.weigandt.goalacademy.classes.ThreeStatesButton;
-
-import com.google.android.gms.plus.PlusOneButton;
+import info.weigandt.goalacademy.adapters.GoalListAdapter;
 
 /**
  * A fragment
  * Activities that contain this fragment must implement the
- * {@link TrackFragment.OnFragmentInteractionListener} interface
+ * {@link TrophiesFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link TrackFragment#newInstance} factory method to
+ * Use the {@link TrophiesFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TrackFragment extends Fragment {
+public class TrophiesFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -34,17 +30,14 @@ public class TrackFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    @BindView(R.id.rv_track) RecyclerView mRecyclerView;
+    @BindView(R.id.rv_trophies) RecyclerView mRecyclerView;
     //private TrackListAdapter mAdapter;
     private RecyclerView.Adapter mAdapter;  // TODO is this sup  class enough?
     private RecyclerView.LayoutManager mLayoutManager;
 
-
-
-
     // private OnFragmentInteractionListener mListener; TODO keep only if...
 
-    public TrackFragment() {
+    public TrophiesFragment() {
         // Required empty public constructor
     }
 
@@ -57,8 +50,8 @@ public class TrackFragment extends Fragment {
      * @return A new instance of fragment TrackFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static TrackFragment newInstance(String param1, String param2) {
-        TrackFragment fragment = new TrackFragment();
+    public static TrophiesFragment newInstance(String param1, String param2) {
+        TrophiesFragment fragment = new TrophiesFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -79,54 +72,14 @@ public class TrackFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_track, container, false);
+        View view = inflater.inflate(R.layout.fragment_trophies, container, false);
         ButterKnife.bind(this, view);
         initializeAdapter();
-
-
         return view;
     }
 
     private void initializeAdapter() {
-        mAdapter = new TrackListAdapter(getContext(), new TrackListAdapter.TrackListAdapterListener() {
-            @Override
-            public void button_0_OnClick(View v, int position, ThreeStatesButton.StatesEnum state) {
-                // TODO process the change here.
-                // TODO position gives the track which has been clicked on
-                // TODO state shows the desired status on a specific day (here button_0 == monday)
-                // TODO View v is WHAT here??? the button, or the surrounding item element????
-            }
-
-            @Override
-            public void button_1_OnClick(View v, int position, ThreeStatesButton.StatesEnum state) {
-
-            }
-
-            @Override
-            public void button_2_OnClick(View v, int position, ThreeStatesButton.StatesEnum state) {
-
-            }
-
-            @Override
-            public void button_3_OnClick(View v, int position, ThreeStatesButton.StatesEnum state) {
-
-            }
-
-            @Override
-            public void button_4_OnClick(View v, int position, ThreeStatesButton.StatesEnum state) {
-
-            }
-
-            @Override
-            public void button_5_OnClick(View v, int position, ThreeStatesButton.StatesEnum state) {
-
-            }
-
-            @Override
-            public void button_6_OnClick(View v, int position, ThreeStatesButton.StatesEnum state) {
-
-            }
-        });  // TODO change signature later
+        mAdapter = new GoalListAdapter(getContext());
         mRecyclerView.setAdapter(mAdapter);
         // Using a linear layout manager
         mLayoutManager = new LinearLayoutManager(getActivity());

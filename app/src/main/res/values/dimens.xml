@@ -6,4 +6,7 @@
     <dimen name="pad_3">32dp</dimen>
     <dimen name="fragment_week_margin_top">8dp</dimen>
     <dimen name="font_size_week_number">24sp</dimen>
+    <dimen name="fab_elevation">6dp</dimen>
+    <dimen name="fab_press_translation_z">6dp</dimen>
+    <dimen name="fab_margin">24dp</dimen>
 </resources>

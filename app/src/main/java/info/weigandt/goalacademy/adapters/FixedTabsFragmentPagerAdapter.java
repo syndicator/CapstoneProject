@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import info.weigandt.goalacademy.R; // TODO try to remove this later on
+import info.weigandt.goalacademy.fragments.GoalsFragment;
 import info.weigandt.goalacademy.fragments.TrackFragment;
 
 public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
@@ -31,7 +32,7 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
             case 0:
                 return TrackFragment.newInstance(null, null);  // TODO enter correct fragment
             case 1:
-                return new Fragment();// TODO enter correct fragment
+                return new GoalsFragment().newInstance(null, null);// TODO enter correct fragment
             case 2:
                 return new Fragment();// TODO enter correct fragment
             default:
