@@ -5,15 +5,18 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
+import info.weigandt.goalacademy.classes.AwardEnum;
 
-import static info.weigandt.goalacademy.activities.MainActivity.goalList;
+import static info.weigandt.goalacademy.activities.MainActivity.trophyList;
 
-public class TrohpyListAdapter extends RecyclerView.Adapter<TrohpyListAdapter.TrackViewHolder> {
+public class TrophyListAdapter extends RecyclerView.Adapter<TrophyListAdapter.TrophyViewHolder> {
 
     // region Variables
     private Context mContext;
@@ -21,7 +24,7 @@ public class TrohpyListAdapter extends RecyclerView.Adapter<TrohpyListAdapter.Tr
     // endregion Variables
 
     // region Constructor
-    public TrohpyListAdapter(Context context) {
+    public TrophyListAdapter(Context context) {
         super();    //  TODO needed?
         this.mContext = context;
     }
@@ -32,13 +35,13 @@ public class TrohpyListAdapter extends RecyclerView.Adapter<TrohpyListAdapter.Tr
      * This is called for each new ViewHolder
      */
     @Override
-    public TrackViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public TrophyViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         Context context = viewGroup.getContext();
-        int layoutIdForListItem = R.layout.goal_list_item;
+        int layoutIdForListItem = R.layout.list_item_trophy;
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
         View view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
-        return new TrackViewHolder(view);
+        return new TrophyViewHolder(view);
     }
 
     /**
@@ -46,7 +49,7 @@ public class TrohpyListAdapter extends RecyclerView.Adapter<TrohpyListAdapter.Tr
      */
     @Override
     public int getItemCount() {
-        return goalList.size();
+        return trophyList.size();
     }
 
     /**
@@ -56,7 +59,7 @@ public class TrohpyListAdapter extends RecyclerView.Adapter<TrohpyListAdapter.Tr
      * @param position The position of the item
      */
     @Override
-    public void onBindViewHolder(TrackViewHolder holder, int position)
+    public void onBindViewHolder(TrophyViewHolder holder, int position)
 
 
 
@@ -96,17 +99,17 @@ public class TrohpyListAdapter extends RecyclerView.Adapter<TrohpyListAdapter.Tr
      * Complex data items may need more than one view per item, and
      * you provide access to all the views for a data item in a view holder
      */
-    public class TrackViewHolder extends RecyclerView.ViewHolder {
+    public class TrophyViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.tv_goal_name)
         TextView mTextViewGoalName;
-        @BindView(R.id.tv_streak)
-        TextView mTextViewStreak;
-        @BindView(R.id.tv_completed)
-        TextView mTextViewCompleted;
-        @BindView(R.id.tv_next_level)
-        TextView mTextViewNextLevel;
+        @BindView(R.id.iv_award)
+        ImageView mImageViewAward;
+        @BindView(R.id.tv_completion_date)
+        TextView mTextViewCompletionDate;
+        @BindView(R.id.ib_share)
+        ImageButton mImageButtonShare;
 
-        public TrackViewHolder(View itemView) {
+        public TrophyViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
@@ -118,14 +121,22 @@ public class TrohpyListAdapter extends RecyclerView.Adapter<TrohpyListAdapter.Tr
          * @param listIndex Position of the item in the list
          */
         void bind(int listIndex) {
-            mTextViewGoalName.setText(goalList.get(listIndex).getName());
-            String streak = String.valueOf(1);  // TODO implement method to get Streak number (from DB / calculate it)
-            // TODO just store a List / Array of integers to count the completed numbers. special care for 1st week!
-            String percentage = "70%";  // TODO implement method
-            String nextLevel = "Gold";  // TODO implement method
-            mTextViewStreak.setText(streak);
-            mTextViewCompleted.setText(percentage);
-            mTextViewNextLevel.setText(nextLevel);
+            mTextViewGoalName.setText(trophyList.get(listIndex).getGoalName());
+            if (trophyList.get(listIndex).getAward() == AwardEnum.BRONZE)
+            {
+                mImageViewAward.setImageResource(R.drawable.ic_trophy_bronze);
+            }
+            else if (trophyList.get(listIndex).getAward() == AwardEnum.SILVER)
+            {
+                mImageViewAward.setImageResource(R.drawable.ic_trophy_silver);
+            }
+            else if (trophyList.get(listIndex).getAward() == AwardEnum.GOLD)
+            {
+                mImageViewAward.setImageResource(R.drawable.ic_trophy_gold);
+            }
+            mTextViewCompletionDate.setText(String.valueOf(trophyList.get(listIndex).getCompletionDate().getYear()));
+            // mImageButtonShare... TODO complete this
+
         }
 
         /*  TODO not needed anymore!? after change from codeproject

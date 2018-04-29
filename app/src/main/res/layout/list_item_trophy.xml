@@ -6,24 +6,25 @@
 
     <TextView
         android:id="@+id/tv_goal_name"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="@string/tv_fallback_trackname" />
+        android:text="@string/fallback_trackname" />
+   <ImageView
+       android:id="@+id/iv_award"
+       android:layout_width="0dp"
+       android:layout_height="wrap_content"
+       android:src="@drawable/ic_trophy_bronze"
+       android:layout_weight="1"
+       />
     <TextView
-        android:id="@+id/tv_award"
-        android:layout_width="wrap_content"
+        android:id="@+id/tv_completion_date"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="@string/tv_fallback_streak" />
-    <TextView
-        android:id="@+id/tv_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="@string/tv_fallback_finished" />
+        android:text="@string/fallback_finished_percent" />
     <ImageButton
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/ib_share"
         android:src="@drawable/ic_share"

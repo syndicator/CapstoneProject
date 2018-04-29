@@ -9,7 +9,7 @@
         android:id="@+id/tv_goal_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/tv_fallback_trackname" />
+        android:text="@string/fallback_trackname" />
 
     <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -28,43 +28,43 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#b0b0b0"
-                android:text="@string/tv_monday_short" />
+                android:text="@string/monday_short" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#b0b0b0"
-                android:text="@string/tv_tuesday_short" />
+                android:text="@string/tuesday_short" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#b0b0b0"
-                android:text="@string/tv_wednesday_short" />
+                android:text="@string/wednesday_short" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#b0b0b0"
-                android:text="@string/tv_thursday_short" />
+                android:text="@string/thursday_short" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#b0b0b0"
-                android:text="@string/tv_friday_short" />
+                android:text="@string/friday_short" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#b0b0b0"
-                android:text="@string/tv_saturday_short" />
+                android:text="@string/saturday_short" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#b0b0b0"
-                android:text="@string/tv_sunday_short" />
+                android:text="@string/sunday_short" />
         </TableRow>
 
         <!-- Row 1 with 7 columns -->

@@ -10,7 +10,6 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
-import info.weigandt.goalacademy.classes.ThreeStatesButton;
 
 import static info.weigandt.goalacademy.activities.MainActivity.goalList;
 
@@ -35,7 +34,7 @@ public class GoalListAdapter extends RecyclerView.Adapter<GoalListAdapter.TrackV
     @Override
     public TrackViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         Context context = viewGroup.getContext();
-        int layoutIdForListItem = R.layout.goal_list_item;
+        int layoutIdForListItem = R.layout.list_item_goal;
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
         View view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);

@@ -20,8 +20,7 @@ import com.google.android.gms.plus.PlusOneButton;
 
 /**
  * A fragment
- * Activities that contain this fragment must implement the
- * {@link TrackFragment.OnFragmentInteractionListener} interface
+ * Activities that contain this fragment must implement the...
  * to handle interaction events.
  * Use the {@link TrackFragment#newInstance} factory method to
  * create an instance of this fragment.

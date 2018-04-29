@@ -11,6 +11,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+<TableLayout
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:stretchColumns="1">
 
         <TableRow xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
@@ -19,28 +24,28 @@
             android:paddingTop="@dimen/pad_2">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/tv_goal" />
+                android:text="@string/goal" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/tv_streak" />
+                android:text="@string/streak" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/tv_completion" />
+                android:text="@string/completion" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/tv_next_level" />
+                android:text="@string/next_level" />
 
         </TableRow>
 
@@ -51,7 +56,7 @@
             android:layout_weight="1"
             android:background="#444444"
             android:scrollbars="vertical" />
-
+</TableLayout>
         <TextView
             android:id="@+id/tv_motivating_quote"
             android:layout_width="match_parent"
@@ -60,7 +65,7 @@
             android:layout_marginLeft="@dimen/pad_3"
             android:layout_marginRight="@dimen/pad_3"
             android:background="@color/cardview_light_background"
-            android:text="@string/tv_fallback_motivation" />
+            android:text="@string/fallback_motivation" />
 
         <com.google.android.gms.ads.AdView
             android:id="@+id/adView"
@@ -75,7 +80,7 @@
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/share_fab"
+        android:id="@+id/fab_add"
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_marginBottom="@dimen/fab_margin"

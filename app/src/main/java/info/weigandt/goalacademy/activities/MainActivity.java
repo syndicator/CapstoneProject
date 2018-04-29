@@ -4,7 +4,12 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
+
+import com.jakewharton.threetenabp.AndroidThreeTen;
+
+import org.threeten.bp.LocalDateTime;
 
 import java.util.ArrayList;
 
@@ -14,11 +19,13 @@ import info.weigandt.goalacademy.BuildConfig;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.FixedTabsFragmentPagerAdapter;
 import info.weigandt.goalacademy.classes.Goal;
+import info.weigandt.goalacademy.classes.Trophy;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
     public FixedTabsFragmentPagerAdapter mFixedTabsFragmentPagerAdapter;
     public static ArrayList<Goal> goalList;
+    public static ArrayList<Trophy> trophyList;
     @BindView(R.id.viewpager) ViewPager mViewPager;
     @BindView(R.id.tablayout) TabLayout mTabLayout;
 
@@ -26,10 +33,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // ThreeTen Android Backport: Includes Java8 java.time features to replace outdated Java7 time
+        AndroidThreeTen.init(this);
 
         // Initialize Butterknife
         ButterKnife.bind(this);
         fillGoalListWithDummyData();
+        fillTrophyListWithDummyData();
         // Initialize Timber
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
@@ -54,6 +64,18 @@ public class MainActivity extends AppCompatActivity {
         //tab1 = (Fragment1) adapter.instantiateItem(viewPager, 1);
         //adapter.finishUpdate(viewPager);
 
+    }
+
+    private void fillTrophyListWithDummyData() {
+        trophyList = new ArrayList<>();
+        Trophy trophy = new Trophy();
+        trophy.setGoalName("Go running every day!");
+        trophy.setCompletionDate(LocalDateTime.now());
+        trophyList.add(trophy);
+        Trophy trophy2 = new Trophy();
+        trophy.setGoalName("Drink water daily!");
+        trophy2.setCompletionDate(LocalDateTime.of(1950,12,24, 10,30));
+        trophyList.add(trophy2);
     }
 
     private void fillGoalListWithDummyData() {

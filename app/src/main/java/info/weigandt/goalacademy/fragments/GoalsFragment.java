@@ -1,8 +1,14 @@
 package info.weigandt.goalacademy.fragments;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.ShareCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,11 +21,12 @@ import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.GoalListAdapter;
 import info.weigandt.goalacademy.adapters.TrackListAdapter;
 import info.weigandt.goalacademy.classes.ThreeStatesButton;
+import timber.log.Timber;
 
 /**
  * A fragment
  * Activities that contain this fragment must implement the
- * {@link GoalsFragment.OnFragmentInteractionListener} interface
+ *
  * to handle interaction events.
  * Use the {@link GoalsFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -33,6 +40,7 @@ public class GoalsFragment extends Fragment {
     private String mParam1;
     private String mParam2;
     @BindView(R.id.rv_goals) RecyclerView mRecyclerView;
+    @BindView(R.id.fab_add) FloatingActionButton mFloatingActionButtonAdd;
     //private TrackListAdapter mAdapter;
     private RecyclerView.Adapter mAdapter;  // TODO is this sup  class enough?
     private RecyclerView.LayoutManager mLayoutManager;
@@ -77,7 +85,24 @@ public class GoalsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_goals, container, false);
         ButterKnife.bind(this, view);
         initializeAdapter();
+        Timber.e("trying to set onclicklistener now");
+
+        mFloatingActionButtonAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Timber.e("onClick executing");
+                showCustomFragmentDialog();
+            }
+        });
         return view;
+    }
+
+    private void showCustomFragmentDialog() {
+        FragmentManager fm = getFragmentManager();
+        CustomDialogFragment customDialogFragment = CustomDialogFragment.newInstance("New goal TODO check code"); // TODO enter resource string here
+        customDialogFragment.show(fm, "fragment_edit_name");
+        //new CustomDialogFragment().show(getFragmentManager(), "CustomDialogFragment");
+
     }
 
     private void initializeAdapter() {

@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import info.weigandt.goalacademy.R; // TODO try to remove this later on
 import info.weigandt.goalacademy.fragments.GoalsFragment;
 import info.weigandt.goalacademy.fragments.TrackFragment;
+import info.weigandt.goalacademy.fragments.TrophiesFragment;
 
 public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
     private final Context mContext;
@@ -19,7 +20,7 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 3;   // TODO use value from config or so?
+        return 3;
     }
 
     @Override
@@ -30,11 +31,11 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
         // and not here (i.e. getItem() won't be called again).
         switch (position) {
             case 0:
-                return TrackFragment.newInstance(null, null);  // TODO enter correct fragment
+                return TrackFragment.newInstance(null, null);
             case 1:
-                return new GoalsFragment().newInstance(null, null);// TODO enter correct fragment
+                return GoalsFragment.newInstance(null, null);
             case 2:
-                return new Fragment();// TODO enter correct fragment
+                return TrophiesFragment.newInstance(null, null);
             default:
                 return null;
         }
@@ -43,10 +44,10 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         if (position == 0) {
             return mContext.getResources().getString(R.string.category_track);
-        } else if (position == 2) {
-            return mContext.getString(R.string.category_track); // TODO enter tab sections here
+        } else if (position == 1) {
+            return mContext.getString(R.string.category_goals);
         } else {
-            return mContext.getString(R.string.category_track); // TODO enter tab sections here
+            return mContext.getString(R.string.category_trophies);
         }
     }
 }

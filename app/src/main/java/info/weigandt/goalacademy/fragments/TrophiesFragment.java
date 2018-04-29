@@ -13,11 +13,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.GoalListAdapter;
+import info.weigandt.goalacademy.adapters.TrophyListAdapter;
 
 /**
  * A fragment
- * Activities that contain this fragment must implement the
- * {@link TrophiesFragment.OnFragmentInteractionListener} interface
+ * Activities that contain this fragment must implement the..
  * to handle interaction events.
  * Use the {@link TrophiesFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -79,7 +79,7 @@ public class TrophiesFragment extends Fragment {
     }
 
     private void initializeAdapter() {
-        mAdapter = new GoalListAdapter(getContext());
+        mAdapter = new TrophyListAdapter(getContext());
         mRecyclerView.setAdapter(mAdapter);
         // Using a linear layout manager
         mLayoutManager = new LinearLayoutManager(getActivity());
