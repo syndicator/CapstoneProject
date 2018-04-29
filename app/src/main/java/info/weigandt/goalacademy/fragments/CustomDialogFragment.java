@@ -8,14 +8,17 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,16 +28,24 @@ import timber.log.Timber;
 public class CustomDialogFragment extends DialogFragment {
 
     private View mView;
-    private int mTimesAweek;
+    public int mTimesAweek;
     @BindView(R.id.et_goal_name) TextView mEditTextGoalName;
     @BindView(R.id.btn_plus) Button mButtonPlus;
     @BindView(R.id.btn_minus) Button mButtonMinus;
     @BindView(R.id.et_times_a_week) EditText mEditTextTimesAweek;
+    @BindView(R.id.checkbox_monday) CheckBox mCheckboxMonday;
+    @BindView(R.id.checkbox_tuesday) CheckBox mCheckboxTuesday;
+    @BindView(R.id.checkbox_wednesday) CheckBox mCheckboxWednesday;
+    @BindView(R.id.checkbox_thursday) CheckBox mCheckboxThursday;
+    @BindView(R.id.checkbox_friday) CheckBox mCheckboxFriday;
+    @BindView(R.id.checkbox_saturday) CheckBox mCheckboxSaturday;
+    @BindView(R.id.checkbox_sunday) CheckBox mCheckboxSunday;
+    @BindView(R.id.btn_ok) Button mButtonOk;
+    @BindView(R.id.btn_cancel) Button mButtonCancel;
 
     public CustomDialogFragment() {
         // Empty constructor is required for DialogFragment
-        // Make sure not to add arguments to the constructor
-        // Use `newInstance` instead as shown below
+        // Use `newInstance` instead as shown below to add arguments
     }
 
     public static CustomDialogFragment newInstance(String title) {
@@ -50,21 +61,154 @@ public class CustomDialogFragment extends DialogFragment {
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragmentdialog_new_goal, container);
         ButterKnife.bind(this, mView);
-        Timber.e("DOH!");
-        mView.findViewById(R.layout.)
-        mButtonPlus.setText("DADADA");
+        mTimesAweek = 0;    // TODO later check if ok after state is restored
         mButtonPlus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Timber.e("onClick executed.");
-                if (Integer.getInteger(mEditTextTimesAweek.getText().toString()) < 7)
+                uncheckAllCheckboxes();
+                if (mTimesAweek < 7)
                 {
                     mTimesAweek +=1;
                     mEditTextTimesAweek.setText(String.valueOf(mTimesAweek));
                 }
             }
         });
+        mButtonMinus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mTimesAweek > 0)
+                {
+                    mTimesAweek -=1;
+                    mEditTextTimesAweek.setText(String.valueOf(mTimesAweek));
+                }
+            }
+        });
+        mCheckboxMonday.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mTimesAweek > 0)
+                {
+                    mTimesAweek =0;
+                    mEditTextTimesAweek.setText(String.valueOf(mTimesAweek));
+                }
+            }
+        });
+        mCheckboxTuesday.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mTimesAweek > 0)
+                {
+                    mTimesAweek =0;
+                    mEditTextTimesAweek.setText(String.valueOf(mTimesAweek));
+                }
+            }
+        });
+        mCheckboxWednesday.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mTimesAweek > 0)
+                {
+                    mTimesAweek =0;
+                    mEditTextTimesAweek.setText(String.valueOf(mTimesAweek));
+                }
+            }
+        });
+        mCheckboxThursday.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mTimesAweek > 0)
+                {
+                    mTimesAweek =0;
+                    mEditTextTimesAweek.setText(String.valueOf(mTimesAweek));
+                }
+            }
+        });
+        mCheckboxFriday.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mTimesAweek > 0)
+                {
+                    mTimesAweek =0;
+                    mEditTextTimesAweek.setText(String.valueOf(mTimesAweek));
+                }
+            }
+        });
+        mCheckboxSaturday.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mTimesAweek > 0)
+                {
+                    mTimesAweek =0;
+                    mEditTextTimesAweek.setText(String.valueOf(mTimesAweek));
+                }
+            }
+        });
+        mCheckboxSunday.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mTimesAweek > 0)
+                {
+                    mTimesAweek =0;
+                    mEditTextTimesAweek.setText(String.valueOf(mTimesAweek));
+                }
+            }
+        });
+        mButtonOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (mEditTextGoalName.getText().toString().matches(""))
+                {
+                    Toast.makeText(getContext(), R.string.error_no_goal_name, Toast.LENGTH_SHORT).show();
+                }
+                else if (!((mCheckboxMonday.isChecked() ||
+                        mCheckboxTuesday.isChecked() ||
+                        mCheckboxWednesday.isChecked() ||
+                        mCheckboxThursday.isChecked() ||
+                        mCheckboxFriday.isChecked() ||
+                        mCheckboxSaturday.isChecked() ||
+                        mCheckboxSunday.isChecked()) ||
+                        mTimesAweek > 0)) {
+                    Toast.makeText(getContext(), R.string.error_no_time_chosen, Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    // TODO enter data callback here
+                    dismiss();
+                }
+            }
+        });
+        mButtonCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dismiss();
+            }
+        });
         return mView;
+    }
+
+    private void uncheckAllCheckboxes() {
+        if(mCheckboxMonday.isChecked()){
+            mCheckboxMonday.toggle();
+        }
+        if(mCheckboxTuesday.isChecked()){
+            mCheckboxTuesday.toggle();
+        }
+        if(mCheckboxWednesday.isChecked()){
+            mCheckboxWednesday.toggle();
+        }
+        if(mCheckboxThursday.isChecked()){
+            mCheckboxThursday.toggle();
+        }
+        if(mCheckboxFriday.isChecked()){
+            mCheckboxFriday.toggle();
+        }
+        if(mCheckboxSaturday.isChecked()){
+            mCheckboxSaturday.toggle();
+        }
+        if(mCheckboxSunday.isChecked()){
+            mCheckboxSunday.toggle();
+        }
     }
 
     @Override
@@ -80,30 +224,6 @@ public class CustomDialogFragment extends DialogFragment {
         getDialog().getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
                 */
-
     }
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        // Get the layout inflater
-        LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        // Inflate and set the layout for the dialog
-        // Pass null as the parent view because its going in the dialog layout
-        builder.setView(inflater.inflate(R.layout.fragmentdialog_new_goal, null))
-                // Add action buttons
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        // TODO handle data callback here?
-                    }
-                })
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        CustomDialogFragment.this.getDialog().cancel();
-                    }
-                });
-
-        return builder.create();
-    }
 }

@@ -32,5 +32,7 @@
     <string name="times_a_week">times a week.</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="error_no_goal_name">Please enter a goal name</string>
+    <string name="error_no_time_chosen">Please select a time when to do it</string>
 
 </resources>
