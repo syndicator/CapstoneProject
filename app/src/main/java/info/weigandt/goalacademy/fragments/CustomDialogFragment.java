@@ -1,6 +1,8 @@
 package info.weigandt.goalacademy.fragments;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,25 +25,41 @@ import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
+import info.weigandt.goalacademy.classes.Goal;
 import timber.log.Timber;
 
 public class CustomDialogFragment extends DialogFragment {
 
     private View mView;
+    // Instance of the interface to deliver action events to the "parent" class
+    public CustomDialogFragmentListener mCustomDialogFragmentListener;
     public int mTimesAweek;
-    @BindView(R.id.et_goal_name) TextView mEditTextGoalName;
-    @BindView(R.id.btn_plus) Button mButtonPlus;
-    @BindView(R.id.btn_minus) Button mButtonMinus;
-    @BindView(R.id.et_times_a_week) EditText mEditTextTimesAweek;
-    @BindView(R.id.checkbox_monday) CheckBox mCheckboxMonday;
-    @BindView(R.id.checkbox_tuesday) CheckBox mCheckboxTuesday;
-    @BindView(R.id.checkbox_wednesday) CheckBox mCheckboxWednesday;
-    @BindView(R.id.checkbox_thursday) CheckBox mCheckboxThursday;
-    @BindView(R.id.checkbox_friday) CheckBox mCheckboxFriday;
-    @BindView(R.id.checkbox_saturday) CheckBox mCheckboxSaturday;
-    @BindView(R.id.checkbox_sunday) CheckBox mCheckboxSunday;
-    @BindView(R.id.btn_ok) Button mButtonOk;
-    @BindView(R.id.btn_cancel) Button mButtonCancel;
+    @BindView(R.id.et_goal_name)
+    TextView mEditTextGoalName;
+    @BindView(R.id.btn_plus)
+    Button mButtonPlus;
+    @BindView(R.id.btn_minus)
+    Button mButtonMinus;
+    @BindView(R.id.et_times_a_week)
+    EditText mEditTextTimesAweek;
+    @BindView(R.id.checkbox_monday)
+    CheckBox mCheckboxMonday;
+    @BindView(R.id.checkbox_tuesday)
+    CheckBox mCheckboxTuesday;
+    @BindView(R.id.checkbox_wednesday)
+    CheckBox mCheckboxWednesday;
+    @BindView(R.id.checkbox_thursday)
+    CheckBox mCheckboxThursday;
+    @BindView(R.id.checkbox_friday)
+    CheckBox mCheckboxFriday;
+    @BindView(R.id.checkbox_saturday)
+    CheckBox mCheckboxSaturday;
+    @BindView(R.id.checkbox_sunday)
+    CheckBox mCheckboxSunday;
+    @BindView(R.id.btn_ok)
+    Button mButtonOk;
+    @BindView(R.id.btn_cancel)
+    Button mButtonCancel;
 
     public CustomDialogFragment() {
         // Empty constructor is required for DialogFragment
@@ -56,6 +74,14 @@ public class CustomDialogFragment extends DialogFragment {
         return customDialogFragment;
     }
 
+    public interface CustomDialogFragmentListener {
+        void onDialogPositiveClick(Goal goal);
+    }
+
+    public void setCustomDialogFragmentListener(CustomDialogFragmentListener customDialogFragmentListener) {
+        mCustomDialogFragmentListener = customDialogFragmentListener;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -66,9 +92,8 @@ public class CustomDialogFragment extends DialogFragment {
             @Override
             public void onClick(View view) {
                 uncheckAllCheckboxes();
-                if (mTimesAweek < 7)
-                {
-                    mTimesAweek +=1;
+                if (mTimesAweek < 7) {
+                    mTimesAweek += 1;
                     mEditTextTimesAweek.setText(String.valueOf(mTimesAweek));
                 }
             }
@@ -76,9 +101,8 @@ public class CustomDialogFragment extends DialogFragment {
         mButtonMinus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mTimesAweek > 0)
-                {
-                    mTimesAweek -=1;
+                if (mTimesAweek > 0) {
+                    mTimesAweek -= 1;
                     mEditTextTimesAweek.setText(String.valueOf(mTimesAweek));
                 }
             }
@@ -86,9 +110,8 @@ public class CustomDialogFragment extends DialogFragment {
         mCheckboxMonday.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mTimesAweek > 0)
-                {
-                    mTimesAweek =0;
+                if (mTimesAweek > 0) {
+                    mTimesAweek = 0;
                     mEditTextTimesAweek.setText(String.valueOf(mTimesAweek));
                 }
             }
@@ -96,9 +119,8 @@ public class CustomDialogFragment extends DialogFragment {
         mCheckboxTuesday.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mTimesAweek > 0)
-                {
-                    mTimesAweek =0;
+                if (mTimesAweek > 0) {
+                    mTimesAweek = 0;
                     mEditTextTimesAweek.setText(String.valueOf(mTimesAweek));
                 }
             }
@@ -106,9 +128,8 @@ public class CustomDialogFragment extends DialogFragment {
         mCheckboxWednesday.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mTimesAweek > 0)
-                {
-                    mTimesAweek =0;
+                if (mTimesAweek > 0) {
+                    mTimesAweek = 0;
                     mEditTextTimesAweek.setText(String.valueOf(mTimesAweek));
                 }
             }
@@ -116,9 +137,8 @@ public class CustomDialogFragment extends DialogFragment {
         mCheckboxThursday.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mTimesAweek > 0)
-                {
-                    mTimesAweek =0;
+                if (mTimesAweek > 0) {
+                    mTimesAweek = 0;
                     mEditTextTimesAweek.setText(String.valueOf(mTimesAweek));
                 }
             }
@@ -126,9 +146,8 @@ public class CustomDialogFragment extends DialogFragment {
         mCheckboxFriday.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mTimesAweek > 0)
-                {
-                    mTimesAweek =0;
+                if (mTimesAweek > 0) {
+                    mTimesAweek = 0;
                     mEditTextTimesAweek.setText(String.valueOf(mTimesAweek));
                 }
             }
@@ -136,9 +155,8 @@ public class CustomDialogFragment extends DialogFragment {
         mCheckboxSaturday.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mTimesAweek > 0)
-                {
-                    mTimesAweek =0;
+                if (mTimesAweek > 0) {
+                    mTimesAweek = 0;
                     mEditTextTimesAweek.setText(String.valueOf(mTimesAweek));
                 }
             }
@@ -146,9 +164,8 @@ public class CustomDialogFragment extends DialogFragment {
         mCheckboxSunday.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mTimesAweek > 0)
-                {
-                    mTimesAweek =0;
+                if (mTimesAweek > 0) {
+                    mTimesAweek = 0;
                     mEditTextTimesAweek.setText(String.valueOf(mTimesAweek));
                 }
             }
@@ -157,11 +174,9 @@ public class CustomDialogFragment extends DialogFragment {
             @Override
             public void onClick(View view) {
 
-                if (mEditTextGoalName.getText().toString().matches(""))
-                {
+                if (mEditTextGoalName.getText().toString().matches("")) {
                     Toast.makeText(getContext(), R.string.error_no_goal_name, Toast.LENGTH_SHORT).show();
-                }
-                else if (!((mCheckboxMonday.isChecked() ||
+                } else if (!((mCheckboxMonday.isChecked() ||
                         mCheckboxTuesday.isChecked() ||
                         mCheckboxWednesday.isChecked() ||
                         mCheckboxThursday.isChecked() ||
@@ -170,10 +185,50 @@ public class CustomDialogFragment extends DialogFragment {
                         mCheckboxSunday.isChecked()) ||
                         mTimesAweek > 0)) {
                     Toast.makeText(getContext(), R.string.error_no_time_chosen, Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
-                    // TODO enter data callback here
+                } else {
+                    Goal goal = new Goal();
+                    goal.setName(mEditTextGoalName.toString());
+                    if (mTimesAweek != 0)
+                    {
+                        goal.setTimesPerWeek(mTimesAweek);
+                    }
+                    else
+                    {
+                        int number = 0;
+                        if (mCheckboxMonday.isChecked())
+                        {
+                            number +=1;
+                        }
+                        if (mCheckboxTuesday.isChecked())
+                        {
+                            number +=2;
+                        }
+                        if (mCheckboxWednesday.isChecked())
+                        {
+                            number +=4;
+                        }
+                        if (mCheckboxThursday.isChecked())
+                        {
+                            number +=8;
+                        }
+                        if (mCheckboxFriday.isChecked())
+                        {
+                            number +=16;
+                        }
+                        if (mCheckboxSaturday.isChecked())
+                        {
+                            number +=32;
+                        }
+                        if (mCheckboxSunday.isChecked())
+                        {
+                            number +=64;
+                        }
+                        goal.setScheduledWeekdays(number);
+                    }
+
+                    // Now let's trigger the event
+                    if (mCustomDialogFragmentListener != null)
+                        mCustomDialogFragmentListener.onDialogPositiveClick(goal); // <---- fire listener here
                     dismiss();
                 }
             }
@@ -188,25 +243,25 @@ public class CustomDialogFragment extends DialogFragment {
     }
 
     private void uncheckAllCheckboxes() {
-        if(mCheckboxMonday.isChecked()){
+        if (mCheckboxMonday.isChecked()) {
             mCheckboxMonday.toggle();
         }
-        if(mCheckboxTuesday.isChecked()){
+        if (mCheckboxTuesday.isChecked()) {
             mCheckboxTuesday.toggle();
         }
-        if(mCheckboxWednesday.isChecked()){
+        if (mCheckboxWednesday.isChecked()) {
             mCheckboxWednesday.toggle();
         }
-        if(mCheckboxThursday.isChecked()){
+        if (mCheckboxThursday.isChecked()) {
             mCheckboxThursday.toggle();
         }
-        if(mCheckboxFriday.isChecked()){
+        if (mCheckboxFriday.isChecked()) {
             mCheckboxFriday.toggle();
         }
-        if(mCheckboxSaturday.isChecked()){
+        if (mCheckboxSaturday.isChecked()) {
             mCheckboxSaturday.toggle();
         }
-        if(mCheckboxSunday.isChecked()){
+        if (mCheckboxSunday.isChecked()) {
             mCheckboxSunday.toggle();
         }
     }

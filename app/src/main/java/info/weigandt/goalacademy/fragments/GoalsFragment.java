@@ -1,28 +1,25 @@
 package info.weigandt.goalacademy.fragments;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.ShareCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.GoalListAdapter;
-import info.weigandt.goalacademy.adapters.TrackListAdapter;
-import info.weigandt.goalacademy.classes.ThreeStatesButton;
+import info.weigandt.goalacademy.classes.Goal;
 import timber.log.Timber;
+
+import static info.weigandt.goalacademy.activities.MainActivity.goalList;
 
 /**
  * A fragment
@@ -101,6 +98,12 @@ public class GoalsFragment extends Fragment {
     private void showCustomFragmentDialog() {
         FragmentManager fm = getFragmentManager();
         CustomDialogFragment customDialogFragment = CustomDialogFragment.newInstance("New goal TODO check code"); // TODO enter resource string here
+        customDialogFragment.setCustomDialogFragmentListener(new CustomDialogFragment.CustomDialogFragmentListener() {
+            @Override
+            public void onDialogPositiveClick(Goal goal) {
+                goalList.add(goal); // TODO enter proper data processing here (update view also)
+            }
+        });
         customDialogFragment.show(fm, "fragment_edit_name");
         //new CustomDialogFragment().show(getFragmentManager(), "CustomDialogFragment");
 
