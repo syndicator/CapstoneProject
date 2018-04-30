@@ -34,5 +34,7 @@
     <string name="cancel">Cancel</string>
     <string name="error_no_goal_name">Please enter a goal name</string>
     <string name="error_no_time_chosen">Please select a time when to do it</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 
 </resources>

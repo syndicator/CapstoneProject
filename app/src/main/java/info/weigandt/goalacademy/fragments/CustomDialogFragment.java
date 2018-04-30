@@ -187,7 +187,8 @@ public class CustomDialogFragment extends DialogFragment {
                     Toast.makeText(getContext(), R.string.error_no_time_chosen, Toast.LENGTH_SHORT).show();
                 } else {
                     Goal goal = new Goal();
-                    goal.setName(mEditTextGoalName.toString());
+                    goal.setName(mEditTextGoalName.getText().toString());
+                    Timber.e(goal.getName());
                     if (mTimesAweek != 0)
                     {
                         goal.setTimesPerWeek(mTimesAweek);
