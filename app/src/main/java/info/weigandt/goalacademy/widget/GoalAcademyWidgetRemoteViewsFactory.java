@@ -2,7 +2,6 @@ package info.weigandt.goalacademy.widget;
 
 import android.content.Context;
 import android.content.Intent;
-import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -28,7 +27,7 @@ public class GoalAcademyWidgetRemoteViewsFactory implements RemoteViewsService.R
     }
 
     @Override
-    public void onDatatSetChanged()
+    public void onDataSetChanged()
     {
 
     }
@@ -43,17 +42,18 @@ public class GoalAcademyWidgetRemoteViewsFactory implements RemoteViewsService.R
         return 2; // TODO enter number of list items here
     }
 
+    /**
+     *
+     * @param position
+     * @return "RemoteViews" single list item
+     */
     @Override
     public RemoteViews getViewAt(int position) {
-        if (position == AdapterView.INVALID_POSITION ||
-                mCursor == null || !mCursor.moveToPosition(position)) {
-            return null;
-        }
 
-        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.collection_widget_list_item);
-        rv.setTextViewText(R.id.widgetItemTaskNameLabel, mCursor.getString(1));
-
-        return rv;
+        RemoteViews remoteview = new RemoteViews(mContext.getPackageName(), R.layout.collection_widget_list_item);
+        remoteview.setTextViewText(R.id.tv_widget_goal_name, "TEST");
+        // TODO retrieve data here. e.g. "goalList.getString(1))" - from Firebase or cursor or what?
+        return remoteview;
     }
     @Override
     public RemoteViews getLoadingView() {

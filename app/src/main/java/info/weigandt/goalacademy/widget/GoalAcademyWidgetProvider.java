@@ -21,14 +21,14 @@ public class GoalAcademyWidgetProvider extends AppWidgetProvider {
         CharSequence widgetText = context.getString(R.string.appwidget_text);
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.goal_adacemy_app_widget);
-        views.setTextViewText(R.id.appwidget_text, widgetText);
+        //views.setTextViewText(R.id.tv..., widgetText);
 
         // Creating an intent to launch MainActivity when clicked
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
         // Set click handler to launch pending intent
-        views.setOnClickPendingIntent(R.id.rl_widget_goal_academy, pendingIntent);
+        views.setOnClickPendingIntent(R.id.ll_widget_goal_academy, pendingIntent);
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);

@@ -3,7 +3,6 @@ package info.weigandt.goalacademy.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,6 +10,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,6 +43,8 @@ public class GoalsFragment extends Fragment {
     private String mParam2;
     @BindView(R.id.rv_goals) RecyclerView mRecyclerView;
     @BindView(R.id.fab_add) FloatingActionButton mFloatingActionButtonAdd;
+    @BindView(R.id.adView) AdView mAdView;
+
     //private TrackListAdapter mAdapter;
     private RecyclerView.Adapter mAdapter;  // TODO is this sup  class enough?
     private RecyclerView.LayoutManager mLayoutManager;
@@ -74,6 +80,7 @@ public class GoalsFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
     }
 
     @Override
@@ -92,7 +99,15 @@ public class GoalsFragment extends Fragment {
                 showCustomFragmentDialog();
             }
         });
+        initializeAdMob();
         return view;
+    }
+    private void initializeAdMob()
+    {
+        // Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713
+        MobileAds.initialize(getContext(), getResources().getString(R.string.sample_admob_app_ID_for_activity));
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
     }
 
     private void showCustomFragmentDialog() {
@@ -162,4 +177,5 @@ public class GoalsFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
     */
+
 }

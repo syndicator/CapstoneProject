@@ -65,7 +65,7 @@ dependencies {
     // TODO check if needed compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     // Recyclerview
     implementation 'com.android.support:recyclerview-v7:26.+'
-    // Google Ads
+    // Google AdMob
     freeImplementation 'com.google.android.gms:play-services-ads:15.0.0'
     // ThreeTen Android Backport: Includes Java8 java.time features to replace outdated Java7 time
     implementation 'com.jakewharton.threetenabp:threetenabp:1.1.0'
