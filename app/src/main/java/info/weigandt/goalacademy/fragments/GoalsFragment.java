@@ -3,7 +3,6 @@ package info.weigandt.goalacademy.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +13,11 @@ import android.view.ViewGroup;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 
 import butterknife.BindView;
@@ -21,9 +25,9 @@ import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.GoalListAdapter;
 import info.weigandt.goalacademy.classes.Goal;
-import timber.log.Timber;
 
-import static info.weigandt.goalacademy.activities.MainActivity.goalList;
+import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
+import static info.weigandt.goalacademy.activities.MainActivity.sGoalsDatabaseReference;
 
 /**
  * A fragment
@@ -33,7 +37,7 @@ import static info.weigandt.goalacademy.activities.MainActivity.goalList;
  * Use the {@link GoalsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class GoalsFragment extends Fragment {
+public class GoalsFragment extends BaseFragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -41,6 +45,14 @@ public class GoalsFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    // Firebase related
+    /* moved to mainActivity
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mGoalsDatabaseReference;   // TODO: Adjust to correct node. users?
+    private ChildEventListener mGoalsEventListener;
+    */
+
     @BindView(R.id.rv_goals) RecyclerView mRecyclerView;
     @BindView(R.id.fab_add) FloatingActionButton mFloatingActionButtonAdd;
     @BindView(R.id.adView) AdView mAdView;
@@ -49,7 +61,19 @@ public class GoalsFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;  // TODO is this sup  class enough?
     private RecyclerView.LayoutManager mLayoutManager;
 
-    // private OnFragmentInteractionListener mListener; TODO keep only if...
+    // Fragment Interaction Interface
+
+    /*
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    private OnFragmentInteractionListener mFragmentInteractionListener;
 
     public GoalsFragment() {
         // Required empty public constructor
@@ -61,7 +85,7 @@ public class GoalsFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment TrackFragment.
+     * @return A new instance of fragment GoalsFragment.
      */
     // TODO: Rename and change types and number of parameters
     public static GoalsFragment newInstance(String param1, String param2) {
@@ -89,19 +113,35 @@ public class GoalsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_goals, container, false);
         ButterKnife.bind(this, view);
+
+
+        //initializeFirebase();
+        //loadFirebaseData();
         initializeAdapter();
-        Timber.e("trying to set onclicklistener now");
+
 
         mFloatingActionButtonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Timber.e("onClick executing");
                 showCustomFragmentDialog();
             }
         });
         initializeAdMob();
+
         return view;
     }
+
+
+
+    public void updateView() {
+        mAdapter.notifyItemInserted(sGoalList.size() - 1);
+        //  issues.remove(position);
+        //                    notifyItemRemoved(position);
+        //                    //this line below gives you the animation and also updates the
+        //                    //list items after the deleted item
+        //                    notifyItemRangeChanged(position, getItemCount());
+    }
+
     private void initializeAdMob()
     {
         // Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713
@@ -116,12 +156,17 @@ public class GoalsFragment extends Fragment {
         customDialogFragment.setCustomDialogFragmentListener(new CustomDialogFragment.CustomDialogFragmentListener() {
             @Override
             public void onDialogPositiveClick(Goal goal) {
-                goalList.add(goal); // TODO enter proper data processing here (update view also)
+                // goalList.add(goal); // TODO enter proper data processing here (update view also)
+                addGoalToDatabase(goal);
             }
         });
         customDialogFragment.show(fm, "fragment_edit_name");
         //new CustomDialogFragment().show(getFragmentManager(), "CustomDialogFragment");
 
+    }
+
+    private void addGoalToDatabase(Goal goal) {
+        sGoalsDatabaseReference.push().setValue(goal);
     }
 
     private void initializeAdapter() {
@@ -145,14 +190,14 @@ public class GoalsFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        /* TODO keep only if communication between Fragments and/or Activity is needed
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+
+        if (context instanceof BaseFragment.OnFragmentInteractionListener) {
+            mFragmentInteractionListener = (BaseFragment.OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
-        */
+
     }
 
     @Override
@@ -161,21 +206,9 @@ public class GoalsFragment extends Fragment {
         // mListener = null; TODO remove if no needed
     }
 
-    /* TODO remove if not needed
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     *
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
-    */
+
+
+
+
 
 }

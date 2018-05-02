@@ -1,11 +1,22 @@
 package info.weigandt.goalacademy.classes;
 
+import java.util.List;
+
 public class Goal {
     private String name;
     private String stringStartDate;
     private int timesPerWeek;
     private int scheduledWeekdays;
+    private List<Integer> counterCompletedEvents;   // Starts in the week of stringStartDate, further weeks are added sequentially
     private int status;
+
+    public List<Integer> getCounterCompletedEvents() {
+        return counterCompletedEvents;
+    }
+
+    public void setCounterCompletedEvents(List<Integer> counterCompletedEvents) {
+        this.counterCompletedEvents = counterCompletedEvents;
+    }
 
     public String getName() {
         return name;

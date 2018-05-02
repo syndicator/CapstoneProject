@@ -11,10 +11,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.classes.ThreeStatesButton;
+import info.weigandt.goalacademy.fragments.BaseFragment;
 
-import static info.weigandt.goalacademy.activities.MainActivity.goalList;
+import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
 
-public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.TrackViewHolder> {
+public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.TrackViewHolder> implements BaseFragment.OnFragmentInteractionListener{
 
     // region Variables
     private Context mContext;
@@ -49,7 +50,7 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
      */
     @Override
     public int getItemCount() {
-        return goalList.size();
+        return sGoalList.size();
     }
 
     /**
@@ -89,6 +90,11 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
 
     {
         holder.bind(position);
+    }
+
+    @Override
+    public void onDataChangedByFragment() {
+
     }
     // endregion Overrides
 
@@ -195,9 +201,9 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
          * @param listIndex Position of the item in the list
          */
         void bind(int listIndex) {
-            mTextViewGoalName.setText(goalList.get(listIndex).getName());
-            //String url = mPosterList.get(listIndex); TODO take int and update the view correspondingly
-            //Picasso.with(mContext).load(url).into(listItemPosterView);
+            mTextViewGoalName.setText(sGoalList.get(listIndex).getName());
+
+
         }
 
         /*  TODO not needed anymore!? after change from codeproject

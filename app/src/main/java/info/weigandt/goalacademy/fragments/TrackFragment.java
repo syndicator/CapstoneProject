@@ -16,7 +16,7 @@ import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.TrackListAdapter;
 import info.weigandt.goalacademy.classes.ThreeStatesButton;
 
-import com.google.android.gms.plus.PlusOneButton;
+import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
 
 /**
  * A fragment
@@ -25,20 +25,21 @@ import com.google.android.gms.plus.PlusOneButton;
  * Use the {@link TrackFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TrackFragment extends Fragment {
+public class TrackFragment extends BaseFragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private OnFragmentInteractionListener mFragmentInteractionListener;
+
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    @BindView(R.id.rv_track) RecyclerView mRecyclerView;
+    @BindView(R.id.rv_track)
+    RecyclerView mRecyclerView;
     //private TrackListAdapter mAdapter;
     private RecyclerView.Adapter mAdapter;  // TODO is this sup  class enough?
     private RecyclerView.LayoutManager mLayoutManager;
-
-
 
 
     // private OnFragmentInteractionListener mListener; TODO keep only if...
@@ -81,8 +82,6 @@ public class TrackFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_track, container, false);
         ButterKnife.bind(this, view);
         initializeAdapter();
-
-
         return view;
     }
 
@@ -90,6 +89,16 @@ public class TrackFragment extends Fragment {
         mAdapter = new TrackListAdapter(getContext(), new TrackListAdapter.TrackListAdapterListener() {
             @Override
             public void button_0_OnClick(View v, int position, ThreeStatesButton.StatesEnum state) {
+
+                // TODO save the state to Firebase :)
+
+                // we are about to change the setting of monday in the current week
+                // so the element we want to change is some member of goal object:
+                // private List<Integer> counterCompletedEvents;
+                // for ease of processing, the counter should be accessible through the week number and the year
+                // deriving from start date and the position is quite too complicated
+
+
                 // TODO process the change here.
                 // TODO position gives the track which has been clicked on
                 // TODO state shows the desired status on a specific day (here button_0 == monday)
@@ -143,22 +152,27 @@ public class TrackFragment extends Fragment {
     }
 
     @Override
+    public void updateView() {
+        mAdapter.notifyItemInserted(sGoalList.size() - 1);
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        /* TODO keep only if communication between Fragments and/or Activity is needed
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+
+        if (context instanceof BaseFragment.OnFragmentInteractionListener) {
+            mFragmentInteractionListener = (BaseFragment.OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
-        */
+
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        // mListener = null; TODO remove if no needed
+        mFragmentInteractionListener = null;    // TODO check if outdated
     }
 
     /* TODO remove if not needed

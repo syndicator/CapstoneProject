@@ -14,7 +14,7 @@ import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.classes.AwardEnum;
 
-import static info.weigandt.goalacademy.activities.MainActivity.trophyList;
+import static info.weigandt.goalacademy.activities.MainActivity.sTrophyList;
 
 public class TrophyListAdapter extends RecyclerView.Adapter<TrophyListAdapter.TrophyViewHolder> {
 
@@ -49,7 +49,7 @@ public class TrophyListAdapter extends RecyclerView.Adapter<TrophyListAdapter.Tr
      */
     @Override
     public int getItemCount() {
-        return trophyList.size();
+        return sTrophyList.size();
     }
 
     /**
@@ -121,20 +121,20 @@ public class TrophyListAdapter extends RecyclerView.Adapter<TrophyListAdapter.Tr
          * @param listIndex Position of the item in the list
          */
         void bind(int listIndex) {
-            mTextViewGoalName.setText(trophyList.get(listIndex).getGoalName());
-            if (trophyList.get(listIndex).getAward() == AwardEnum.BRONZE)
+            mTextViewGoalName.setText(sTrophyList.get(listIndex).getGoalName());
+            if (sTrophyList.get(listIndex).getAward() == AwardEnum.BRONZE)
             {
                 mImageViewAward.setImageResource(R.drawable.ic_trophy_bronze);
             }
-            else if (trophyList.get(listIndex).getAward() == AwardEnum.SILVER)
+            else if (sTrophyList.get(listIndex).getAward() == AwardEnum.SILVER)
             {
                 mImageViewAward.setImageResource(R.drawable.ic_trophy_silver);
             }
-            else if (trophyList.get(listIndex).getAward() == AwardEnum.GOLD)
+            else if (sTrophyList.get(listIndex).getAward() == AwardEnum.GOLD)
             {
                 mImageViewAward.setImageResource(R.drawable.ic_trophy_gold);
             }
-            mTextViewCompletionDate.setText(String.valueOf(trophyList.get(listIndex).getCompletionDate().getYear()));
+            mTextViewCompletionDate.setText(String.valueOf(sTrophyList.get(listIndex).getCompletionDate().getYear()));
             // mImageButtonShare... TODO complete this
 
         }

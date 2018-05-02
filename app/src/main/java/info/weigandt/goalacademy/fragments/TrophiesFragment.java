@@ -22,7 +22,7 @@ import info.weigandt.goalacademy.adapters.TrophyListAdapter;
  * Use the {@link TrophiesFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TrophiesFragment extends Fragment {
+public class TrophiesFragment extends BaseFragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -108,11 +108,17 @@ public class TrophiesFragment extends Fragment {
         }
         */
     }
-
+/*
     @Override
     public void onDetach() {
         super.onDetach();
-        // mListener = null; TODO remove if no needed
+        mListener = null; TODO remove if no needed
+    }
+    */
+
+    @Override
+    public void updateView() {
+
     }
 
     /* TODO remove if not needed

@@ -11,13 +11,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
 
-import static info.weigandt.goalacademy.activities.MainActivity.goalList;
+import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
 
 public class GoalListAdapter extends RecyclerView.Adapter<GoalListAdapter.TrackViewHolder> {
 
     // region Variables
     private Context mContext;
-    // List is accessible as static from MainActivity
+    // List is accessible as static var in MainActivity
     // endregion Variables
 
     // region Constructor
@@ -46,7 +46,7 @@ public class GoalListAdapter extends RecyclerView.Adapter<GoalListAdapter.TrackV
      */
     @Override
     public int getItemCount() {
-        return goalList.size();
+        return sGoalList.size();
     }
 
     /**
@@ -87,6 +87,7 @@ public class GoalListAdapter extends RecyclerView.Adapter<GoalListAdapter.TrackV
     {
         holder.bind(position);
     }
+
     // endregion Overrides
 
     // region Inner Class
@@ -118,7 +119,7 @@ public class GoalListAdapter extends RecyclerView.Adapter<GoalListAdapter.TrackV
          * @param listIndex Position of the item in the list
          */
         void bind(int listIndex) {
-            mTextViewGoalName.setText(goalList.get(listIndex).getName());
+            mTextViewGoalName.setText(sGoalList.get(listIndex).getName());
             String streak = String.valueOf(1);  // TODO implement method to get Streak number (from DB / calculate it)
             // TODO just store a List / Array of integers to count the completed numbers. special care for 1st week!
             String percentage = "70%";  // TODO implement method
