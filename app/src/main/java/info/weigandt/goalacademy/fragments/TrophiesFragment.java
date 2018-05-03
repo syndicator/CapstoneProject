@@ -116,9 +116,16 @@ public class TrophiesFragment extends BaseFragment {
     }
     */
 
-    @Override
-    public void updateView() {
 
+    @Override
+    public void updateViewNotifyGoalChanged(int position) {
+        // TODO complete
+
+    }
+
+    @Override
+    public void updateViewNotifyGoalInserted() {
+        // no need for TrophiesFragment
     }
 
     /* TODO remove if not needed

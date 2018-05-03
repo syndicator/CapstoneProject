@@ -67,11 +67,19 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
         }
     }
 
-    public void updateViews() {
+    public void updateViewNotifyGoalInserted() {
         for (BaseFragment fragment : fragmentList) {
-            fragment.updateView();
+            // fragment.updateViewNotifyGoalChanged();
+            fragment.updateViewNotifyGoalInserted();
             Timber.e("updating views from tabsFragmentPager. current fragment:");
             Timber.e(fragment.toString());
+        }
+    }
+
+    public void updateViewNotifyGoalUpdated(int position) {
+        for (BaseFragment fragment : fragmentList) {
+            // fragment.updateViewNotifyGoalChanged();
+            fragment.updateViewNotifyGoalChanged(position);
         }
     }
 }

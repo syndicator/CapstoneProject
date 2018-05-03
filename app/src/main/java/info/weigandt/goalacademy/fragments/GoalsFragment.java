@@ -131,9 +131,13 @@ public class GoalsFragment extends BaseFragment {
         return view;
     }
 
+    @Override
+    public void updateViewNotifyGoalChanged(int position) {
+        // TODO complete
+        mAdapter.notifyItemRangeChanged(position, sGoalList.size());
+    }
 
-
-    public void updateView() {
+    public void updateViewNotifyGoalInserted() {
         mAdapter.notifyItemInserted(sGoalList.size() - 1);
         //  issues.remove(position);
         //                    notifyItemRemoved(position);
@@ -203,12 +207,6 @@ public class GoalsFragment extends BaseFragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        // mListener = null; TODO remove if no needed
+        mFragmentInteractionListener = null; // TODO remove if no needed
     }
-
-
-
-
-
-
 }

@@ -2,6 +2,8 @@ package info.weigandt.goalacademy.classes;
 
 import org.threeten.bp.LocalDateTime;
 
+import info.weigandt.goalacademy.enums.AwardEnum;
+
 /**
  * This class is not a POJO and the data will be derived from the Goal class
  */

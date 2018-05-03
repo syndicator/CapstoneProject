@@ -3,19 +3,20 @@ package info.weigandt.goalacademy.classes;
 import java.util.List;
 
 public class Goal {
+    private String pushId;
     private String name;
     private String stringStartDate;
     private int timesPerWeek;
     private int scheduledWeekdays;
-    private List<Integer> counterCompletedEvents;   // Starts in the week of stringStartDate, further weeks are added sequentially
     private int status;
+    private List<WeeklyEventCounter> WeeklyEventCounterList;
 
-    public List<Integer> getCounterCompletedEvents() {
-        return counterCompletedEvents;
+    public List<WeeklyEventCounter> getWeeklyEventCounterList() {
+        return WeeklyEventCounterList;
     }
 
-    public void setCounterCompletedEvents(List<Integer> counterCompletedEvents) {
-        this.counterCompletedEvents = counterCompletedEvents;
+    public void setWeeklyEventCounterList(List<WeeklyEventCounter> weeklyEventCounterList) {
+        WeeklyEventCounterList = weeklyEventCounterList;
     }
 
     public String getName() {
@@ -58,4 +59,41 @@ public class Goal {
         this.status = status;
     }
 
+    public String getPushId() {
+        return pushId;
+    }
+
+    public void setPushId(String pushId) {
+        this.pushId = pushId;
+    }
+
+    public static class WeeklyEventCounter {
+        private String yearWeekString;
+        private int weekPassCounter;
+        private int weekFailCounter;
+
+        public String getYearWeekString() {
+            return yearWeekString;
+        }
+
+        public void setYearWeekString(String yearWeekString) {
+            this.yearWeekString = yearWeekString;
+        }
+
+        public int getWeekPassCounter() {
+            return weekPassCounter;
+        }
+
+        public void setWeekPassCounter(int weekPassCounter) {
+            this.weekPassCounter = weekPassCounter;
+        }
+
+        public int getWeekFailCounter() {
+            return weekFailCounter;
+        }
+
+        public void setWeekFailCounter(int weekFailCounter) {
+            this.weekFailCounter = weekFailCounter;
+        }
+    }
 }

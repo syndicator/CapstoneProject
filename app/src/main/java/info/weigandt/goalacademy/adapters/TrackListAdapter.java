@@ -10,12 +10,12 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
+import info.weigandt.goalacademy.enums.EventStateEnum;
 import info.weigandt.goalacademy.classes.ThreeStatesButton;
-import info.weigandt.goalacademy.fragments.BaseFragment;
 
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
 
-public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.TrackViewHolder> implements BaseFragment.OnFragmentInteractionListener{
+public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.TrackViewHolder> {
 
     // region Variables
     private Context mContext;
@@ -62,53 +62,30 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
     @Override
     public void onBindViewHolder(TrackViewHolder holder, int position)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     {
         holder.bind(position);
     }
 
-    @Override
-    public void onDataChangedByFragment() {
-
-    }
     // endregion Overrides
 
     // region Interface TrackListAdapter listener
     public interface TrackListAdapterListener {
 
-        void button_0_OnClick(View v, int position, ThreeStatesButton.StatesEnum state);
-        void button_1_OnClick(View v, int position, ThreeStatesButton.StatesEnum state);
-        void button_2_OnClick(View v, int position, ThreeStatesButton.StatesEnum state);
-        void button_3_OnClick(View v, int position, ThreeStatesButton.StatesEnum state);
-        void button_4_OnClick(View v, int position, ThreeStatesButton.StatesEnum state);
-        void button_5_OnClick(View v, int position, ThreeStatesButton.StatesEnum state);
-        void button_6_OnClick(View v, int position, ThreeStatesButton.StatesEnum state);
+        void button_0_OnClick(View v, int position, EventStateEnum state);
+
+        void button_1_OnClick(View v, int position, EventStateEnum state);
+
+        void button_2_OnClick(View v, int position, EventStateEnum state);
+
+        void button_3_OnClick(View v, int position, EventStateEnum state);
+
+        void button_4_OnClick(View v, int position, EventStateEnum state);
+
+        void button_5_OnClick(View v, int position, EventStateEnum state);
+
+        void button_6_OnClick(View v, int position, EventStateEnum state);
     }
+
     // endregion Interface
 
 
@@ -203,7 +180,6 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
         void bind(int listIndex) {
             mTextViewGoalName.setText(sGoalList.get(listIndex).getName());
 
-
         }
 
         /*  TODO not needed anymore!? after change from codeproject
@@ -220,8 +196,5 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
         */
     }
     // endregion Inner Class
-
-
-
 
 }

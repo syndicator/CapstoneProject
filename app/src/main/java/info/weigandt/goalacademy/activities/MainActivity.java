@@ -4,7 +4,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 
 
 import com.google.firebase.database.ChildEventListener;
@@ -12,7 +11,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import org.threeten.bp.LocalDateTime;
@@ -24,14 +22,13 @@ import butterknife.ButterKnife;
 import info.weigandt.goalacademy.BuildConfig;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.FixedTabsFragmentPagerAdapter;
+import info.weigandt.goalacademy.classes.FirebaseOperations;
 import info.weigandt.goalacademy.classes.Goal;
 import info.weigandt.goalacademy.classes.Trophy;
 import info.weigandt.goalacademy.fragments.BaseFragment;
-import info.weigandt.goalacademy.fragments.GoalsFragment;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity implements BaseFragment.OnFragmentInteractionListener
-{
+public class MainActivity extends AppCompatActivity implements BaseFragment.OnFragmentInteractionListener {
     public FixedTabsFragmentPagerAdapter mFixedTabsFragmentPagerAdapter;
     public static ArrayList<Goal> sGoalList;
     public static ArrayList<Trophy> sTrophyList;
@@ -39,8 +36,10 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
     public static FirebaseDatabase sFirebaseDatabase;
     public static DatabaseReference sDatabaseReference;   // TODO: Adjust to correct node. users?
 
-    @BindView(R.id.viewpager) ViewPager mViewPager;
-    @BindView(R.id.tablayout) TabLayout mTabLayout;
+    @BindView(R.id.viewpager)
+    ViewPager mViewPager;
+    @BindView(R.id.tablayout)
+    TabLayout mTabLayout;
     public static DatabaseReference sGoalsDatabaseReference;
     private FirebaseDatabase mFirebaseDatabase;
     private ChildEventListener mGoalsEventListener;
@@ -82,9 +81,8 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
         initializeFirebase();
     }
 
-    public void updateViews()
-    {
-        mFixedTabsFragmentPagerAdapter.updateViews();
+    public void updateViewsNotifyGoalInserted() {
+        mFixedTabsFragmentPagerAdapter.updateViewNotifyGoalInserted();
     }
 
     private void fillTrophyListWithDummyData() {
@@ -95,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
         sTrophyList.add(trophy);
         Trophy trophy2 = new Trophy();
         trophy.setGoalName("Drink water daily!");
-        trophy2.setCompletionDate(LocalDateTime.of(1950,12,24, 10,30));
+        trophy2.setCompletionDate(LocalDateTime.of(1950, 12, 24, 10, 30));
         sTrophyList.add(trophy2);
     }
 
@@ -111,18 +109,29 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
 
     @Override
     public void onDataChangedByFragment() {
-        mFixedTabsFragmentPagerAdapter.updateViews();
+        mFixedTabsFragmentPagerAdapter.updateViewNotifyGoalInserted();
     }
+
+    @Override
+    public void onGoalChangedByFragment(Goal goal) {
+        FirebaseOperations.UpdateGoal(goal);
+        mFixedTabsFragmentPagerAdapter.updateViewNotifyGoalUpdated();
+    }
+
     private void initializeFirebase() {
         // initial loading of the goalList to be ready for adapter!
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         sGoalsDatabaseReference = mFirebaseDatabase.getReference().child("goals");   // TODO save under node of userID or so
         mGoalsEventListener = new ChildEventListener() {
+
+            // "New Goal"
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-                // TODO:  DataSnapshot has to be retrieved before already to initially fill the list
                 Goal goal = dataSnapshot.getValue(Goal.class);
+                if (goal.getPushId() == null) {
+                    goal.setPushId(dataSnapshot.getKey());
+                }
                 // change the sGoalList now and then call:
                 // mAdapter.notifyItemInserted(mItems.size() - 1);
                 //  issues.remove(position);
@@ -137,9 +146,11 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
                     mFragmentInteractionListener.onDataChangedByFragment();
                 }
                 */
-                updateViews();  // TODO check if fragment list not null in subclass tab....
+                updateViewsNotifyGoalInserted();  // TODO check if fragment list not null in subclass tab....
+                // TODO replace with proper method (inserted instead of former general update)
             }
 
+            // Change Goal?
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 

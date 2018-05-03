@@ -12,7 +12,7 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
-import info.weigandt.goalacademy.classes.AwardEnum;
+import info.weigandt.goalacademy.enums.AwardEnum;
 
 import static info.weigandt.goalacademy.activities.MainActivity.sTrophyList;
 

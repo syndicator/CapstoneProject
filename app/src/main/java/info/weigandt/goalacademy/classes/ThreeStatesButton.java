@@ -5,12 +5,9 @@ import android.support.v7.widget.AppCompatImageButton;
 import android.util.AttributeSet;
 
 import info.weigandt.goalacademy.R;
+import info.weigandt.goalacademy.enums.EventStateEnum;
 
 public class ThreeStatesButton extends AppCompatImageButton {
-
-    public enum StatesEnum {
-        NEUTRAL, CHECK, FAIL
-    }
 
     public interface ThreeStatesListener {
         void onNeutral();
@@ -20,20 +17,20 @@ public class ThreeStatesButton extends AppCompatImageButton {
         void onFail();
     }
 
-    private StatesEnum mState;
+    private EventStateEnum mState;
     private ThreeStatesListener mThreeStatesListener;
 
     public ThreeStatesButton(Context context, AttributeSet attrs) {
         super(context, attrs);
         //Sets initial state
-        setState(StatesEnum.NEUTRAL);
+        setState(EventStateEnum.NEUTRAL);
     }
 
     @Override
     public boolean performClick() {
         super.performClick();
-        int next = ((mState.ordinal() + 1) % StatesEnum.values().length);
-        setState(StatesEnum.values()[next]);
+        int next = ((mState.ordinal() + 1) % EventStateEnum.values().length);
+        setState(EventStateEnum.values()[next]);
         performThreeStatesClick();
         return true;
     }
@@ -44,7 +41,7 @@ public class ThreeStatesButton extends AppCompatImageButton {
             case NEUTRAL:
                 mThreeStatesListener.onNeutral();
                 break;
-            case CHECK:
+            case PASS:
                 mThreeStatesListener.onCheck();
                 break;
             case FAIL:
@@ -58,7 +55,7 @@ public class ThreeStatesButton extends AppCompatImageButton {
             case NEUTRAL:
                 setImageResource(R.drawable.ic_neutral);
                 break;
-            case CHECK:
+            case PASS:
                 setImageResource(R.drawable.ic_check);
                 break;
             case FAIL:
@@ -67,11 +64,11 @@ public class ThreeStatesButton extends AppCompatImageButton {
         }
     }
 
-    public StatesEnum getState() {
+    public EventStateEnum getState() {
         return mState;
     }
 
-    public void setState(StatesEnum state) {
+    public void setState(EventStateEnum state) {
         if (state == null) return;
         this.mState = state;
         createDrawableState();
