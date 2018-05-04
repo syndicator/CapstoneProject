@@ -113,9 +113,12 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
     }
 
     @Override
-    public void onGoalChangedByFragment(Goal goal) {
+    public void onGoalChangedByFragment(Goal goal, int position) {
         FirebaseOperations.UpdateGoal(goal);
-        mFixedTabsFragmentPagerAdapter.updateViewNotifyGoalUpdated();
+        // TODO this should only be called if a goal gets removed (completed, failed).
+        // TODO  otherwise the buttons act weird (change due to button behaviour and due to view update)
+        // mFixedTabsFragmentPagerAdapter.updateViewNotifyGoalUpdated(position);
+
     }
 
     private void initializeFirebase() {

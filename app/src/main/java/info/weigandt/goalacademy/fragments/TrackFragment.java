@@ -18,6 +18,7 @@ import info.weigandt.goalacademy.enums.EventStateEnum;
 import info.weigandt.goalacademy.classes.Goal;
 import info.weigandt.goalacademy.classes.GoalHelper;
 import info.weigandt.goalacademy.classes.WrapLinearLayoutManager;
+import timber.log.Timber;
 
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
 
@@ -45,6 +46,7 @@ public class TrackFragment extends BaseFragment {
     //private TrackListAdapter mAdapter;
     private RecyclerView.Adapter mAdapter;  // TODO is this sup  class enough?
     private RecyclerView.LayoutManager mLayoutManager;
+    public static String sYearWeekString;
 
 
     // private OnFragmentInteractionListener mListener; TODO keep only if...
@@ -88,6 +90,9 @@ public class TrackFragment extends BaseFragment {
         ButterKnife.bind(this, view);
         // TODO debug!!!!!
         mDisplayedWeek = LocalDate.now();
+        sYearWeekString = "2018-18";
+
+        // TODO end debug!!!!!
         initializeAdapter();
         return view;
     }
@@ -134,32 +139,32 @@ public class TrackFragment extends BaseFragment {
 
             @Override
             public void button_1_OnClick(View v, int position, EventStateEnum state) {
-
+                processButtonClick(position, state, 1);
             }
 
             @Override
             public void button_2_OnClick(View v, int position, EventStateEnum state) {
-
+                processButtonClick(position, state, 2);
             }
 
             @Override
             public void button_3_OnClick(View v, int position, EventStateEnum state) {
-
+                processButtonClick(position, state, 3);
             }
 
             @Override
             public void button_4_OnClick(View v, int position, EventStateEnum state) {
-
+                processButtonClick(position, state, 4);
             }
 
             @Override
             public void button_5_OnClick(View v, int position, EventStateEnum state) {
-
+                processButtonClick(position, state, 5);
             }
 
             @Override
             public void button_6_OnClick(View v, int position, EventStateEnum state) {
-
+                processButtonClick(position, state, 6);
             }
         });  // TODO change signature later
         mRecyclerView.setAdapter(mAdapter);
@@ -194,7 +199,7 @@ public class TrackFragment extends BaseFragment {
         // TODO #0: Update FB!
             // TODO also add a ChildEventListener to listen to changes (in the list?)
             // TODO -> only one Goal has to be updated in FB!
-        mFragmentInteractionListener.onGoalChangedByFragment(goal);
+        mFragmentInteractionListener.onGoalChangedByFragment(goal, position);
 
         // TODO #1: Update the GUI!
             // TODO this might be needed to inform the other fragments of changes (e.g. new trophy, removed goal etc.)
@@ -243,5 +248,8 @@ public class TrackFragment extends BaseFragment {
     public void updateViewNotifyGoalChanged(int position) {
         // sGoalList.size() - 1 -> Last position
         mAdapter.notifyItemChanged(position);
+        // TODO the view does not care for the status of the list yet.
+        // TODO  so each reload will show the standard buttons again.
+        // TODO change this now :D
     }
 }

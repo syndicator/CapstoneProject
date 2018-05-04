@@ -10,6 +10,6 @@ public abstract class BaseFragment extends Fragment {
 
     public interface OnFragmentInteractionListener {
         void onDataChangedByFragment();
-        void onGoalChangedByFragment(Goal goal);
+        void onGoalChangedByFragment(Goal goal, int position);
     }
 }

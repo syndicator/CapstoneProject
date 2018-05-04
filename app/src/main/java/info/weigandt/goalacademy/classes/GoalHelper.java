@@ -1,5 +1,7 @@
 package info.weigandt.goalacademy.classes;
 
+import android.util.EventLog;
+
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.temporal.TemporalField;
 import org.threeten.bp.temporal.WeekFields;
@@ -10,10 +12,11 @@ import java.util.Locale;
 
 import info.weigandt.goalacademy.enums.EventStateEnum;
 
+import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
+
 public class GoalHelper {
     public static Goal ChangeEvent(Goal goal, EventStateEnum newState, int clickedWeekday, LocalDate currentlyDisplayedLocalDate)
     {
-
         // region prepare String format of current week
         String currentlyDisplayedYearWeekString = String.valueOf(currentlyDisplayedLocalDate.getYear());
         TemporalField weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
@@ -167,5 +170,74 @@ public class GoalHelper {
                 break;
         }
         return weekCounter;
+    }
+    public static EventStateEnum getEventState(Goal goal, int weekDay, String yearWeekString)
+    {
+        if (goal.getWeeklyEventCounterList() == null)
+        {
+            return EventStateEnum.NEUTRAL;
+        }
+        else
+        {
+            for (int i = 0; i < goal.getWeeklyEventCounterList().size(); i++)
+            {
+                Goal.WeeklyEventCounter weeklyEventCounter = goal.getWeeklyEventCounterList().get(i);
+                if (weeklyEventCounter.getYearWeekString().equals(yearWeekString))
+                {
+                    if(checkIfDayIsInCounter(weekDay, goal.getWeeklyEventCounterList().get(i).getWeekPassCounter()))
+                    {
+                        return EventStateEnum.PASS;
+                    }
+                    else if (checkIfDayIsInCounter(weekDay, goal.getWeeklyEventCounterList().get(i).getWeekFailCounter()))
+                    {
+                        return EventStateEnum.FAIL;
+                    }
+                    else
+                    {
+                        return EventStateEnum.NEUTRAL;
+                    }
+                }
+            }
+            return EventStateEnum.NEUTRAL;
+        }
+
+    }
+    public static boolean checkIfDayIsInCounter(int weekDay, int weekCounter)
+    {
+        if (weekCounter>=64)
+        {
+            if (weekDay == 6) { return true; }
+            weekCounter -=64;
+        }
+        if (weekCounter>=32)
+        {
+            if (weekDay == 5) { return true; }
+            weekCounter -=32;
+        }
+        if (weekCounter>=16)
+        {
+            if (weekDay == 4) { return true; }
+            weekCounter -=16;
+        }
+        if (weekCounter>=8)
+        {
+            if (weekDay == 3) { return true; }
+            weekCounter -=8;
+        }
+        if (weekCounter>=4)
+        {
+            if (weekDay == 2) { return true; }
+            weekCounter -=4;
+        }
+        if (weekCounter>=2)
+        {
+            if (weekDay == 1) { return true; }
+            weekCounter -=64;
+        }
+        if (weekCounter==1)
+        {
+            if (weekDay == 0) { return true; }
+        }
+        return false;
     }
 }

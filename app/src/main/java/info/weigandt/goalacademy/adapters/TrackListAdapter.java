@@ -10,10 +10,12 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
+import info.weigandt.goalacademy.classes.GoalHelper;
 import info.weigandt.goalacademy.enums.EventStateEnum;
 import info.weigandt.goalacademy.classes.ThreeStatesButton;
 
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
+import static info.weigandt.goalacademy.fragments.TrackFragment.sYearWeekString;
 
 public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.TrackViewHolder> {
 
@@ -178,8 +180,28 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
          * @param listIndex Position of the item in the list
          */
         void bind(int listIndex) {
+            EventStateEnum state;
             mTextViewGoalName.setText(sGoalList.get(listIndex).getName());
-
+            state = GoalHelper.getEventState(sGoalList.get(listIndex), 0, sYearWeekString);
+            mThreeStatesButton0.setState(state);
+            mTextViewGoalName.setText(sGoalList.get(listIndex).getName());
+            state = GoalHelper.getEventState(sGoalList.get(listIndex), 1, sYearWeekString);
+            mThreeStatesButton1.setState(state);
+            mTextViewGoalName.setText(sGoalList.get(listIndex).getName());
+            state = GoalHelper.getEventState(sGoalList.get(listIndex), 2, sYearWeekString);
+            mThreeStatesButton2.setState(state);
+            mTextViewGoalName.setText(sGoalList.get(listIndex).getName());
+            state = GoalHelper.getEventState(sGoalList.get(listIndex), 3, sYearWeekString);
+            mThreeStatesButton3.setState(state);
+            mTextViewGoalName.setText(sGoalList.get(listIndex).getName());
+            state = GoalHelper.getEventState(sGoalList.get(listIndex), 4, sYearWeekString);
+            mThreeStatesButton4.setState(state);
+            mTextViewGoalName.setText(sGoalList.get(listIndex).getName());
+            state = GoalHelper.getEventState(sGoalList.get(listIndex), 5, sYearWeekString);
+            mThreeStatesButton5.setState(state);
+            mTextViewGoalName.setText(sGoalList.get(listIndex).getName());
+            state = GoalHelper.getEventState(sGoalList.get(listIndex), 6, sYearWeekString);
+            mThreeStatesButton6.setState(state);
         }
 
         /*  TODO not needed anymore!? after change from codeproject
