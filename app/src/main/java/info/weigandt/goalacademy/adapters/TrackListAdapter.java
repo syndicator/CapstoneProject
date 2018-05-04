@@ -182,26 +182,41 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
         void bind(int listIndex) {
             EventStateEnum state;
             mTextViewGoalName.setText(sGoalList.get(listIndex).getName());
+
             state = GoalHelper.getEventState(sGoalList.get(listIndex), 0, sYearWeekString);
             mThreeStatesButton0.setState(state);
-            mTextViewGoalName.setText(sGoalList.get(listIndex).getName());
+            boolean isBlocked = GoalHelper.isDayBlockedInScheme(0, sGoalList.get(listIndex));
+            if (isBlocked) { mThreeStatesButton0.setVisibility(View.INVISIBLE); }
+
             state = GoalHelper.getEventState(sGoalList.get(listIndex), 1, sYearWeekString);
             mThreeStatesButton1.setState(state);
-            mTextViewGoalName.setText(sGoalList.get(listIndex).getName());
+            isBlocked = GoalHelper.isDayBlockedInScheme(1, sGoalList.get(listIndex));
+            if (isBlocked) { mThreeStatesButton1.setVisibility(View.INVISIBLE); }
+
             state = GoalHelper.getEventState(sGoalList.get(listIndex), 2, sYearWeekString);
             mThreeStatesButton2.setState(state);
-            mTextViewGoalName.setText(sGoalList.get(listIndex).getName());
+            isBlocked = GoalHelper.isDayBlockedInScheme(2, sGoalList.get(listIndex));
+            if (isBlocked) { mThreeStatesButton2.setVisibility(View.INVISIBLE); }
+
             state = GoalHelper.getEventState(sGoalList.get(listIndex), 3, sYearWeekString);
             mThreeStatesButton3.setState(state);
-            mTextViewGoalName.setText(sGoalList.get(listIndex).getName());
+            isBlocked = GoalHelper.isDayBlockedInScheme(3, sGoalList.get(listIndex));
+            if (isBlocked) { mThreeStatesButton3.setVisibility(View.INVISIBLE); }
+
             state = GoalHelper.getEventState(sGoalList.get(listIndex), 4, sYearWeekString);
             mThreeStatesButton4.setState(state);
-            mTextViewGoalName.setText(sGoalList.get(listIndex).getName());
+            isBlocked = GoalHelper.isDayBlockedInScheme(4, sGoalList.get(listIndex));
+            if (isBlocked) { mThreeStatesButton4.setVisibility(View.INVISIBLE); }
+
             state = GoalHelper.getEventState(sGoalList.get(listIndex), 5, sYearWeekString);
             mThreeStatesButton5.setState(state);
-            mTextViewGoalName.setText(sGoalList.get(listIndex).getName());
+            isBlocked = GoalHelper.isDayBlockedInScheme(5, sGoalList.get(listIndex));
+            if (isBlocked) { mThreeStatesButton5.setVisibility(View.INVISIBLE); }
+
             state = GoalHelper.getEventState(sGoalList.get(listIndex), 6, sYearWeekString);
             mThreeStatesButton6.setState(state);
+            isBlocked = GoalHelper.isDayBlockedInScheme(6, sGoalList.get(listIndex));
+            if (isBlocked) { mThreeStatesButton6.setVisibility(View.INVISIBLE); }
         }
 
         /*  TODO not needed anymore!? after change from codeproject

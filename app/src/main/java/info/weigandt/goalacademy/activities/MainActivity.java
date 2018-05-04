@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
     @BindView(R.id.tablayout)
     TabLayout mTabLayout;
     public static DatabaseReference sGoalsDatabaseReference;
+    public static DatabaseReference sTrophiesDatabaseReference;
     private FirebaseDatabase mFirebaseDatabase;
     private ChildEventListener mGoalsEventListener;
 
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
 
         // Initialize Butterknife
         ButterKnife.bind(this);
-        fillGoalListWithDummyData();
+        fillGoalListWithDummyData(); // TODO remove this debug line
         fillTrophyListWithDummyData();
         // Initialize Timber
         if (BuildConfig.DEBUG) {
@@ -99,12 +100,14 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
 
     private void fillGoalListWithDummyData() {
         sGoalList = new ArrayList<>();
+        /*
         Goal goal = new Goal();
         goal.setName("Go running every day!");
         sGoalList.add(goal);
         Goal goal2 = new Goal();
         goal2.setName("Drink water daily.");
         sGoalList.add(goal2);
+        */
     }
 
     @Override
@@ -125,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
         // initial loading of the goalList to be ready for adapter!
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         sGoalsDatabaseReference = mFirebaseDatabase.getReference().child("goals");   // TODO save under node of userID or so
+        sTrophiesDatabaseReference = mFirebaseDatabase.getReference().child("trophies");   // TODO save under node of userID or so
         mGoalsEventListener = new ChildEventListener() {
 
             // "New Goal"

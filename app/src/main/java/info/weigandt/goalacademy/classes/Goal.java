@@ -5,7 +5,6 @@ import java.util.List;
 public class Goal {
     private String pushId;
     private String name;
-    private String stringStartDate;
     private int timesPerWeek;
     private int scheduledWeekdays;
     private int status;
@@ -25,14 +24,6 @@ public class Goal {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getStringStartDate() {
-        return stringStartDate;
-    }
-
-    public void setStringStartDate(String stringStartDate) {
-        this.stringStartDate = stringStartDate;
     }
 
     public int getTimesPerWeek() {

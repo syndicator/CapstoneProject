@@ -17,12 +17,7 @@ import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
 public class GoalHelper {
     public static Goal ChangeEvent(Goal goal, EventStateEnum newState, int clickedWeekday, LocalDate currentlyDisplayedLocalDate)
     {
-        // region prepare String format of current week
-        String currentlyDisplayedYearWeekString = String.valueOf(currentlyDisplayedLocalDate.getYear());
-        TemporalField weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
-        int weekNumber = currentlyDisplayedLocalDate.get(weekOfYear);
-        currentlyDisplayedYearWeekString = currentlyDisplayedYearWeekString + "-" + String.valueOf(weekNumber);
-        // endregion
+        String currentlyDisplayedYearWeekString = convertDateToYearWeekString(currentlyDisplayedLocalDate);
 
         // #case0   Status is now PASS: this means, before it has been NEUTRAL
         //  -> add the pass to the list
@@ -117,6 +112,13 @@ public class GoalHelper {
             }
         }
         return goal;
+    }
+
+    public static String convertDateToYearWeekString(LocalDate localDate) {
+        String yearWeekString = String.valueOf(localDate.getYear());
+        TemporalField weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
+        int weekNumber = localDate.get(weekOfYear);
+        return yearWeekString + "-" + String.valueOf(weekNumber);
     }
 
     private static int AddEventToCounter(int weekCounter, int clickedWeekday) {
@@ -232,12 +234,114 @@ public class GoalHelper {
         if (weekCounter>=2)
         {
             if (weekDay == 1) { return true; }
-            weekCounter -=64;
+            weekCounter -=2;
         }
         if (weekCounter==1)
         {
             if (weekDay == 0) { return true; }
         }
         return false;
+    }
+
+    public static boolean isDayBlockedInScheme(int weekDay, Goal goal) {
+        if ((goal.getTimesPerWeek() != 0))
+        {
+            return false;
+        }
+        int scheme = goal.getScheduledWeekdays();
+        if (scheme>=64)
+        {
+            if (weekDay == 6) { return false; }
+            scheme -=64;
+        }
+        if (scheme>=32)
+        {
+            if (weekDay == 5) { return false; }
+            scheme -=32;
+        }
+        if (scheme>=16)
+        {
+            if (weekDay == 4) { return false; }
+            scheme -=16;
+        }
+        if (scheme>=8)
+        {
+            if (weekDay == 3) { return false; }
+            scheme -=8;
+        }
+        if (scheme>=4)
+        {
+            if (weekDay == 2) { return false; }
+            scheme -=4;
+        }
+        if (scheme>=2)
+        {
+            if (weekDay == 1) { return false; }
+            scheme -=2;
+        }
+        if (scheme==1)
+        {
+            if (weekDay == 0) { return false; }
+        }
+        return true;
+    }
+
+    public static int calculateNumberOfEvents(int weekCounter) {
+        int total = 0;
+        if (weekCounter>=64)
+        {
+            total += 1;
+            weekCounter -=64;
+        }
+        if (weekCounter>=32)
+        {
+            total += 1;
+            weekCounter -=32;
+        }
+        if (weekCounter>=16)
+        {
+            total += 1;
+            weekCounter -=16;
+        }
+        if (weekCounter>=8)
+        {
+            total += 1;
+            weekCounter -=8;
+        }
+        if (weekCounter>=4)
+        {
+            total += 1;
+            weekCounter -=4;
+        }
+        if (weekCounter>=2)
+        {
+            total += 1;
+            weekCounter -=2;
+        }
+        if (weekCounter==1)
+        {
+            total += 1;
+        }
+        return total;
+    }
+
+    public static int calculateNumberOfPasses(Goal goal, LocalDate displayedWeek) {
+        int totalPasses = 0;
+        for (Goal.WeeklyEventCounter weeklyEventCounter : goal.getWeeklyEventCounterList()) {
+            if (weeklyEventCounter.getYearWeekString().equals(convertDateToYearWeekString(displayedWeek))) {
+                totalPasses += calculateNumberOfEvents(weeklyEventCounter.getWeekPassCounter());
+            }
+        }
+        return totalPasses;
+    }
+
+    public static int calculateNumberOfFails(Goal goal, LocalDate displayedWeek) {
+        int totalFails = 0;
+        for (Goal.WeeklyEventCounter weeklyEventCounter : goal.getWeeklyEventCounterList()) {
+            if (weeklyEventCounter.getYearWeekString().equals(convertDateToYearWeekString(displayedWeek))) {
+                totalFails += calculateNumberOfEvents(weeklyEventCounter.getWeekFailCounter());
+            }
+        }
+        return totalFails;
     }
 }

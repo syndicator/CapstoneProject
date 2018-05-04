@@ -1,24 +1,31 @@
 package info.weigandt.goalacademy.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 
 import org.threeten.bp.LocalDate;
+import org.threeten.bp.temporal.TemporalField;
+import org.threeten.bp.temporal.WeekFields;
+
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.TrackListAdapter;
+import info.weigandt.goalacademy.classes.Config;
 import info.weigandt.goalacademy.enums.EventStateEnum;
 import info.weigandt.goalacademy.classes.Goal;
 import info.weigandt.goalacademy.classes.GoalHelper;
 import info.weigandt.goalacademy.classes.WrapLinearLayoutManager;
-import timber.log.Timber;
+import info.weigandt.goalacademy.enums.GoalStatusEnum;
+import info.weigandt.goalacademy.enums.GoalStatusPseudoEnum;
 
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
 
@@ -35,6 +42,12 @@ public class TrackFragment extends BaseFragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private OnFragmentInteractionListener mFragmentInteractionListener;
+
+    public void setDisplayedWeek(LocalDate displayedWeek) {
+        mDisplayedWeek = displayedWeek;
+        sYearWeekString = GoalHelper.convertDateToYearWeekString(mDisplayedWeek);   // TODO: optionally check helper class to superflous conversions
+    }
+
     // private String mYearWeekString;
     private LocalDate mDisplayedWeek;
 
@@ -43,6 +56,13 @@ public class TrackFragment extends BaseFragment {
     private String mParam2;
     @BindView(R.id.rv_track)
     RecyclerView mRecyclerView;
+    @BindView(R.id.button_week_current)
+    Button mCurrentWeekButton;
+    @BindView(R.id.button_week_increase)
+    ImageButton mIncreaseWeekButton;
+    @BindView(R.id.button_week_decrease)
+    ImageButton mDecreaseWeekButton;
+
     //private TrackListAdapter mAdapter;
     private RecyclerView.Adapter mAdapter;  // TODO is this sup  class enough?
     private RecyclerView.LayoutManager mLayoutManager;
@@ -89,12 +109,65 @@ public class TrackFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.fragment_track, container, false);
         ButterKnife.bind(this, view);
         // TODO debug!!!!!
-        mDisplayedWeek = LocalDate.now();
-        sYearWeekString = "2018-18";
+        setDisplayedWeek(LocalDate.now());
+        sYearWeekString = "2018-18";    // TODO used by whom?....
 
         // TODO end debug!!!!!
         initializeAdapter();
+
+        // Set button_week_current to current week
+        LocalDate nowLocalDate = LocalDate.now();
+        mCurrentWeekButton.setText(getWeekNumberYearStringForView(nowLocalDate));
+        mCurrentWeekButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!(getWeekFrom(mDisplayedWeek).equals(getWeekFrom(LocalDate.now())))) {
+                    setDisplayedWeek(LocalDate.now());
+                    mCurrentWeekButton.setText(getWeekNumberYearStringForView(mDisplayedWeek));
+                    updateRecyclerView();
+                }
+            }
+        });
+        mIncreaseWeekButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setDisplayedWeek(mDisplayedWeek.plusWeeks(1));
+                mCurrentWeekButton.setText(getWeekNumberYearStringForView(mDisplayedWeek));
+                updateRecyclerView();
+            }
+        });
+        mDecreaseWeekButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setDisplayedWeek(mDisplayedWeek.minusWeeks(1));
+                mCurrentWeekButton.setText(getWeekNumberYearStringForView(mDisplayedWeek));
+                updateRecyclerView();
+            }
+        });
+
         return view;
+    }
+
+    private void updateRecyclerView() {
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private String getWeekNumberYearStringForView(LocalDate localDate) {
+        TemporalField weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
+        int weekNumber = localDate.get(weekOfYear);
+        String format = "%1$02d"; // Two digits
+        String formattedWeekNumber = (String.format(format, weekNumber));
+
+        String year = String.valueOf(localDate.getYear());
+
+        String yearWeekString = "Week " + formattedWeekNumber + " (" + year + ")";
+
+        return yearWeekString;
+    }
+
+    private String getWeekFrom(LocalDate localDate) {
+        TemporalField weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
+        return (String.valueOf(localDate.get(weekOfYear)));
     }
 
     private void initializeAdapter() {
@@ -181,10 +254,12 @@ public class TrackFragment extends BaseFragment {
         Goal goal = sGoalList.get(position);
         Goal changedGoal;
         // DANGER: the state committed is the previous state BEFORE clicking.
-        switch(state) {
+        switch (state) {
             case PASS:
                 changedGoal = GoalHelper.ChangeEvent(goal, EventStateEnum.FAIL, weekday, mDisplayedWeek);
-                sGoalList.set(position, changedGoal);
+                // TODO this day was a fail! check if goal is failed also now
+                calculateStatusOfGoal(changedGoal, EventStateEnum.FAIL);
+
                 break;
             case FAIL:
                 changedGoal = GoalHelper.ChangeEvent(goal, EventStateEnum.NEUTRAL, weekday, mDisplayedWeek);
@@ -192,24 +267,90 @@ public class TrackFragment extends BaseFragment {
                 break;
             case NEUTRAL:
                 changedGoal = GoalHelper.ChangeEvent(goal, EventStateEnum.PASS, weekday, mDisplayedWeek);
+                // TODO this day was a pass! check if goal is progressing now
+                calculateStatusOfGoal(changedGoal, EventStateEnum.PASS);
+
                 sGoalList.set(position, changedGoal);
                 break;
         }
 
         // TODO #0: Update FB!
-            // TODO also add a ChildEventListener to listen to changes (in the list?)
-            // TODO -> only one Goal has to be updated in FB!
+        // TODO also add a ChildEventListener to listen to changes (in the list?)
+        // TODO -> only one Goal has to be updated in FB!
         mFragmentInteractionListener.onGoalChangedByFragment(goal, position);
 
         // TODO #1: Update the GUI!
-            // TODO this might be needed to inform the other fragments of changes (e.g. new trophy, removed goal etc.)
+        // TODO this might be needed to inform the other fragments of changes (e.g. new trophy, removed goal etc.)
         //mFragmentInteractionListener.onDataChangedByFragment();
 
 
         // GUI update is needed, because after returning to this week,
-        //   old data might reside in the adapter which differs from sGoalList
+        //   old data might reside in the adapter which differs from sGoalList.... hmmm, really?
         // mRecyclerView.getAdapter().notifyItemChanged(position);
         // mRecyclerView.getAdapter().notifyItemRangeRemoved(0, sGoalList.size()-1);
+
+
+    }
+
+    private int calculateStatusOfGoal(Goal goal, EventStateEnum eventState) {
+        if (eventState.equals(EventStateEnum.PASS)) {
+            int totalPasses = 0;
+            for (Goal.WeeklyEventCounter weeklyEventCounter : goal.getWeeklyEventCounterList()) {
+                totalPasses += GoalHelper.calculateNumberOfEvents(weeklyEventCounter.getWeekPassCounter());
+            }
+            if (totalPasses == Config.NUMBER_FOR_GOLD) {
+                // Following line is not needed, because we delete the goal 'n turn it into a trophy,
+                //  but may be useful in a future version
+                goal.setStatus(GoalStatusPseudoEnum.BRONZE_EARNED);
+                // TODO delete goal n create trophy
+            } else if (totalPasses >= Config.NUMBER_FOR_SILVER) {
+                goal.setStatus(GoalStatusPseudoEnum.SILVER_EARNED);
+                // TODO call update on goals to show correct progress
+            } else if (totalPasses >= Config.NUMBER_FOR_BRONZE) {
+                goal.setStatus(GoalStatusPseudoEnum.BRONZE_EARNED);
+                // TODO call update on goals to show correct progress
+            }
+        }
+        else if (eventState.equals(EventStateEnum.FAIL)) {
+            // TODO check for near / total fail now
+
+            // determine number of possible passes this week
+            // 7     =   daysLeft + failed days + passed days
+            // daysLeft = 7 - failedDays - passedDays
+            // if (daysLeft - neededPasses + passedDays) == -1 -> TOTAL FAIL
+            // if (daysLeft - neededPasses + passedDays) == 0 -> NEAR FAIL
+            // daysLeft = 7 - 3 - 3 = 1
+            // neededPasses == 4
+            // if (1 - 4 + 3) = 0   -> means Goal is in critical state (no more misses allowed)
+            //
+            if (goal.getTimesPerWeek() == 0)
+            {
+                // TODO skip this stuff!
+            }
+            else
+            {
+                int passedDays = GoalHelper.calculateNumberOfPasses(goal, mDisplayedWeek);
+                int failedDays = GoalHelper.calculateNumberOfFails(goal, mDisplayedWeek);
+                int daysLeft = 7 - failedDays - passedDays;
+                int criticalSum = daysLeft - goal.getTimesPerWeek() + passedDays;
+                if (criticalSum < 0)
+                {
+                    // TODO trigger a fail!
+                    int i = 0; // TODO just for breakpoint
+                }
+            }
+
+
+
+            // if totally failed, open an dialog with the option to confirm failure or to reset this button!!!
+
+            // If nearly failed == last day to complete the goal for this week, change the GUI to
+            //  critical for this item
+
+            // if not totally failed, update List
+            sGoalList.set(position, changedGoal);
+        }
+
 
 
     }
@@ -219,7 +360,6 @@ public class TrackFragment extends BaseFragment {
         super.onResume();
 
     }
-
 
 
     @Override
@@ -240,10 +380,12 @@ public class TrackFragment extends BaseFragment {
         super.onDetach();
         mFragmentInteractionListener = null;    // TODO check if outdated
     }
+
     @Override
     public void updateViewNotifyGoalInserted() {
         mAdapter.notifyItemInserted(sGoalList.size() - 1);
     }
+
     @Override
     public void updateViewNotifyGoalChanged(int position) {
         // sGoalList.size() - 1 -> Last position
