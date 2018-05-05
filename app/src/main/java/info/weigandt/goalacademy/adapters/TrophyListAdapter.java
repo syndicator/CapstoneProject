@@ -13,6 +13,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.enums.AwardEnum;
+import info.weigandt.goalacademy.enums.GoalStatusPseudoEnum;
 
 import static info.weigandt.goalacademy.activities.MainActivity.sTrophyList;
 
@@ -122,19 +123,19 @@ public class TrophyListAdapter extends RecyclerView.Adapter<TrophyListAdapter.Tr
          */
         void bind(int listIndex) {
             mTextViewGoalName.setText(sTrophyList.get(listIndex).getGoalName());
-            if (sTrophyList.get(listIndex).getAward() == AwardEnum.BRONZE)
+            if (sTrophyList.get(listIndex).getAward().equals(GoalStatusPseudoEnum.BRONZE_EARNED_STRING))
             {
                 mImageViewAward.setImageResource(R.drawable.ic_trophy_bronze);
             }
-            else if (sTrophyList.get(listIndex).getAward() == AwardEnum.SILVER)
+            else if (sTrophyList.get(listIndex).getAward().equals(GoalStatusPseudoEnum.SILVER_EARNED_STRING))
             {
                 mImageViewAward.setImageResource(R.drawable.ic_trophy_silver);
             }
-            else if (sTrophyList.get(listIndex).getAward() == AwardEnum.GOLD)
+            else if (sTrophyList.get(listIndex).getAward().equals(GoalStatusPseudoEnum.GOLD_EARNED_STRING))
             {
                 mImageViewAward.setImageResource(R.drawable.ic_trophy_gold);
             }
-            mTextViewCompletionDate.setText(String.valueOf(sTrophyList.get(listIndex).getCompletionDate().getYear()));
+            mTextViewCompletionDate.setText(String.valueOf(sTrophyList.get(listIndex).getCompletionDate()));
             // mImageButtonShare... TODO complete this
 
         }

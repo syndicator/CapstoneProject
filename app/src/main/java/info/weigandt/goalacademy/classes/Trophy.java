@@ -1,16 +1,13 @@
 package info.weigandt.goalacademy.classes;
 
-import org.threeten.bp.LocalDateTime;
-
-import info.weigandt.goalacademy.enums.AwardEnum;
-
 /**
- * This class is not a POJO and the data will be derived from the Goal class
+ * This class is a POJO and the data will be derived from the Goal class upon goal completion
  */
 public class Trophy {
     private String goalName;
-    private LocalDateTime completionDate;
-    private Enum<AwardEnum> award;
+    private String completionDate;
+    private String award;
+    private String pushId;
 
     public String getGoalName() {
         return goalName;
@@ -20,20 +17,27 @@ public class Trophy {
         this.goalName = goalName;
     }
 
-    public LocalDateTime getCompletionDate() {
+    public String getCompletionDate() {
         return completionDate;
     }
 
-    public void setCompletionDate(LocalDateTime completionDate) {
+    public void setCompletionDate(String completionDate) {
         this.completionDate = completionDate;
     }
 
-    public Enum<AwardEnum> getAward() {
+    public String getAward() {
         return award;
     }
 
-    public void setAward(Enum<AwardEnum> award) {
+    public void setAward(String award) {
         this.award = award;
     }
 
+    public String getPushId() {
+        return pushId;
+    }
+
+    public void setPushId(String pushId) {
+        this.pushId = pushId;
+    }
 }

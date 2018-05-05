@@ -15,6 +15,9 @@ import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.GoalListAdapter;
 import info.weigandt.goalacademy.adapters.TrophyListAdapter;
 
+import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
+import static info.weigandt.goalacademy.activities.MainActivity.sTrophyList;
+
 /**
  * A fragment
  * Activities that contain this fragment must implement the..
@@ -116,16 +119,8 @@ public class TrophiesFragment extends BaseFragment {
     }
     */
 
-
-    @Override
-    public void updateViewNotifyGoalChanged(int position) {
-        // TODO complete
-
-    }
-
-    @Override
-    public void updateViewNotifyGoalInserted() {
-        // no need for TrophiesFragment
+    public void updateViewNotifyTrophyInserted() {
+        mAdapter.notifyItemInserted(sTrophyList.size() - 1);
     }
 
     /* TODO remove if not needed

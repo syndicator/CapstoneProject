@@ -4,26 +4,29 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
 import info.weigandt.goalacademy.R; // TODO try to remove this later on
+import info.weigandt.goalacademy.classes.Goal;
 import info.weigandt.goalacademy.fragments.BaseFragment;
 import info.weigandt.goalacademy.fragments.GoalsFragment;
 import info.weigandt.goalacademy.fragments.TrackFragment;
 import info.weigandt.goalacademy.fragments.TrophiesFragment;
-import timber.log.Timber;
 
 public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
     private final Context mContext;
+    private TrackFragment mTrackFragment;
+    private GoalsFragment mGoalsFragment;
+    private TrophiesFragment mTrophiesFragment;
+    public ArrayList<BaseFragment> fragmentList;
 
     public FixedTabsFragmentPagerAdapter(FragmentManager fm, Context context) {
         super(fm);
         mContext = context;
         fragmentList = new ArrayList<>();
     }
-
-    public ArrayList<BaseFragment> fragmentList;
 
     @Override
     public int getCount() {
@@ -37,23 +40,45 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
         // was already created, then it will be retrieved from the FragmentManger
         // and not here (i.e. getItem() won't be called again).
         BaseFragment fragment;
-
         switch (position) {
             case 0:
                 fragment = TrackFragment.newInstance(null, null);
-                fragmentList.add(fragment);
                 return fragment;
             case 1:
                 fragment = GoalsFragment.newInstance(null, null);
-                fragmentList.add(fragment);
                 return fragment;
             case 2:
                 fragment = TrophiesFragment.newInstance(null, null);
-                fragmentList.add(fragment);
                 return fragment;
             default:
                 return null;
         }
+    }
+
+    // Here we can finally safely save a reference to the created
+    // Fragment, no matter where it came from (either getItem() or
+    // FragmentManger). Simply save the returned Fragment from
+    // super.instantiateItem() into an appropriate reference depending
+    // on the ViewPager position.   ->     #loveIt :)
+    @Override
+    public Object instantiateItem(ViewGroup container, int position) {
+        Fragment createdFragment = (Fragment) super.instantiateItem(container, position);
+        // save the appropriate reference depending on position
+        switch (position) {
+            case 0:
+                mTrackFragment = ((TrackFragment)createdFragment);
+                fragmentList.add(mTrackFragment);
+                break;
+            case 1:
+                mGoalsFragment = ((GoalsFragment)createdFragment);
+                fragmentList.add(mGoalsFragment);
+                break;
+            case 2:
+                mTrophiesFragment = ((TrophiesFragment)createdFragment);
+                fragmentList.add(mTrackFragment);
+                break;
+        }
+        return createdFragment;
     }
 
     @Override
@@ -68,18 +93,16 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
     }
 
     public void updateViewNotifyGoalInserted() {
-        for (BaseFragment fragment : fragmentList) {
-            // fragment.updateViewNotifyGoalChanged();
-            fragment.updateViewNotifyGoalInserted();
-            Timber.e("updating views from tabsFragmentPager. current fragment:");
-            Timber.e(fragment.toString());
-        }
+        mTrackFragment.updateViewNotifyGoalInserted();
+        mGoalsFragment.updateViewNotifyGoalInserted();
     }
 
-    public void updateViewNotifyGoalUpdated(int position) {
-        for (BaseFragment fragment : fragmentList) {
-            // fragment.updateViewNotifyGoalChanged();
-            fragment.updateViewNotifyGoalChanged(position);
-        }
+    public void updateViewsNotifyGoalUpdated(int position) {
+        mGoalsFragment.updateViewNotifyGoalChanged(position);
+        mTrackFragment.updateViewNotifyGoalChanged(position);
+    }
+
+    public void updateViewNotifyTrophyInserted() {
+        mTrophiesFragment.updateViewNotifyTrophyInserted();
     }
 }

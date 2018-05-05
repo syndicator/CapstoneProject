@@ -24,6 +24,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.GoalListAdapter;
+import info.weigandt.goalacademy.classes.FirebaseOperations;
 import info.weigandt.goalacademy.classes.Goal;
 
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
@@ -131,7 +132,6 @@ public class GoalsFragment extends BaseFragment {
         return view;
     }
 
-    @Override
     public void updateViewNotifyGoalChanged(int position) {
         // TODO complete
         mAdapter.notifyItemRangeChanged(position, sGoalList.size());
@@ -161,16 +161,12 @@ public class GoalsFragment extends BaseFragment {
             @Override
             public void onDialogPositiveClick(Goal goal) {
                 // goalList.add(goal); // TODO enter proper data processing here (update view also)
-                addGoalToDatabase(goal);
+                FirebaseOperations.addGoalToDatabase(goal);
             }
         });
         customDialogFragment.show(fm, "fragment_edit_name");
         //new CustomDialogFragment().show(getFragmentManager(), "CustomDialogFragment");
 
-    }
-
-    private void addGoalToDatabase(Goal goal) {
-        sGoalsDatabaseReference.push().setValue(goal);
     }
 
     private void initializeAdapter() {

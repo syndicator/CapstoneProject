@@ -181,14 +181,6 @@ public class CustomDialogFragment extends DialogFragment {
                     Goal goal = new Goal();
                     goal.setName(mEditTextGoalName.getText().toString());
 
-                    // TODO remove these debug lines
-                    Goal.WeeklyEventCounter counter = new Goal.WeeklyEventCounter();
-                    counter.setWeekPassCounter(5);
-                    counter.setYearWeekString("2014-42");
-                    List<Goal.WeeklyEventCounter> counterList = new ArrayList<>();
-                    counterList.add(counter);
-                    goal.setWeeklyEventCounterList(counterList);
-
                     if (mTimesAweek != 0)
                     {
                         goal.setTimesPerWeek(mTimesAweek);

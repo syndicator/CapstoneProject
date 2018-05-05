@@ -10,6 +10,10 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
+import info.weigandt.goalacademy.classes.Config;
+import info.weigandt.goalacademy.classes.Goal;
+import info.weigandt.goalacademy.classes.GoalHelper;
+import info.weigandt.goalacademy.enums.GoalStatusPseudoEnum;
 
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
 
@@ -57,33 +61,6 @@ public class GoalListAdapter extends RecyclerView.Adapter<GoalListAdapter.TrackV
      */
     @Override
     public void onBindViewHolder(TrackViewHolder holder, int position)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     {
         holder.bind(position);
     }
@@ -119,12 +96,33 @@ public class GoalListAdapter extends RecyclerView.Adapter<GoalListAdapter.TrackV
          * @param listIndex Position of the item in the list
          */
         void bind(int listIndex) {
-            mTextViewGoalName.setText(sGoalList.get(listIndex).getName());
-            String streak = String.valueOf(1);  // TODO implement method to get Streak number (from DB / calculate it)
-            // TODO just store a List / Array of integers to count the completed numbers. special care for 1st week!
-            String percentage = "70%";  // TODO implement method
-            String nextLevel = "Gold";  // TODO implement method
-            mTextViewStreak.setText(streak);
+            Goal goal = sGoalList.get(listIndex);
+            // Name
+            mTextViewGoalName.setText(goal.getName());
+
+            // Streak
+            int streakNumber = GoalHelper.calculateNumberOfTotalPasses(goal);
+            mTextViewStreak.setText(streakNumber);
+
+            // Percentage & Next stage
+            int eventsNeededToReachNextLevel = 1;
+            String nextLevel = GoalStatusPseudoEnum.BEGINNER_STRING;
+            if (streakNumber < Config.NUMBER_FOR_BRONZE)
+            {
+                 eventsNeededToReachNextLevel = Config.NUMBER_FOR_BRONZE;
+                 nextLevel = GoalStatusPseudoEnum.BRONZE_EARNED_STRING;
+            }
+            else if (streakNumber < Config.NUMBER_FOR_SILVER) {
+                 eventsNeededToReachNextLevel = Config.NUMBER_FOR_SILVER
+                        - Config.NUMBER_FOR_BRONZE;
+                nextLevel = GoalStatusPseudoEnum.SILVER_EARNED_STRING;
+            }
+            else if (streakNumber < Config.NUMBER_FOR_GOLD) {
+                 eventsNeededToReachNextLevel = Config.NUMBER_FOR_GOLD
+                        - Config.NUMBER_FOR_SILVER;
+                nextLevel = GoalStatusPseudoEnum.GOLD_EARNED_STRING;
+            }
+            int percentage = (streakNumber / eventsNeededToReachNextLevel)*100;
             mTextViewCompleted.setText(percentage);
             mTextViewNextLevel.setText(nextLevel);
         }
@@ -143,8 +141,5 @@ public class GoalListAdapter extends RecyclerView.Adapter<GoalListAdapter.TrackV
         */
     }
     // endregion Inner Class
-
-
-
 
 }

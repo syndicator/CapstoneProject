@@ -325,12 +325,20 @@ public class GoalHelper {
         return total;
     }
 
-    public static int calculateNumberOfPasses(Goal goal, LocalDate displayedWeek) {
+    public static int calculateNumberOfPassesGivenWeek(Goal goal, LocalDate displayedWeek) {
         int totalPasses = 0;
         for (Goal.WeeklyEventCounter weeklyEventCounter : goal.getWeeklyEventCounterList()) {
             if (weeklyEventCounter.getYearWeekString().equals(convertDateToYearWeekString(displayedWeek))) {
                 totalPasses += calculateNumberOfEvents(weeklyEventCounter.getWeekPassCounter());
             }
+        }
+        return totalPasses;
+    }
+
+    public static int calculateNumberOfTotalPasses(Goal goal) {
+        int totalPasses = 0;
+        for (Goal.WeeklyEventCounter weeklyEventCounter : goal.getWeeklyEventCounterList()) {
+            totalPasses += calculateNumberOfEvents(weeklyEventCounter.getWeekPassCounter());
         }
         return totalPasses;
     }
