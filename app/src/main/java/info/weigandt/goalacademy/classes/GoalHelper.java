@@ -15,7 +15,7 @@ import info.weigandt.goalacademy.enums.EventStateEnum;
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
 
 public class GoalHelper {
-    public static Goal ChangeEvent(Goal goal, EventStateEnum newState, int clickedWeekday, LocalDate currentlyDisplayedLocalDate)
+    public static Goal ChangeEventEntryInGoal(Goal goal, EventStateEnum newState, int clickedWeekday, LocalDate currentlyDisplayedLocalDate)
     {
         String currentlyDisplayedYearWeekString = convertDateToYearWeekString(currentlyDisplayedLocalDate);
 
@@ -336,11 +336,18 @@ public class GoalHelper {
     }
 
     public static int calculateNumberOfTotalPasses(Goal goal) {
-        int totalPasses = 0;
-        for (Goal.WeeklyEventCounter weeklyEventCounter : goal.getWeeklyEventCounterList()) {
-            totalPasses += calculateNumberOfEvents(weeklyEventCounter.getWeekPassCounter());
+        if (goal.getWeeklyEventCounterList() == null)
+        {
+            return 0;
         }
-        return totalPasses;
+        else
+        {
+            int totalPasses = 0;
+            for (Goal.WeeklyEventCounter weeklyEventCounter : goal.getWeeklyEventCounterList()) {
+                totalPasses += calculateNumberOfEvents(weeklyEventCounter.getWeekPassCounter());
+            }
+            return totalPasses;
+        }
     }
 
     public static int calculateNumberOfFails(Goal goal, LocalDate displayedWeek) {

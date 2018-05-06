@@ -273,5 +273,4 @@ public class CustomDialogFragment extends DialogFragment {
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
                 */
     }
-
 }

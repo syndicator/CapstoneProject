@@ -21,6 +21,7 @@ import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.TrackListAdapter;
 import info.weigandt.goalacademy.classes.Config;
+import info.weigandt.goalacademy.classes.FirebaseOperations;
 import info.weigandt.goalacademy.enums.EventStateEnum;
 import info.weigandt.goalacademy.classes.Goal;
 import info.weigandt.goalacademy.classes.GoalHelper;
@@ -63,6 +64,9 @@ public class TrackFragment extends BaseFragment {
     @BindView(R.id.button_week_decrease)
     ImageButton mDecreaseWeekButton;
 
+    /*@BindView(R.id.DELETE_BUTTON)
+    Button mDeleteButton;
+*/
     //private TrackListAdapter mAdapter;
     private RecyclerView.Adapter mAdapter;  // TODO is this sup  class enough?
     private RecyclerView.LayoutManager mLayoutManager;
@@ -111,9 +115,16 @@ public class TrackFragment extends BaseFragment {
         // TODO debug!!!!!
         setDisplayedWeek(LocalDate.now());
         sYearWeekString = "2018-18";    // TODO used by whom?....
-
         // TODO end debug!!!!!
         initializeAdapter();
+        /*
+        mDeleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseOperations.deleteTest();
+            }
+        });
+        */
 
         // Set button_week_current to current week
         LocalDate nowLocalDate = LocalDate.now();
@@ -144,8 +155,10 @@ public class TrackFragment extends BaseFragment {
                 updateRecyclerView();
             }
         });
-
         return view;
+    }
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        // updateRecyclerView();
     }
 
     private void updateRecyclerView() {
@@ -175,8 +188,6 @@ public class TrackFragment extends BaseFragment {
             @Override
             public void button_0_OnClick(View v, int position, EventStateEnum state) {
                 processButtonClick(position, state, 0);
-                // TODO process the change here.
-                // TODO View v is WHAT here??? the button, or the surrounding item element????
             }
 
             @Override
@@ -225,30 +236,25 @@ public class TrackFragment extends BaseFragment {
         // DANGER: the state committed is the previous state BEFORE clicking.
         switch (state) {
             case PASS:
-                changedGoal = GoalHelper.ChangeEvent(goal, EventStateEnum.FAIL, weekday, mDisplayedWeek);
+                changedGoal = GoalHelper.ChangeEventEntryInGoal(goal, EventStateEnum.FAIL, weekday, mDisplayedWeek);
                 // this day was a fail! check if goal is failed also now
                 calculateStatusOfGoal(changedGoal, EventStateEnum.FAIL, position);
                 break;
             case FAIL:
-                changedGoal = GoalHelper.ChangeEvent(goal, EventStateEnum.NEUTRAL, weekday, mDisplayedWeek);
+                changedGoal = GoalHelper.ChangeEventEntryInGoal(goal, EventStateEnum.NEUTRAL, weekday, mDisplayedWeek);
                 calculateStatusOfGoal(changedGoal, EventStateEnum.NEUTRAL, position);
                 break;
             case NEUTRAL:
-                changedGoal = GoalHelper.ChangeEvent(goal, EventStateEnum.PASS, weekday, mDisplayedWeek);
+                changedGoal = GoalHelper.ChangeEventEntryInGoal(goal, EventStateEnum.PASS, weekday, mDisplayedWeek);
                 // this day was a pass! check if goal is progressing now
                 calculateStatusOfGoal(changedGoal, EventStateEnum.PASS, position);
                 break;
         }
-
-        // TODO #0: Update FB!
-        // TODO also add a ChildEventListener to listen to changes (in the list?)
-        // TODO -> only one Goal has to be updated in FB!
-        mFragmentInteractionListener.onGoalChangedByFragment(goal, position);
+        // mFragmentInteractionListener.onGoalChangedByFragment(goal, position);
 
         // TODO #1: Update the GUI!
         // TODO this might be needed to inform the other fragments of changes (e.g. new trophy, removed goal etc.)
         //mFragmentInteractionListener.onDataChangedByFragment();
-
 
         // GUI update is needed, because after returning to this week,
         //   old data might reside in the adapter which differs from sGoalList.... hmmm, really?
@@ -269,22 +275,22 @@ public class TrackFragment extends BaseFragment {
                 //  but may be useful in a future version
                 goal.setStatus(GoalStatusPseudoEnum.GOLD_EARNED);
                 // Invoke parent activity to handle the goal completion. We send the final award also.
-                mFragmentInteractionListener.onGoalCompleted(goal, position, GoalStatusPseudoEnum.GOLD_EARNED_STRING);
+                mFragmentInteractionListener.onGoalCompleted(goal, GoalStatusPseudoEnum.GOLD_EARNED_STRING);
 
             } else if (totalPasses == Config.NUMBER_FOR_SILVER) {
                 goal.setStatus(GoalStatusPseudoEnum.SILVER_EARNED);
                 // TODO inform the GoalsFragment about the changed status of this goal (on more streak, new award status!)
-                mFragmentInteractionListener.onGoalProgressChanged(goal, position);  // TODO maybe goal ist not needed??
+                mFragmentInteractionListener.onGoalChangedByFragment(goal);  // TODO maybe goal is not needed??
 
             } else if (totalPasses == Config.NUMBER_FOR_BRONZE) {
                 goal.setStatus(GoalStatusPseudoEnum.BRONZE_EARNED);
                 // TODO inform the GoalsFragment about the changed status of this goal (on more streak, new award status!)
-                mFragmentInteractionListener.onGoalProgressChanged(goal, position);  // TODO maybe goal ist not needed??
+                mFragmentInteractionListener.onGoalChangedByFragment(goal);  // TODO maybe goal is not needed??
             }
             else
             {
-                // this a "normal" pass with an increase in streak only
-                mFragmentInteractionListener.onGoalProgressChanged(goal, position);  // TODO maybe goal ist not needed??
+                // This a "normal" pass with an increase in streak only
+                mFragmentInteractionListener.onGoalChangedByFragment(goal);  // TODO maybe goal ist not needed??
             }
         }
         //////// endregion PASSED  //////////////////////
@@ -292,23 +298,14 @@ public class TrackFragment extends BaseFragment {
         //////// region FAILED /////////////////////////
         else if (eventState.equals(EventStateEnum.FAIL)) {
             // checking for near / total failure now
-
-            // determine number of possible passes this week
-            // 7     =   daysLeft + failed days + passed days
-            // daysLeft = 7 - failedDays - passedDays
-            // if (daysLeft - neededPasses + passedDays) == -1 -> TOTAL FAIL
-            // if (daysLeft - neededPasses + passedDays) == 0 -> NEAR FAIL
-            // daysLeft = 7 - 3 - 3 = 1
-            // neededPasses == 4
-            // if (1 - 4 + 3) = 0   -> means Goal is in critical state (no more misses allowed)
-            //
-            if (goal.getTimesPerWeek() == 0) {
-                // TODO skip this stuff, goal has fixed days without flexibility to calculate.
-            } else {
+            // skip this block otherwise, if fixed days are set
+            if (goal.getTimesPerWeek() != 0) {
                 int passedDays = GoalHelper.calculateNumberOfPassesGivenWeek(goal, mDisplayedWeek);
                 int failedDays = GoalHelper.calculateNumberOfFails(goal, mDisplayedWeek);
                 int daysLeft = 7 - failedDays - passedDays;
                 int criticalSum = daysLeft - goal.getTimesPerWeek() + passedDays;
+
+                // HANDLING THE CRITICAL STATES HERE
                 if (criticalSum < 0) {
                     // TODO trigger a fail! dialog or so
                     // if totally failed, open an dialog with the option to confirm failure or to reset this button!!!
@@ -318,15 +315,24 @@ public class TrackFragment extends BaseFragment {
                     //  critical for this item
                     // TODO complete this
                 }
+                // TODO ignoring critical things for now, DEBUG
+                // TODO later, a onGoalFailed method will be needed to show fail dialog and remove the goal also,
+                // TODO and maybe create a new trophy of bronze or silver
+                mFragmentInteractionListener.onGoalChangedByFragment(goal);
+                // END HANDLING THE CRITICAL STATES HERE
+            }
+            else
+            {
+                // TODO will be a total fail in every case!!! But ask first if this setting is intentionally
+                mFragmentInteractionListener.onGoalFailed(goal);
             }
             // if not totally failed, update List
-            sGoalList.set(position, goal);  // TODO swap to correct position later on
         }
         //////// endregion FAILED ////////////////////////
 
         //////// region NEUTRAL ////////////////////////
         else {
-            sGoalList.set(position, goal);  // TODO swap to correct position later on
+            mFragmentInteractionListener.onGoalChangedByFragment(goal);
         }
         //////// endregion NEUTRAL ////////////////////////
     }
@@ -334,9 +340,7 @@ public class TrackFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-
     }
-
 
     @Override
     public void onAttach(Context context) {
@@ -353,7 +357,7 @@ public class TrackFragment extends BaseFragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mFragmentInteractionListener = null;    // TODO check if outdated
+        mFragmentInteractionListener = null;
     }
 
     public void updateViewNotifyGoalInserted() {
@@ -361,10 +365,10 @@ public class TrackFragment extends BaseFragment {
     }
 
     public void updateViewNotifyGoalChanged(int position) {
-        // sGoalList.size() - 1 -> Last position
         mAdapter.notifyItemChanged(position);   // TODO change method to keep an animation? see stackoverflow...
-        // TODO the view does not care for the status of the list yet.
-        // TODO  so each reload will show the standard buttons again.
-        // TODO change this now :D
+    }
+
+    public void updateViewNotifyGoalRemoved() {
+        mAdapter.notifyDataSetChanged();
     }
 }

@@ -55,8 +55,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
 
         // Initialize Butterknife
         ButterKnife.bind(this);
-        fillGoalListWithDummyData(); // TODO remove this debug line
-        fillTrophyListWithDummyData();
+        initializeLists();
         // Initialize Timber
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
@@ -83,44 +82,48 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
         initializeFirebase();
     }
 
-    public void updateViewsNotifyGoalInserted() {
-        mFixedTabsFragmentPagerAdapter.updateViewNotifyGoalInserted();
-    }
-
-    private void fillTrophyListWithDummyData() {
-        sTrophyList = new ArrayList<>();
-        /*
-        Trophy trophy = new Trophy();
-        trophy.setGoalName("Go running every day!");
-        trophy.setCompletionDate(LocalDateTime.now());
-        sTrophyList.add(trophy);
-        Trophy trophy2 = new Trophy();
-        trophy.setGoalName("Drink water daily!");
-        trophy2.setCompletionDate(LocalDateTime.of(1950, 12, 24, 10, 30));
-        sTrophyList.add(trophy2);
-        */
-    }
-
-    private void fillGoalListWithDummyData() {
+    private void initializeLists() {
         sGoalList = new ArrayList<>();
+        sTrophyList = new ArrayList<>();
     }
 
-    @Override
-    public void onDataChangedByFragment() {
-        mFixedTabsFragmentPagerAdapter.updateViewNotifyGoalInserted();
+    //// region updateViews ////
+
+    public void updateViewsNotifyGoalInserted() {
+        mFixedTabsFragmentPagerAdapter.updateViewsNotifyGoalInserted();
     }
 
+    private void updateViewsNotifyGoalRemoved(int position) {
+        mFixedTabsFragmentPagerAdapter.updateViewsNotifyGoalRemoved(position);
+    }
+
+    private void updateViewNotifyTrophyInserted() {
+        mFixedTabsFragmentPagerAdapter.updateViewNotifyTrophyInserted();
+    }
+
+    public void updateViewsNotifyGoalChanged(int foundAtPosition) {
+        mFixedTabsFragmentPagerAdapter.updateViewsNotifyGoalUpdated(foundAtPosition);
+    }
+    //// end region updateViews ////
+
     @Override
-    public void onGoalChangedByFragment(Goal goal, int position) {
+    public void onGoalChangedByFragment(Goal goal) {
         FirebaseOperations.UpdateGoal(goal);
-        // TODO this should only be called if a goal gets removed (completed, failed).
-        // TODO  otherwise the buttons act weird (change due to button behaviour and due to view update)
-        // mFixedTabsFragmentPagerAdapter.updateViewNotifyGoalUpdated(position);
     }
 
     @Override
-    public void onGoalCompleted(Goal goal, int position, String award) {
+    public void onGoalFailed(Goal goal) {
+        FirebaseOperations.removeGoalFromDatabase(goal);
+    }
+
+    @Override
+    public void onGoalCompleted(Goal goal, String award) {
         // Create Trophy first, then delete goal
+        createTrophyFromCompletedGoal(goal, award);
+        FirebaseOperations.removeGoalFromDatabase(goal);
+    }
+
+    private void createTrophyFromCompletedGoal(Goal goal, String award) {
         Trophy trophy = new Trophy();
         LocalDate date = LocalDate.now();
         // see https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html
@@ -128,12 +131,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
         trophy.setCompletionDate(isoDateString);
         trophy.setGoalName(goal.getName());
         trophy.setAward(award);
-    }
-
-    // TODO change method name
-    @Override
-    public void onGoalProgressChanged(Goal goal, int position) {
-        mFixedTabsFragmentPagerAdapter.updateViewsNotifyGoalUpdated(position);
+        FirebaseOperations.addTrophyToDatabase(trophy);
     }
 
     private void initializeFirebase() {
@@ -143,14 +141,13 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
         sTrophiesDatabaseReference = sFirebaseDatabase.getReference().child("trophies");   // TODO save under node of userID or so
         mGoalsEventListener = new ChildEventListener() {
 
-            // "New Goal"
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
                 Goal goal = dataSnapshot.getValue(Goal.class);
-                if (goal.getPushId() == null) {
-                    goal.setPushId(dataSnapshot.getKey());
-                }
+                sGoalList.add(goal);
+                updateViewsNotifyGoalInserted();  // TODO check if fragment list not null in subclass tab....
+                // TODO replace with proper method (inserted instead of former general update)
+
                 // change the sGoalList now and then call:
                 // mAdapter.notifyItemInserted(mItems.size() - 1);
                 //  issues.remove(position);
@@ -158,20 +155,35 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
                 //                    //this line below gives you the animation and also updates the
                 //                    //list items after the deleted item
                 //                    notifyItemRangeChanged(position, getItemCount());
-                sGoalList.add(goal);
-                updateViewsNotifyGoalInserted();  // TODO check if fragment list not null in subclass tab....
-                // TODO replace with proper method (inserted instead of former general update)
             }
 
-            // Change Goal?
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+                Goal changedGoal = dataSnapshot.getValue(Goal.class);
+                int foundAtPosition = 0;
+                for (int i = 0; i < sGoalList.size(); i++) {
+                    if (sGoalList.get(i).getPushId().equals(changedGoal.getPushId())) {
+                        foundAtPosition = i;
+                        break;
+                    }
+                }
+                sGoalList.set(foundAtPosition, changedGoal);
+                // updateViewsNotifyGoalChanged(foundAtPosition);
+                updateGoalsFragmentNotifyGoalChanged(foundAtPosition);
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                Goal removedGoal = dataSnapshot.getValue(Goal.class);
+                int foundAtPosition = 0;
+                for (int i = 0; i < sGoalList.size(); i++) {
+                    if (sGoalList.get(i).getPushId().equals(removedGoal.getPushId())) {
+                        foundAtPosition = i;
+                        break;
+                    }
+                }
+                sGoalList.remove(foundAtPosition);
+                updateViewsNotifyGoalRemoved(foundAtPosition);
             }
 
             @Override
@@ -181,7 +193,8 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Timber.e(databaseError.getMessage());
+                Timber.e(databaseError.getDetails());
             }
         };
         sGoalsDatabaseReference.addChildEventListener(mGoalsEventListener);
@@ -207,6 +220,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
                 sTrophyList.add(trophy);
                 updateViewNotifyTrophyInserted();
             }
+
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
@@ -224,14 +238,15 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Timber.e(databaseError.getMessage());
+                Timber.e(databaseError.getDetails());
             }
 
         };
         sTrophiesDatabaseReference.addChildEventListener(mTrophiesEventListener);
     }
 
-    private void updateViewNotifyTrophyInserted() {
-        mFixedTabsFragmentPagerAdapter.updateViewNotifyTrophyInserted();
+    private void updateGoalsFragmentNotifyGoalChanged(int foundAtPosition) {
+        mFixedTabsFragmentPagerAdapter.updateGoalsFragmentNofifyGoalChanged(foundAtPosition);
     }
 }

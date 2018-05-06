@@ -102,11 +102,12 @@ public class GoalListAdapter extends RecyclerView.Adapter<GoalListAdapter.TrackV
 
             // Streak
             int streakNumber = GoalHelper.calculateNumberOfTotalPasses(goal);
-            mTextViewStreak.setText(streakNumber);
+            mTextViewStreak.setText(String.valueOf(streakNumber));
 
             // Percentage & Next stage
             int eventsNeededToReachNextLevel = 1;
-            String nextLevel = GoalStatusPseudoEnum.BEGINNER_STRING;
+            int subtractSmaller = 0;
+            String nextLevel = "";
             if (streakNumber < Config.NUMBER_FOR_BRONZE)
             {
                  eventsNeededToReachNextLevel = Config.NUMBER_FOR_BRONZE;
@@ -116,30 +117,18 @@ public class GoalListAdapter extends RecyclerView.Adapter<GoalListAdapter.TrackV
                  eventsNeededToReachNextLevel = Config.NUMBER_FOR_SILVER
                         - Config.NUMBER_FOR_BRONZE;
                 nextLevel = GoalStatusPseudoEnum.SILVER_EARNED_STRING;
+                subtractSmaller = Config.NUMBER_FOR_BRONZE;
             }
             else if (streakNumber < Config.NUMBER_FOR_GOLD) {
                  eventsNeededToReachNextLevel = Config.NUMBER_FOR_GOLD
                         - Config.NUMBER_FOR_SILVER;
                 nextLevel = GoalStatusPseudoEnum.GOLD_EARNED_STRING;
+                subtractSmaller = Config.NUMBER_FOR_SILVER;
             }
-            int percentage = (streakNumber / eventsNeededToReachNextLevel)*100;
-            mTextViewCompleted.setText(percentage);
+            int percentage = ((streakNumber-subtractSmaller)*100) / eventsNeededToReachNextLevel;
+            mTextViewCompleted.setText(String.valueOf(percentage));
             mTextViewNextLevel.setText(nextLevel);
         }
-
-        /*  TODO not needed anymore!? after change from codeproject
-        /**
-         * Called when a user clicks on an item in the list
-         *
-         * @param v The View that was clicked
-
-        @Override
-        public void onClick(View v) {
-            int clickedPosition = getAdapterPosition();
-            // mOnClickListener.onListItemClick(clickedPosition);   // TODO fix
-        }
-        */
     }
     // endregion Inner Class
-
 }

@@ -38,4 +38,12 @@
         android:scrollbars="vertical"
         android:id="@+id/rv_track"
         android:background="#444444" />
+    <!--
+    <Button
+        android:id="@+id/DELETE_BUTTON"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:text="DELETE"
+        ></Button>
+        -->
 </LinearLayout>

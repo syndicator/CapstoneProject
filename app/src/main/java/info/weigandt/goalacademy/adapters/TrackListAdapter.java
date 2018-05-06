@@ -121,7 +121,6 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-
             mThreeStatesButton0.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

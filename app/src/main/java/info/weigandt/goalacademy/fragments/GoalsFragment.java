@@ -13,12 +13,6 @@ import android.view.ViewGroup;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,7 +22,6 @@ import info.weigandt.goalacademy.classes.FirebaseOperations;
 import info.weigandt.goalacademy.classes.Goal;
 
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
-import static info.weigandt.goalacademy.activities.MainActivity.sGoalsDatabaseReference;
 
 /**
  * A fragment
@@ -132,11 +125,6 @@ public class GoalsFragment extends BaseFragment {
         return view;
     }
 
-    public void updateViewNotifyGoalChanged(int position) {
-        // TODO complete
-        mAdapter.notifyItemRangeChanged(position, sGoalList.size());
-    }
-
     public void updateViewNotifyGoalInserted() {
         mAdapter.notifyItemInserted(sGoalList.size() - 1);
         //  issues.remove(position);
@@ -144,6 +132,14 @@ public class GoalsFragment extends BaseFragment {
         //                    //this line below gives you the animation and also updates the
         //                    //list items after the deleted item
         //                    notifyItemRangeChanged(position, getItemCount());
+    }
+
+    public void updateViewNotifyGoalRemoved() {
+        mAdapter.notifyDataSetChanged();
+    }
+
+    public void updateViewNotifyGoalChanged(int position) {
+        mAdapter.notifyItemRangeChanged(position, sGoalList.size());
     }
 
     private void initializeAdMob()

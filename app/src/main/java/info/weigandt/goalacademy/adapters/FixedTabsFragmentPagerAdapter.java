@@ -75,7 +75,7 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
                 break;
             case 2:
                 mTrophiesFragment = ((TrophiesFragment)createdFragment);
-                fragmentList.add(mTrackFragment);
+                fragmentList.add(mTrophiesFragment);
                 break;
         }
         return createdFragment;
@@ -92,9 +92,16 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
         }
     }
 
-    public void updateViewNotifyGoalInserted() {
+    public void updateViewsNotifyGoalInserted() {
         mTrackFragment.updateViewNotifyGoalInserted();
         mGoalsFragment.updateViewNotifyGoalInserted();
+    }
+
+    public void updateViewsNotifyGoalRemoved(int position) {
+        // TODO maybe not needed if listener is set??? hmmmmm
+        mTrackFragment.updateViewNotifyGoalRemoved();
+        mGoalsFragment.updateViewNotifyGoalRemoved();
+
     }
 
     public void updateViewsNotifyGoalUpdated(int position) {
@@ -103,6 +110,13 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
     }
 
     public void updateViewNotifyTrophyInserted() {
-        mTrophiesFragment.updateViewNotifyTrophyInserted();
+        if (mTrophiesFragment != null)
+        {
+            mTrophiesFragment.updateViewNotifyTrophyInserted();
+        }
+    }
+
+    public void updateGoalsFragmentNofifyGoalChanged(int position) {
+        mGoalsFragment.updateViewNotifyGoalChanged(position);
     }
 }
