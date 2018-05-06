@@ -1,7 +1,5 @@
 package info.weigandt.goalacademy.classes;
 
-import android.util.EventLog;
-
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.temporal.TemporalField;
 import org.threeten.bp.temporal.WeekFields;
@@ -11,8 +9,7 @@ import java.util.List;
 import java.util.Locale;
 
 import info.weigandt.goalacademy.enums.EventStateEnum;
-
-import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
+import info.weigandt.goalacademy.enums.GoalStatusPseudoEnum;
 
 public class GoalHelper {
     public static Goal ChangeEventEntryInGoal(Goal goal, EventStateEnum newState, int clickedWeekday, LocalDate currentlyDisplayedLocalDate)
@@ -336,18 +333,24 @@ public class GoalHelper {
     }
 
     public static int calculateNumberOfTotalPasses(Goal goal) {
-        if (goal.getWeeklyEventCounterList() == null)
+        int totalPasses = 0;
+        if (goal.getWeeklyEventCounterList() != null)
         {
-            return 0;
-        }
-        else
-        {
-            int totalPasses = 0;
-            for (Goal.WeeklyEventCounter weeklyEventCounter : goal.getWeeklyEventCounterList()) {
-                totalPasses += calculateNumberOfEvents(weeklyEventCounter.getWeekPassCounter());
+            if (goal.getWeeklyEventCounterList() == null)
+            {
+                for (Goal.WeeklyEventCounter weeklyEventCounter : goal.getWeeklyEventCounterList()) {
+                    totalPasses += calculateNumberOfEvents(weeklyEventCounter.getWeekPassCounter());
+                }
             }
-            return totalPasses;
+            else
+            {
+
+                for (Goal.WeeklyEventCounter weeklyEventCounter : goal.getWeeklyEventCounterList()) {
+                    totalPasses += calculateNumberOfEvents(weeklyEventCounter.getWeekPassCounter());
+                }
+            }
         }
+        return totalPasses;
     }
 
     public static int calculateNumberOfFails(Goal goal, LocalDate displayedWeek) {
@@ -358,5 +361,20 @@ public class GoalHelper {
             }
         }
         return totalFails;
+    }
+
+    public static int calculateAward (Goal goal) {
+        int totalPasses = GoalHelper.calculateNumberOfTotalPasses(goal);
+        if (totalPasses == Config.NUMBER_FOR_GOLD) {
+            return GoalStatusPseudoEnum.GOLD_EARNED;
+        } else if (totalPasses == Config.NUMBER_FOR_SILVER) {
+            return GoalStatusPseudoEnum.SILVER_EARNED;
+        } else if (totalPasses == Config.NUMBER_FOR_BRONZE) {
+            return GoalStatusPseudoEnum.BRONZE_EARNED;
+        }
+        else
+        {
+            return 0;
+        }
     }
 }

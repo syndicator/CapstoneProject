@@ -2,6 +2,7 @@ package info.weigandt.goalacademy.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,12 +21,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.TrackListAdapter;
-import info.weigandt.goalacademy.classes.Config;
-import info.weigandt.goalacademy.classes.FirebaseOperations;
-import info.weigandt.goalacademy.enums.EventStateEnum;
+import info.weigandt.goalacademy.classes.AlertDialogFactory;
 import info.weigandt.goalacademy.classes.Goal;
 import info.weigandt.goalacademy.classes.GoalHelper;
 import info.weigandt.goalacademy.classes.WrapLinearLayoutManager;
+import info.weigandt.goalacademy.enums.EventStateEnum;
 import info.weigandt.goalacademy.enums.GoalStatusPseudoEnum;
 
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
@@ -266,23 +266,20 @@ public class TrackFragment extends BaseFragment {
     private void calculateStatusOfGoal(Goal goal, EventStateEnum eventState, int position) {
         //////// region PASSED  ////////////////////////
         if (eventState.equals(EventStateEnum.PASS)) {
-            int totalPasses = 0;
-            for (Goal.WeeklyEventCounter weeklyEventCounter : goal.getWeeklyEventCounterList()) {
-                totalPasses += GoalHelper.calculateNumberOfEvents(weeklyEventCounter.getWeekPassCounter());
-            }
-            if (totalPasses == Config.NUMBER_FOR_GOLD) {
+            int award = GoalHelper.calculateAward(goal);
+            if (award == GoalStatusPseudoEnum.GOLD_EARNED) {
                 // Following line is not needed, because we delete the goal 'n turn it into a trophy,
                 //  but may be useful in a future version
                 goal.setStatus(GoalStatusPseudoEnum.GOLD_EARNED);
                 // Invoke parent activity to handle the goal completion. We send the final award also.
                 mFragmentInteractionListener.onGoalCompleted(goal, GoalStatusPseudoEnum.GOLD_EARNED_STRING);
 
-            } else if (totalPasses == Config.NUMBER_FOR_SILVER) {
+            } else if (award == GoalStatusPseudoEnum.SILVER_EARNED) {
                 goal.setStatus(GoalStatusPseudoEnum.SILVER_EARNED);
                 // TODO inform the GoalsFragment about the changed status of this goal (on more streak, new award status!)
                 mFragmentInteractionListener.onGoalChangedByFragment(goal);  // TODO maybe goal is not needed??
 
-            } else if (totalPasses == Config.NUMBER_FOR_BRONZE) {
+            } else if (award == GoalStatusPseudoEnum.BRONZE_EARNED) {
                 goal.setStatus(GoalStatusPseudoEnum.BRONZE_EARNED);
                 // TODO inform the GoalsFragment about the changed status of this goal (on more streak, new award status!)
                 mFragmentInteractionListener.onGoalChangedByFragment(goal);  // TODO maybe goal is not needed??
@@ -305,10 +302,13 @@ public class TrackFragment extends BaseFragment {
                 int daysLeft = 7 - failedDays - passedDays;
                 int criticalSum = daysLeft - goal.getTimesPerWeek() + passedDays;
 
-                // HANDLING THE CRITICAL STATES HERE
+                // HANDLING THE CRITICAL STATES
                 if (criticalSum < 0) {
                     // TODO trigger a fail! dialog or so
                     // if totally failed, open an dialog with the option to confirm failure or to reset this button!!!
+
+
+
                     int i = 0; // TODO just for breakpoint
                 } else if (criticalSum == 1) {
                     // If nearly failed == last day to complete the goal for this week, change the GUI to
@@ -318,13 +318,39 @@ public class TrackFragment extends BaseFragment {
                 // TODO ignoring critical things for now, DEBUG
                 // TODO later, a onGoalFailed method will be needed to show fail dialog and remove the goal also,
                 // TODO and maybe create a new trophy of bronze or silver
+
+
+
                 mFragmentInteractionListener.onGoalChangedByFragment(goal);
-                // END HANDLING THE CRITICAL STATES HERE
+                // END HANDLING THE CRITICAL STATES
             }
             else
             {
                 // TODO will be a total fail in every case!!! But ask first if this setting is intentionally
+                String awardName ="";
+                int award = GoalHelper.calculateAward(goal);
+                if (award == GoalStatusPseudoEnum.GOLD_EARNED) {
+                    goal.setStatus(GoalStatusPseudoEnum.GOLD_EARNED);
+                    awardName = GoalStatusPseudoEnum.GOLD_EARNED_STRING;
+
+                } else if (award == GoalStatusPseudoEnum.SILVER_EARNED) {
+                    goal.setStatus(GoalStatusPseudoEnum.SILVER_EARNED);
+                    awardName = GoalStatusPseudoEnum.SILVER_EARNED_STRING;
+
+                } else if (award == GoalStatusPseudoEnum.BRONZE_EARNED) {
+                    goal.setStatus(GoalStatusPseudoEnum.BRONZE_EARNED);
+                    awardName = GoalStatusPseudoEnum.BRONZE_EARNED_STRING;
+                }
+                else
+                {
+                    awardName = GoalStatusPseudoEnum.BEGINNER_STRING;
+                }
+
                 mFragmentInteractionListener.onGoalFailed(goal);
+
+                AlertDialog alertDialog = AlertDialogFactory.createFailDialog(awardName, getActivity());
+                alertDialog.show();
+
             }
             // if not totally failed, update List
         }

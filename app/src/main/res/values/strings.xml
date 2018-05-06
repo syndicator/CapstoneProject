@@ -38,5 +38,8 @@
     <string name="add_widget">Add widget</string>
     <string name="title_collection_widget">Goal Academy</string>
     <string name="sample_admob_app_ID_for_activity">ca-app-pub-3940256099942544~3347511713</string>
+    <string name="default_message">Something happened.</string>
+    <string name="fail_message">Alas! You failed to progress any further. Your achieved level is:</string>
+    <string name="fail_title">Fail.</string>
 
 </resources>
