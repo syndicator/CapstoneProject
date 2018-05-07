@@ -1,11 +1,19 @@
 package info.weigandt.goalacademy.activities;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.Toast;
 
-
+import com.firebase.ui.auth.AuthUI;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -17,6 +25,7 @@ import org.threeten.bp.LocalDate;
 import org.threeten.bp.format.DateTimeFormatter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,10 +35,14 @@ import info.weigandt.goalacademy.adapters.FixedTabsFragmentPagerAdapter;
 import info.weigandt.goalacademy.classes.FirebaseOperations;
 import info.weigandt.goalacademy.classes.Goal;
 import info.weigandt.goalacademy.classes.Trophy;
+import info.weigandt.goalacademy.data.PostRetrofitQuoteCallListener;
+import info.weigandt.goalacademy.data.QuoteResult;
+import info.weigandt.goalacademy.data.QuotesController;
 import info.weigandt.goalacademy.fragments.BaseFragment;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity implements BaseFragment.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements BaseFragment.OnFragmentInteractionListener, PostRetrofitQuoteCallListener {
+    private static final int RC_SIGN_IN = 0;
     public FixedTabsFragmentPagerAdapter mFixedTabsFragmentPagerAdapter;
     public static ArrayList<Goal> sGoalList;
     public static ArrayList<Trophy> sTrophyList;
@@ -37,6 +50,12 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
     public static DatabaseReference sGoalsDatabaseReference; // TODO: Adjust to correct node. -> include users
     public static DatabaseReference sTrophiesDatabaseReference;
     public static FirebaseDatabase sFirebaseDatabase;
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseAuth.AuthStateListener mAuthStateListener;
+    // API related
+    private QuotesController mQuotesController;
+    private boolean mIsRestoredFromState = false;
+
 
     @BindView(R.id.viewpager)
     ViewPager mViewPager;
@@ -45,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
 
     private ChildEventListener mGoalsEventListener;
     private ChildEventListener mTrophiesEventListener;
+    private String mUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +99,102 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
         //tab0 = (Fragment0) adapter.instantiateItem(viewPager, 0);
         //tab1 = (Fragment1) adapter.instantiateItem(viewPager, 1);
         //adapter.finishUpdate(viewPager);
-        initializeFirebase();
+
+        // Initialize Firebase components
+
+        initializeFirebaseAuth();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(resultCode, resultCode, data);
+        if (requestCode == RC_SIGN_IN)
+        {
+            if (resultCode == RESULT_OK) {
+                Toast.makeText(this, "Signed in.", Toast.LENGTH_SHORT).show();
+            }
+            else if (resultCode == RESULT_CANCELED)
+            {
+                Toast.makeText(this, "Sign in canceled.", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }
+    }
+
+    private void initializeFirebaseAuth() {
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // user is signed in
+                    mUserId = user.getUid();
+                    onSignedInInitialize();
+                    Toast.makeText(MainActivity.this, "You are now signed in to Goal Academy.", Toast.LENGTH_SHORT).show();
+                } else {
+                    // user is signed out
+                    onSignedOutCleanup();
+                    startActivityForResult(
+                            AuthUI.getInstance()
+                                    .createSignInIntentBuilder()
+                                    .setAvailableProviders(Arrays.asList(
+                                            new AuthUI.IdpConfig.EmailBuilder().build(),
+                                            new AuthUI.IdpConfig.GoogleBuilder().build()))
+                                    .build(),
+                            RC_SIGN_IN);
+                }
+            }
+        };
+    }
+
+    private void onSignedInInitialize() {
+        initializeFirebaseDb();
+        attachFirebaseDbListener();
+    }
+
+    private void onSignedOutCleanup() {
+        clearAdapters();
+        detachFirebaseDbListener();
+    }
+
+    private void detachFirebaseDbListener() {
+        if (mGoalsEventListener != null) {
+            sGoalsDatabaseReference.removeEventListener(mGoalsEventListener);
+            mGoalsEventListener = null;
+        }
+        if (mTrophiesEventListener != null) {
+            sTrophiesDatabaseReference.removeEventListener(mTrophiesEventListener);
+            mTrophiesEventListener = null;
+        }
+    }
+
+    private void clearAdapters() {
+        final int sizeGoalList = sGoalList.size();
+        sGoalList.clear();
+        final int sizeTrophyList = sTrophyList.size();
+        sTrophyList.clear();
+        mFixedTabsFragmentPagerAdapter.clearAdapters(sizeGoalList, sizeTrophyList);
+    }
+
+    private void initializeFirebaseDb() {
+        sFirebaseDatabase = FirebaseDatabase.getInstance();
+        sGoalsDatabaseReference = sFirebaseDatabase.getReference().child("goals").child(mUserId);
+        sTrophiesDatabaseReference = sFirebaseDatabase.getReference().child("trophies").child(mUserId);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // This will trigger onSigninInitialize() if user is logged in
+        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        detachFirebaseDbListener();
+        clearAdapters();
     }
 
     private void initializeLists() {
@@ -106,6 +221,29 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
     }
     //// end region updateViews ////
 
+    // region Menu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.sign_out_menu:
+                // sign out
+                AuthUI.getInstance().signOut(this);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    // endregion Menu
     @Override
     public void onGoalChangedByFragment(Goal goal) {
         FirebaseOperations.UpdateGoal(goal);
@@ -134,119 +272,179 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
         FirebaseOperations.addTrophyToDatabase(trophy);
     }
 
-    private void initializeFirebase() {
-        // initial loading of the goalList to be ready for adapter!
-        sFirebaseDatabase = FirebaseDatabase.getInstance();
-        sGoalsDatabaseReference = sFirebaseDatabase.getReference().child("goals");   // TODO save under node of userID or so
-        sTrophiesDatabaseReference = sFirebaseDatabase.getReference().child("trophies");   // TODO save under node of userID or so
-        mGoalsEventListener = new ChildEventListener() {
+    private void attachFirebaseDbListener() {
+        if (mGoalsEventListener == null) {
+            mGoalsEventListener = new ChildEventListener() {
 
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Goal goal = dataSnapshot.getValue(Goal.class);
-                sGoalList.add(goal);
-                updateViewsNotifyGoalInserted();  // TODO check if fragment list not null in subclass tab....
-                // TODO replace with proper method (inserted instead of former general update)
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    Goal goal = dataSnapshot.getValue(Goal.class);
+                    sGoalList.add(goal);
+                    updateViewsNotifyGoalInserted();  // TODO check if fragment list not null in subclass tab....
+                    // TODO replace with proper method (inserted instead of former general update)
 
-                // change the sGoalList now and then call:
-                // mAdapter.notifyItemInserted(mItems.size() - 1);
-                //  issues.remove(position);
-                //                    notifyItemRemoved(position);
-                //                    //this line below gives you the animation and also updates the
-                //                    //list items after the deleted item
-                //                    notifyItemRangeChanged(position, getItemCount());
-            }
+                    // change the sGoalList now and then call:
+                    // mAdapter.notifyItemInserted(mItems.size() - 1);
+                    //  issues.remove(position);
+                    //                    notifyItemRemoved(position);
+                    //                    //this line below gives you the animation and also updates the
+                    //                    //list items after the deleted item
+                    //                    notifyItemRangeChanged(position, getItemCount());
+                }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Goal changedGoal = dataSnapshot.getValue(Goal.class);
-                int foundAtPosition = 0;
-                for (int i = 0; i < sGoalList.size(); i++) {
-                    if (sGoalList.get(i).getPushId().equals(changedGoal.getPushId())) {
-                        foundAtPosition = i;
-                        break;
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    Goal changedGoal = dataSnapshot.getValue(Goal.class);
+                    int foundAtPosition = 0;
+                    for (int i = 0; i < sGoalList.size(); i++) {
+                        if (sGoalList.get(i).getPushId().equals(changedGoal.getPushId())) {
+                            foundAtPosition = i;
+                            break;
+                        }
                     }
+                    sGoalList.set(foundAtPosition, changedGoal);
+                    // updateViewsNotifyGoalChanged(foundAtPosition);
+                    updateGoalsFragmentNotifyGoalChanged(foundAtPosition);
                 }
-                sGoalList.set(foundAtPosition, changedGoal);
-                // updateViewsNotifyGoalChanged(foundAtPosition);
-                updateGoalsFragmentNotifyGoalChanged(foundAtPosition);
-            }
 
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Goal removedGoal = dataSnapshot.getValue(Goal.class);
-                int foundAtPosition = 0;
-                for (int i = 0; i < sGoalList.size(); i++) {
-                    if (sGoalList.get(i).getPushId().equals(removedGoal.getPushId())) {
-                        foundAtPosition = i;
-                        break;
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                    Goal removedGoal = dataSnapshot.getValue(Goal.class);
+                    int foundAtPosition = 0;
+                    for (int i = 0; i < sGoalList.size(); i++) {
+                        if (sGoalList.get(i).getPushId().equals(removedGoal.getPushId())) {
+                            foundAtPosition = i;
+                            break;
+                        }
                     }
+                    sGoalList.remove(foundAtPosition);
+                    updateViewsNotifyGoalRemoved(foundAtPosition);
                 }
-                sGoalList.remove(foundAtPosition);
-                updateViewsNotifyGoalRemoved(foundAtPosition);
-            }
 
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Timber.e(databaseError.getMessage());
-                Timber.e(databaseError.getDetails());
-            }
-        };
-        sGoalsDatabaseReference.addChildEventListener(mGoalsEventListener);
-
-        //// Trophies
-        mTrophiesEventListener = new ChildEventListener() {
-
-            // "Add Trophy"
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
-                Trophy trophy = dataSnapshot.getValue(Trophy.class);
-                if (trophy.getPushId() == null) {
-                    trophy.setPushId(dataSnapshot.getKey());
                 }
-                // change the sGoalList now and then call:
-                // mAdapter.notifyItemInserted(mItems.size() - 1);
-                //  issues.remove(position);
-                //                    notifyItemRemoved(position);
-                //                    //this line below gives you the animation and also updates the
-                //                    //list items after the deleted item
-                //                    notifyItemRangeChanged(position, getItemCount());
-                sTrophyList.add(trophy);
-                updateViewNotifyTrophyInserted();
-            }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Timber.e(databaseError.getMessage());
+                    Timber.e(databaseError.getDetails());
+                }
+            };
+            sGoalsDatabaseReference.addChildEventListener(mGoalsEventListener);
+        }
+        if (mTrophiesEventListener == null) {
+            mTrophiesEventListener = new ChildEventListener() {
 
-            }
+                // "Add Trophy"
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                    Trophy trophy = dataSnapshot.getValue(Trophy.class);
+                    if (trophy.getPushId() == null) {
+                        trophy.setPushId(dataSnapshot.getKey());
+                    }
+                    // change the sGoalList now and then call:
+                    // mAdapter.notifyItemInserted(mItems.size() - 1);
+                    //  issues.remove(position);
+                    //                    notifyItemRemoved(position);
+                    //                    //this line below gives you the animation and also updates the
+                    //                    //list items after the deleted item
+                    //                    notifyItemRangeChanged(position, getItemCount());
+                    sTrophyList.add(trophy);
+                    updateViewNotifyTrophyInserted();
+                }
 
-            }
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                }
 
-            }
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Timber.e(databaseError.getMessage());
-                Timber.e(databaseError.getDetails());
-            }
+                }
 
-        };
-        sTrophiesDatabaseReference.addChildEventListener(mTrophiesEventListener);
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Timber.e(databaseError.getMessage());
+                    Timber.e(databaseError.getDetails());
+                }
+
+            };
+            sTrophiesDatabaseReference.addChildEventListener(mTrophiesEventListener);
+        }
     }
 
     private void updateGoalsFragmentNotifyGoalChanged(int foundAtPosition) {
         mFixedTabsFragmentPagerAdapter.updateGoalsFragmentNofifyGoalChanged(foundAtPosition);
     }
+
+    // region API call
+    /**
+     * Start the async task using Retrofit.
+     * "this" is passed as listener to the controller, so that MainActivity
+     *  can be called when request is finished
+     */
+    private void performQuotesLoading() {
+        if (mIsRestoredFromState == false)
+        {
+            // showMainLoadingIndicator();
+        }
+        mQuotesController = new QuotesController(this);
+        mQuotesController.startLoadingQuote();
+    }
+
+    /**
+     * Listener-method to be executed from controller after Retrofit request is finished
+     */
+    @Override
+    public void onPostTask(QuoteResult quoteResult) {
+        if (quoteResult != null) {
+            if (mIsRestoredFromState == false)
+            {
+                saveRetrofitResponseToContentProvider(quoteResult);
+            }
+            // TODO show result in view / fragment
+        } else {
+            // showMainErrorMessage(); TODO handle error / log etc...
+        }
+    }
+
+    private void saveRetrofitResponseToContentProvider(QuoteResult quoteResult) {
+        // TODO implement. Old code below.
+        /*
+        JSONObject root = null;
+        JSONArray resultsArray = null;
+        try {
+            ArrayList<MovieResult.Movie> moviesList = movieResult.getItems();
+            mPosterList = new ArrayList<String>();
+            mMovieObjects = new ArrayList<JSONObject>();
+
+            for (MovieResult.Movie movie : moviesList) {
+
+                String url = NetworkHelper.buildPosterUrl(movie.getMoviePoster()).toString();
+                mPosterList.add(url);
+                JSONObject json = new JSONObject();
+                json.put(NetworkHelper.PROPERTY_POSTER_PATH, movie.getMoviePoster());
+                json.put(NetworkHelper.PROPERTY_OVERVIEW, movie.getMoviePlot());
+                json.put(NetworkHelper.PROPERTY_RELEASE, movie.getMovieRelease());
+                json.put(NetworkHelper.PROPERTY_ID, movie.getId());
+                json.put(NetworkHelper.PROPERTY_TITLE, movie.getMovieTitle());
+                json.put(NetworkHelper.PROPERTY_RATING, movie.getMovieRating());
+                mMovieObjects.add(json);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        */
+    }
+
+    // endregion API call
 }

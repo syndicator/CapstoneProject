@@ -22,6 +22,7 @@ import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.TrackListAdapter;
 import info.weigandt.goalacademy.classes.AlertDialogFactory;
+import info.weigandt.goalacademy.classes.FirebaseOperations;
 import info.weigandt.goalacademy.classes.Goal;
 import info.weigandt.goalacademy.classes.GoalHelper;
 import info.weigandt.goalacademy.classes.WrapLinearLayoutManager;
@@ -67,6 +68,10 @@ public class TrackFragment extends BaseFragment {
     /*@BindView(R.id.DELETE_BUTTON)
     Button mDeleteButton;
 */
+    @BindView(R.id.LOGOUT_BUTTON)
+    Button mLogoutButton;
+
+
     //private TrackListAdapter mAdapter;
     private RecyclerView.Adapter mAdapter;  // TODO is this sup  class enough?
     private RecyclerView.LayoutManager mLayoutManager;
@@ -124,7 +129,14 @@ public class TrackFragment extends BaseFragment {
                 FirebaseOperations.deleteTest();
             }
         });
-        */
+      */
+        mLogoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseOperations.deleteTest();
+            }
+        });
+
 
         // Set button_week_current to current week
         LocalDate nowLocalDate = LocalDate.now();
@@ -276,18 +288,16 @@ public class TrackFragment extends BaseFragment {
 
             } else if (award == GoalStatusPseudoEnum.SILVER_EARNED) {
                 goal.setStatus(GoalStatusPseudoEnum.SILVER_EARNED);
-                // TODO inform the GoalsFragment about the changed status of this goal (on more streak, new award status!)
-                mFragmentInteractionListener.onGoalChangedByFragment(goal);  // TODO maybe goal is not needed??
+                mFragmentInteractionListener.onGoalChangedByFragment(goal);
 
             } else if (award == GoalStatusPseudoEnum.BRONZE_EARNED) {
                 goal.setStatus(GoalStatusPseudoEnum.BRONZE_EARNED);
-                // TODO inform the GoalsFragment about the changed status of this goal (on more streak, new award status!)
-                mFragmentInteractionListener.onGoalChangedByFragment(goal);  // TODO maybe goal is not needed??
+                mFragmentInteractionListener.onGoalChangedByFragment(goal);
             }
             else
             {
                 // This a "normal" pass with an increase in streak only
-                mFragmentInteractionListener.onGoalChangedByFragment(goal);  // TODO maybe goal ist not needed??
+                mFragmentInteractionListener.onGoalChangedByFragment(goal);
             }
         }
         //////// endregion PASSED  //////////////////////
@@ -304,55 +314,60 @@ public class TrackFragment extends BaseFragment {
 
                 // HANDLING THE CRITICAL STATES
                 if (criticalSum < 0) {
-                    // TODO trigger a fail! dialog or so
-                    // if totally failed, open an dialog with the option to confirm failure or to reset this button!!!
+                    // Version 2: If totally failed, open an dialog with the option to confirm
+                    // failure or to reset this event!
+                    String awardName;
+                    int award = GoalHelper.calculateAward(goal);
+                    if (award == GoalStatusPseudoEnum.GOLD_EARNED) {
+                        awardName = GoalStatusPseudoEnum.GOLD_EARNED_STRING;
 
+                    } else if (award == GoalStatusPseudoEnum.SILVER_EARNED) {
+                        awardName = GoalStatusPseudoEnum.SILVER_EARNED_STRING;
 
+                    } else if (award == GoalStatusPseudoEnum.BRONZE_EARNED) {
+                        awardName = GoalStatusPseudoEnum.BRONZE_EARNED_STRING;
+                    }
+                    else
+                    {
+                        awardName = GoalStatusPseudoEnum.BEGINNER_STRING;
+                    }
+                    mFragmentInteractionListener.onGoalFailed(goal);
+                    AlertDialog alertDialog = AlertDialogFactory.createFailDialog(awardName, getActivity());
+                    alertDialog.show();
 
-                    int i = 0; // TODO just for breakpoint
                 } else if (criticalSum == 1) {
-                    // If nearly failed == last day to complete the goal for this week, change the GUI to
-                    //  critical for this item
-                    // TODO complete this
+                    // Version 2: If nearly failed == last day to complete the goal for this week,
+                    // change the GUI to critical for this item
                 }
-                // TODO ignoring critical things for now, DEBUG
-                // TODO later, a onGoalFailed method will be needed to show fail dialog and remove the goal also,
-                // TODO and maybe create a new trophy of bronze or silver
-
-
-
-                mFragmentInteractionListener.onGoalChangedByFragment(goal);
+                else
+                {
+                    // "Normal" fail
+                    mFragmentInteractionListener.onGoalChangedByFragment(goal);
+                }
                 // END HANDLING THE CRITICAL STATES
             }
             else
             {
                 // TODO will be a total fail in every case!!! But ask first if this setting is intentionally
-                String awardName ="";
+                String awardName;
                 int award = GoalHelper.calculateAward(goal);
                 if (award == GoalStatusPseudoEnum.GOLD_EARNED) {
-                    goal.setStatus(GoalStatusPseudoEnum.GOLD_EARNED);
                     awardName = GoalStatusPseudoEnum.GOLD_EARNED_STRING;
 
                 } else if (award == GoalStatusPseudoEnum.SILVER_EARNED) {
-                    goal.setStatus(GoalStatusPseudoEnum.SILVER_EARNED);
                     awardName = GoalStatusPseudoEnum.SILVER_EARNED_STRING;
 
                 } else if (award == GoalStatusPseudoEnum.BRONZE_EARNED) {
-                    goal.setStatus(GoalStatusPseudoEnum.BRONZE_EARNED);
                     awardName = GoalStatusPseudoEnum.BRONZE_EARNED_STRING;
                 }
                 else
                 {
                     awardName = GoalStatusPseudoEnum.BEGINNER_STRING;
                 }
-
                 mFragmentInteractionListener.onGoalFailed(goal);
-
                 AlertDialog alertDialog = AlertDialogFactory.createFailDialog(awardName, getActivity());
                 alertDialog.show();
-
             }
-            // if not totally failed, update List
         }
         //////// endregion FAILED ////////////////////////
 
@@ -396,5 +411,9 @@ public class TrackFragment extends BaseFragment {
 
     public void updateViewNotifyGoalRemoved() {
         mAdapter.notifyDataSetChanged();
+    }
+
+    public void clearAdapter(int size) {
+        mAdapter.notifyItemRangeRemoved(0, size);
     }
 }

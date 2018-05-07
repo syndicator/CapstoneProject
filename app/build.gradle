@@ -54,7 +54,6 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     // Timber
     implementation 'com.jakewharton.timber:timber:4.7.0'
-    // TODO Reminder: add gson if needed
     // Firebase
     implementation 'com.google.firebase:firebase-database:15.0.0'
     implementation 'com.google.firebase:firebase-auth:15.0.0'
@@ -62,14 +61,15 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-auth:3.3.1'
     // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
-    // TODO check if needed compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     // Recyclerview
     implementation 'com.android.support:recyclerview-v7:26.+'
     // Google AdMob
     freeImplementation 'com.google.android.gms:play-services-ads:15.0.0'
     // ThreeTen Android Backport: Includes Java8 java.time features to replace outdated Java7 time
     implementation 'com.jakewharton.threetenabp:threetenabp:1.1.0'
-
+    // Retrofit 2
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

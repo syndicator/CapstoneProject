@@ -201,4 +201,8 @@ public class GoalsFragment extends BaseFragment {
         super.onDetach();
         mFragmentInteractionListener = null; // TODO remove if no needed
     }
+
+    public void clearAdapter(int size) {
+        mAdapter.notifyItemRangeRemoved(0, size);
+    }
 }

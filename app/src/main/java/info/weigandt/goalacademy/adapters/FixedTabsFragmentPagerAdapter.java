@@ -8,8 +8,7 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-import info.weigandt.goalacademy.R; // TODO try to remove this later on
-import info.weigandt.goalacademy.classes.Goal;
+import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.fragments.BaseFragment;
 import info.weigandt.goalacademy.fragments.GoalsFragment;
 import info.weigandt.goalacademy.fragments.TrackFragment;
@@ -66,15 +65,15 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
         // save the appropriate reference depending on position
         switch (position) {
             case 0:
-                mTrackFragment = ((TrackFragment)createdFragment);
+                mTrackFragment = ((TrackFragment) createdFragment);
                 fragmentList.add(mTrackFragment);
                 break;
             case 1:
-                mGoalsFragment = ((GoalsFragment)createdFragment);
+                mGoalsFragment = ((GoalsFragment) createdFragment);
                 fragmentList.add(mGoalsFragment);
                 break;
             case 2:
-                mTrophiesFragment = ((TrophiesFragment)createdFragment);
+                mTrophiesFragment = ((TrophiesFragment) createdFragment);
                 fragmentList.add(mTrophiesFragment);
                 break;
         }
@@ -110,13 +109,24 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
     }
 
     public void updateViewNotifyTrophyInserted() {
-        if (mTrophiesFragment != null)
-        {
+        if (mTrophiesFragment != null) {
             mTrophiesFragment.updateViewNotifyTrophyInserted();
         }
     }
 
     public void updateGoalsFragmentNofifyGoalChanged(int position) {
         mGoalsFragment.updateViewNotifyGoalChanged(position);
+    }
+
+    public void clearAdapters(int sizeGoalList, int sizeTrophyList) {
+        if (mTrackFragment != null) {
+            mTrackFragment.clearAdapter(sizeGoalList);
+        }
+        if (mGoalsFragment != null) {
+            mGoalsFragment.clearAdapter(sizeGoalList);
+        }
+        if (mTrophiesFragment != null) {
+            mTrophiesFragment.clearAdapter(sizeTrophyList);
+        }
     }
 }

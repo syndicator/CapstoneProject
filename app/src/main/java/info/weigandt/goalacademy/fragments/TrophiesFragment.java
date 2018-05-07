@@ -2,7 +2,6 @@ package info.weigandt.goalacademy.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,10 +11,8 @@ import android.view.ViewGroup;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
-import info.weigandt.goalacademy.adapters.GoalListAdapter;
 import info.weigandt.goalacademy.adapters.TrophyListAdapter;
 
-import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
 import static info.weigandt.goalacademy.activities.MainActivity.sTrophyList;
 
 /**
@@ -121,6 +118,10 @@ public class TrophiesFragment extends BaseFragment {
 
     public void updateViewNotifyTrophyInserted() {
         mAdapter.notifyItemInserted(sTrophyList.size() - 1);
+    }
+
+    public void clearAdapter(int size) {
+        mAdapter.notifyItemRangeRemoved(0, size);
     }
 
     /* TODO remove if not needed

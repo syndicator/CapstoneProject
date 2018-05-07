@@ -17,10 +17,6 @@ public class FirebaseOperations {
         goalReference.setValue(goal);
     }
 
-    public static void FirebaseSetup() {
-
-    }
-
     public static void addGoalToDatabase(Goal goal) {
         // This way we get the key first, then store the goal there
         String pushKey = sGoalsDatabaseReference.push().getKey();
