@@ -3,6 +3,7 @@ package info.weigandt.goalacademy.activities;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -113,12 +114,32 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
         // Initialize Firebase components
         initializeFirebaseAuth();
         loadQuote();
-        testWriteContentResolver();
+        // testWriteContentResolver();
         testReadContentResolver();
     }
 
     private void testReadContentResolver() {
+        Uri uri = QuotesContract.QuotesEntry.CONTENT_URI;
+        try {
+            Cursor cursor = getContentResolver().query(
+                uri,
+                null,
+                null,
+                null,
+                null);
+            for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+                String text = cursor.getString(cursor.getColumnIndex(QuotesContract.QuotesEntry.COLUMN_TEXT));
+                String author = cursor.getString(cursor.getColumnIndex(QuotesContract.QuotesEntry.COLUMN_AUTHOR));
+                int i = 1;
 
+            }
+
+
+        } catch (Exception e) {
+            Timber.e(e.getMessage());
+            e.printStackTrace();
+        }
+        int i = 1;
     }
 
     private void testWriteContentResolver() {
