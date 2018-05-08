@@ -58,7 +58,7 @@
                 android:scrollbars="vertical" />
         </TableLayout>
         <TextView
-            android:id="@+id/tv_motivating_quote"
+            android:id="@+id/tv_quote"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_alignBottom="@id/rv_goals"

@@ -129,4 +129,10 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
             mTrophiesFragment.clearAdapter(sizeTrophyList);
         }
     }
+
+    public void updateViewNotifyQuoteChanged(String quoteText, String quoteAuthor) {
+        if (mGoalsFragment != null) {
+            mGoalsFragment.updateViewQuoteChanged(quoteText, quoteAuthor);
+        }
+    }
 }

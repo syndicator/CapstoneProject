@@ -4,6 +4,7 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface ForismaticApi {
+    // @GET(NetworkHelper.GET_PARAMETERS)
     @GET(NetworkHelper.GET_PARAMETERS)
-    Call<QuoteResult> loadRandomQuote();
+    Call<Quote> loadRandomQuote();
 }

@@ -1,16 +1,11 @@
 package info.weigandt.goalacademy.data;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
-public class QuotesController implements retrofit2.Callback<QuoteResult> {
+public class QuotesController implements retrofit2.Callback<Quote> {
 
-    final String BASE_URL = NetworkHelper.FORISMATIC_BASE_URL;
     private PostRetrofitQuoteCallListener mPostRetrofitQuoteCallListener;
 
     public QuotesController(PostRetrofitQuoteCallListener postRetrofitQuoteCallListener) {
@@ -18,30 +13,24 @@ public class QuotesController implements retrofit2.Callback<QuoteResult> {
     }
 
     public void startLoadingQuote() {
-        Gson gson = new GsonBuilder()
-                .setLenient()
-                .create();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
+        Retrofit retrofit = ApiClient.getClient();
         ForismaticApi forismaticApi = retrofit.create(ForismaticApi.class);
-        Call<QuoteResult> call = forismaticApi.loadRandomQuote();
-        call.enqueue(this);
+        Call<Quote> call = forismaticApi.loadRandomQuote();
+        call.enqueue(this); // "this" passes the onResponse callback
     }
     @Override
-    public void onResponse(Call<QuoteResult> call, Response<QuoteResult> response) {
+    public void onResponse(Call<Quote> call, Response<Quote> response) {
         if (response.isSuccessful()) {
-            QuoteResult quoteResult = response.body();
+            Quote quote = response.body();
             // send the results to the MainActivity via Listener
-            mPostRetrofitQuoteCallListener.onPostTask(quoteResult);
+            mPostRetrofitQuoteCallListener.onPostApiCall(quote);
         } else {
             System.out.println(response.errorBody());
         }
     }
 
     @Override
-    public void onFailure(Call<QuoteResult> call, Throwable t) {
+    public void onFailure(Call<Quote> call, Throwable t) {
         t.printStackTrace();
     }
 

@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -50,6 +51,7 @@ public class GoalsFragment extends BaseFragment {
     @BindView(R.id.rv_goals) RecyclerView mRecyclerView;
     @BindView(R.id.fab_add) FloatingActionButton mFloatingActionButtonAdd;
     @BindView(R.id.adView) AdView mAdView;
+    @BindView(R.id.tv_quote) TextView mQuoteTextView;
 
     //private TrackListAdapter mAdapter;
     private RecyclerView.Adapter mAdapter;  // TODO is this sup  class enough?
@@ -204,5 +206,12 @@ public class GoalsFragment extends BaseFragment {
 
     public void clearAdapter(int size) {
         mAdapter.notifyItemRangeRemoved(0, size);
+    }
+
+    public void updateViewQuoteChanged(String quoteText, String quoteAuthor) {
+        String quote = quoteText + "\\n     - " + quoteAuthor;
+        quote = quote.replace("\\n", System.getProperty("line.separator"));
+
+        mQuoteTextView.setText(quote);
     }
 }

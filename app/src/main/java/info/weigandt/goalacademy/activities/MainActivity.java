@@ -1,6 +1,11 @@
 package info.weigandt.goalacademy.activities;
 
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -36,7 +41,9 @@ import info.weigandt.goalacademy.classes.FirebaseOperations;
 import info.weigandt.goalacademy.classes.Goal;
 import info.weigandt.goalacademy.classes.Trophy;
 import info.weigandt.goalacademy.data.PostRetrofitQuoteCallListener;
+import info.weigandt.goalacademy.data.Quote;
 import info.weigandt.goalacademy.data.QuoteResult;
+import info.weigandt.goalacademy.data.QuotesContract;
 import info.weigandt.goalacademy.data.QuotesController;
 import info.weigandt.goalacademy.fragments.BaseFragment;
 import timber.log.Timber;
@@ -46,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
     public FixedTabsFragmentPagerAdapter mFixedTabsFragmentPagerAdapter;
     public static ArrayList<Goal> sGoalList;
     public static ArrayList<Trophy> sTrophyList;
+    public static String sQuoteText;
+    public static String sQuoteAuthor;
     // Firebase related
     public static DatabaseReference sGoalsDatabaseReference; // TODO: Adjust to correct node. -> include users
     public static DatabaseReference sTrophiesDatabaseReference;
@@ -65,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
     private ChildEventListener mGoalsEventListener;
     private ChildEventListener mTrophiesEventListener;
     private String mUserId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,8 +111,43 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
         //adapter.finishUpdate(viewPager);
 
         // Initialize Firebase components
-
         initializeFirebaseAuth();
+        loadQuote();
+        testWriteContentResolver();
+        testReadContentResolver();
+    }
+
+    private void testReadContentResolver() {
+
+    }
+
+    private void testWriteContentResolver() {
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(QuotesContract.QuotesEntry.COLUMN_LINK, "Unique URL");
+        contentValues.put(QuotesContract.QuotesEntry.COLUMN_TEXT, "So war das.");
+        contentValues.put(QuotesContract.QuotesEntry.COLUMN_AUTHOR, "Horst");
+
+        // Insert the content values via a ContentResolver
+        Uri uri = getContentResolver().insert(QuotesContract.QuotesEntry.CONTENT_URI, contentValues);
+        if (uri != null) {
+            Toast.makeText(getBaseContext(), "Added to Content Provider", Toast.LENGTH_LONG).show();
+            Timber.e("added to content resolver");
+        }
+    }
+
+    private void loadQuote() {
+        if (!isOnline())
+        {
+            loadQuoteFromContentProvider();
+        }
+        else
+        {
+            performQuoteLoadingFromApi();
+        }
+    }
+
+    private void loadQuoteFromContentProvider() {
     }
 
     @Override
@@ -392,30 +437,42 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
      * "this" is passed as listener to the controller, so that MainActivity
      *  can be called when request is finished
      */
-    private void performQuotesLoading() {
+    private void performQuoteLoadingFromApi() {
         if (mIsRestoredFromState == false)
         {
-            // showMainLoadingIndicator();
+            // showMainLoadingIndicator(); TODO check restored effects...
         }
+        // QuotesController will callback to onPostApiCall(Quote quote)
         mQuotesController = new QuotesController(this);
         mQuotesController.startLoadingQuote();
     }
 
     /**
-     * Listener-method to be executed from controller after Retrofit request is finished
+     * Listener-method to be executed from QuotesController after Retrofit request is finished
      */
     @Override
-    public void onPostTask(QuoteResult quoteResult) {
-        if (quoteResult != null) {
+    public void onPostApiCall(Quote quote) {
+        if (quote != null) {
             if (mIsRestoredFromState == false)
             {
-                saveRetrofitResponseToContentProvider(quoteResult);
+                // saveRetrofitResponseToContentProvider(quoteResult);
             }
-            // TODO show result in view / fragment
+            else
+            {
+
+            }
+            String quoteText = quote.getQuoteText();
+            String quoteAuthor = quote.getQuoteAuthor();
+            mFixedTabsFragmentPagerAdapter.updateViewNotifyQuoteChanged(quoteText, quoteAuthor);
         } else {
-            // showMainErrorMessage(); TODO handle error / log etc...
+          // showMainErrorMessage(); TODO handle error / log etc...
+            int i = 0;
         }
     }
+
+    // endregion API call
+
+    // region Content Provider
 
     private void saveRetrofitResponseToContentProvider(QuoteResult quoteResult) {
         // TODO implement. Old code below.
@@ -445,6 +502,12 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
         }
         */
     }
+    // endregion Content Provider
 
-    // endregion API call
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
 }

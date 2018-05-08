@@ -58,10 +58,11 @@
             android:scrollbars="vertical" />
 </TableLayout>
         <TextView
-            android:id="@+id/tv_motivating_quote"
+            android:id="@+id/tv_quote"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_alignBottom="@id/rv_goals"
+            android:padding="@dimen/pad_1"
             android:layout_marginLeft="@dimen/pad_3"
             android:layout_marginRight="@dimen/pad_3"
             android:background="@color/cardview_light_background"

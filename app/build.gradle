@@ -68,8 +68,12 @@ dependencies {
     // ThreeTen Android Backport: Includes Java8 java.time features to replace outdated Java7 time
     implementation 'com.jakewharton.threetenabp:threetenabp:1.1.0'
     // Retrofit 2
-    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation ('com.squareup.retrofit2:retrofit:2.4.0') {
+        // exclude Retrofit’s OkHttp dependency module and define your own module import
+        exclude module: 'okhttp'
+    }
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
+    implementation(group: 'com.squareup.okhttp3', name: 'logging-interceptor', version: '3.8.0')
 }
 
 apply plugin: 'com.google.gms.google-services'

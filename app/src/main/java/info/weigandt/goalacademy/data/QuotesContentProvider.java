@@ -10,14 +10,16 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
-import static info.weigandt.goalacademy.data.MotivatingQuotesContract.MotivatingQuotesEntry.COLUMN_QUOTE_ID;
-import static info.weigandt.goalacademy.data.MotivatingQuotesContract.MotivatingQuotesEntry.TABLE_NAME;
+import timber.log.Timber;
 
-public class MotivatingQuotesContentProvider extends ContentProvider {
+import static info.weigandt.goalacademy.data.QuotesContract.QuotesEntry.COLUMN_LINK;
+import static info.weigandt.goalacademy.data.QuotesContract.QuotesEntry.TABLE_NAME;
 
-    private MotivatingQuotesDbHelper mMotivatingQuotesDbHelper;
-    private static final int MOTIVATING_QUOTES = 100;
-    private static final int MOTIVATING_QUOTES_WITH_ID = 101;
+public class QuotesContentProvider extends ContentProvider {
+
+    private QuotesDbHelper mQuotesDbHelper;
+    private static final int QUOTES = 100;
+    private static final int QUOTE_WITH_ID = 101;
     private static final UriMatcher sUriMatcher = buildUriMatcher();
 
     // Define a static buildUriMatcher method that associates URI's with their int match
@@ -28,8 +30,8 @@ public class MotivatingQuotesContentProvider extends ContentProvider {
      */
     public static UriMatcher buildUriMatcher() {
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI(MotivatingQuotesContract.AUTHORITY, MotivatingQuotesContract.PATH_MOTIVATING_QUOTES, MOTIVATING_QUOTES);
-        uriMatcher.addURI(MotivatingQuotesContract.AUTHORITY, MotivatingQuotesContract.PATH_MOTIVATING_QUOTES + "/#", MOTIVATING_QUOTES_WITH_ID);
+        uriMatcher.addURI(QuotesContract.AUTHORITY, QuotesContract.PATH_QUOTES, QUOTES);
+        uriMatcher.addURI(QuotesContract.AUTHORITY, QuotesContract.PATH_QUOTES + "/#", QUOTE_WITH_ID);
         return uriMatcher;
     }
 
@@ -39,7 +41,7 @@ public class MotivatingQuotesContentProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         Context context = getContext();
-        mMotivatingQuotesDbHelper = new MotivatingQuotesDbHelper(context);
+        mQuotesDbHelper = new QuotesDbHelper(context);
         return true;
     }
 
@@ -48,14 +50,15 @@ public class MotivatingQuotesContentProvider extends ContentProvider {
      */
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues values) {
-        final SQLiteDatabase db = mMotivatingQuotesDbHelper.getWritableDatabase();
+        final SQLiteDatabase db = mQuotesDbHelper.getWritableDatabase();
         int match = sUriMatcher.match(uri);
         Uri returnUri;
         switch (match) {
-            case MOTIVATING_QUOTES:
+            case QUOTES:
                 long id = db.insert(TABLE_NAME, null, values);
                 if (id > 0) {
-                    returnUri = ContentUris.withAppendedId(MotivatingQuotesContract.MotivatingQuotesEntry.CONTENT_URI, id);
+                    returnUri = ContentUris.withAppendedId(QuotesContract.QuotesEntry.CONTENT_URI, id);
+                    Timber.e("returnUri is: " + returnUri.toString());
                 } else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
@@ -77,13 +80,13 @@ public class MotivatingQuotesContentProvider extends ContentProvider {
     @Override
     public Cursor query(@NonNull Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
-        final SQLiteDatabase db = mMotivatingQuotesDbHelper.getReadableDatabase();
+        final SQLiteDatabase db = mQuotesDbHelper.getReadableDatabase();
 
         int match = sUriMatcher.match(uri);
         Cursor retCursor;
 
         switch (match) {
-            case MOTIVATING_QUOTES:
+            case QUOTES:
                 retCursor = db.query(TABLE_NAME,
                         projection,
                         selection,
@@ -92,11 +95,11 @@ public class MotivatingQuotesContentProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
-            case MOTIVATING_QUOTES_WITH_ID:
+            case QUOTE_WITH_ID:
                 // Get the ID from the URI path
                 String id = uri.getPathSegments().get(1);
                 // Use selections/selectionArgs to filter for this ID
-                String mSelection = COLUMN_QUOTE_ID + "=?";
+                String mSelection = COLUMN_LINK + "=?";
                 String[] mSelectionArgs = new String[]{String.valueOf(id)};
                 retCursor = db.query(TABLE_NAME,
                         projection,
@@ -119,7 +122,7 @@ public class MotivatingQuotesContentProvider extends ContentProvider {
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
 
-        final SQLiteDatabase db = mMotivatingQuotesDbHelper.getWritableDatabase();
+        final SQLiteDatabase db = mQuotesDbHelper.getWritableDatabase();
 
         int match = sUriMatcher.match(uri);
         // Keep track of the number of deleted items
@@ -127,11 +130,11 @@ public class MotivatingQuotesContentProvider extends ContentProvider {
 
         switch (match) {
             // Handle the single item case, recognized by the ID included in the URI path
-            case MOTIVATING_QUOTES_WITH_ID:
+            case QUOTE_WITH_ID:
                 // Get the task ID from the URI path
                 String id = uri.getPathSegments().get(1);
                 // Use selections/selectionArgs to filter for this ID
-                favoritesDeleted = db.delete(TABLE_NAME, COLUMN_QUOTE_ID + "=?", new String[]{id});
+                favoritesDeleted = db.delete(TABLE_NAME, COLUMN_LINK + "=?", new String[]{id});
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
