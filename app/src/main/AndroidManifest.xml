@@ -45,8 +45,12 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/goal_academy_app_widget_info" />
         </receiver>
+
         <service android:name=".widget.GoalAcademyWidgetRemoteViewsService"
             android:permission="android.permission.BIND_REMOTEVIEWS"></service>
+        <service
+            android:name=".service.PullQuoteIntentService"
+            android:exported="false"/>
     </application>
 
 </manifest>

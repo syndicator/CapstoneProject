@@ -3,6 +3,7 @@ package info.weigandt.goalacademy.activities;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -10,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -41,15 +43,17 @@ import info.weigandt.goalacademy.adapters.FixedTabsFragmentPagerAdapter;
 import info.weigandt.goalacademy.classes.FirebaseOperations;
 import info.weigandt.goalacademy.classes.Goal;
 import info.weigandt.goalacademy.classes.Trophy;
-import info.weigandt.goalacademy.data.PostRetrofitQuoteCallListener;
 import info.weigandt.goalacademy.data.Quote;
-import info.weigandt.goalacademy.data.QuoteResult;
 import info.weigandt.goalacademy.data.QuotesContract;
 import info.weigandt.goalacademy.data.QuotesController;
 import info.weigandt.goalacademy.fragments.BaseFragment;
+import info.weigandt.goalacademy.service.PullQuoteBroadcastReceiver;
+import info.weigandt.goalacademy.service.PullQuoteIntentService;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity implements BaseFragment.OnFragmentInteractionListener, PostRetrofitQuoteCallListener {
+public class MainActivity extends AppCompatActivity
+        implements BaseFragment.OnFragmentInteractionListener,
+        PullQuoteBroadcastReceiver.BroadcastReceiverListener {
     private static final int RC_SIGN_IN = 0;
     public FixedTabsFragmentPagerAdapter mFixedTabsFragmentPagerAdapter;
     public static ArrayList<Goal> sGoalList;
@@ -65,7 +69,8 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
     // API related
     private QuotesController mQuotesController;
     private boolean mIsRestoredFromState = false;
-
+    // IntentService related
+    private PullQuoteBroadcastReceiver mPullQuoteBroadcastReceiver;
 
     @BindView(R.id.viewpager)
     ViewPager mViewPager;
@@ -75,7 +80,6 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
     private ChildEventListener mGoalsEventListener;
     private ChildEventListener mTrophiesEventListener;
     private String mUserId;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,9 +117,22 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
 
         // Initialize Firebase components
         initializeFirebaseAuth();
-        loadQuote();
-        // testWriteContentResolver();
-        testReadContentResolver();
+         // loadQuote();
+         testWriteContentResolver();
+        // testReadContentResolver();
+        testStartIntentService();
+    }
+
+    private void testStartIntentService() {
+        // use this method later in if/else online or not
+
+        mPullQuoteBroadcastReceiver = new PullQuoteBroadcastReceiver(this);
+        launchPullQuoteIntentService();
+    }
+
+    private void launchPullQuoteIntentService() {
+        Intent pullQuoteIntent = new Intent(MainActivity.this, PullQuoteIntentService.class);
+        startService(pullQuoteIntent);
     }
 
     private void testReadContentResolver() {
@@ -131,10 +148,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
                 String text = cursor.getString(cursor.getColumnIndex(QuotesContract.QuotesEntry.COLUMN_TEXT));
                 String author = cursor.getString(cursor.getColumnIndex(QuotesContract.QuotesEntry.COLUMN_AUTHOR));
                 int i = 1;
-
             }
-
-
         } catch (Exception e) {
             Timber.e(e.getMessage());
             e.printStackTrace();
@@ -164,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
         }
         else
         {
-            performQuoteLoadingFromApi();
+            launchPullQuoteIntentService();
         }
     }
 
@@ -254,6 +268,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
         super.onResume();
         // This will trigger onSigninInitialize() if user is logged in
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+        registerBroadcastReceiver();
     }
 
     @Override
@@ -261,7 +276,31 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
         super.onPause();
         detachFirebaseDbListener();
         clearAdapters();
+        unregisterBroadcastReceiver();
     }
+
+    // region BroadcastReceiver
+
+    private void registerBroadcastReceiver() {
+        if  (mPullQuoteBroadcastReceiver  != null)
+        {
+            mPullQuoteBroadcastReceiver = new PullQuoteBroadcastReceiver(this);
+        }
+        IntentFilter broadcastFilter = new IntentFilter(PullQuoteBroadcastReceiver.LOCAL_ACTION);
+        broadcastFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.registerReceiver(mPullQuoteBroadcastReceiver, broadcastFilter);
+    }
+
+    private void unregisterBroadcastReceiver() {
+        /*
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.unregisterReceiver(mPullQuoteBroadcastReceiver);
+        */
+    }
+
+    // endregion BroadcastReceiver
+
 
     private void initializeLists() {
         sGoalList = new ArrayList<>();
@@ -452,50 +491,33 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
         mFixedTabsFragmentPagerAdapter.updateGoalsFragmentNofifyGoalChanged(foundAtPosition);
     }
 
-    // region API call
-    /**
-     * Start the async task using Retrofit.
-     * "this" is passed as listener to the controller, so that MainActivity
-     *  can be called when request is finished
-     */
-    private void performQuoteLoadingFromApi() {
-        if (mIsRestoredFromState == false)
-        {
-            // showMainLoadingIndicator(); TODO check restored effects...
-        }
-        // QuotesController will callback to onPostApiCall(Quote quote)
-        mQuotesController = new QuotesController(this);
-        mQuotesController.startLoadingQuote();
-    }
-
-    /**
-     * Listener-method to be executed from QuotesController after Retrofit request is finished
-     */
+    /* TODO check this for processing. method has been moved to service
     @Override
     public void onPostApiCall(Quote quote) {
         if (quote != null) {
             if (mIsRestoredFromState == false)
             {
-                // saveRetrofitResponseToContentProvider(quoteResult);
+                saveRetrofitResponseToContentProvider(quote);
             }
             else
             {
 
             }
-            String quoteText = quote.getQuoteText();
-            String quoteAuthor = quote.getQuoteAuthor();
+            //String quoteText = quote.getQuoteText();
+            //String quoteAuthor = quote.getQuoteAuthor();
+
+            // TODO move following line to broadcast receiver!
             mFixedTabsFragmentPagerAdapter.updateViewNotifyQuoteChanged(quoteText, quoteAuthor);
         } else {
-          // showMainErrorMessage(); TODO handle error / log etc...
+            // showMainErrorMessage(); TODO handle error / log etc...
             int i = 0;
         }
     }
-
-    // endregion API call
+    */
 
     // region Content Provider
 
-    private void saveRetrofitResponseToContentProvider(QuoteResult quoteResult) {
+    private void saveRetrofitResponseToContentProvider(Quote quote) {
         // TODO implement. Old code below.
         /*
         JSONObject root = null;
@@ -530,5 +552,11 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
+    @Override
+    public void onBroadcastReceived(String quoteText, String quoteAuthor) {
+        // TODO handle view updating from here.
+        Timber.e("BROADCAST received." + quoteText);
     }
 }

@@ -32,6 +32,6 @@ public class QuotesController implements retrofit2.Callback<Quote> {
     @Override
     public void onFailure(Call<Quote> call, Throwable t) {
         t.printStackTrace();
-    }
+    }   // TODO improve error handling
 
 }
