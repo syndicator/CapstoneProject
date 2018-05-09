@@ -1,6 +1,6 @@
 package info.weigandt.goalacademy.activities;
 
-import android.content.ContentValues;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -10,7 +10,11 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -45,7 +49,6 @@ import info.weigandt.goalacademy.classes.Goal;
 import info.weigandt.goalacademy.classes.Trophy;
 import info.weigandt.goalacademy.data.Quote;
 import info.weigandt.goalacademy.data.QuotesContract;
-import info.weigandt.goalacademy.data.QuotesController;
 import info.weigandt.goalacademy.fragments.BaseFragment;
 import info.weigandt.goalacademy.service.PullQuoteBroadcastReceiver;
 import info.weigandt.goalacademy.service.PullQuoteIntentService;
@@ -53,22 +56,24 @@ import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity
         implements BaseFragment.OnFragmentInteractionListener,
-        PullQuoteBroadcastReceiver.BroadcastReceiverListener {
+        PullQuoteBroadcastReceiver.BroadcastReceiverListener, LoaderManager.LoaderCallbacks<Quote> {
     private static final int RC_SIGN_IN = 0;
+    private boolean mIsRestoredFromState = false;
     public FixedTabsFragmentPagerAdapter mFixedTabsFragmentPagerAdapter;
     public static ArrayList<Goal> sGoalList;
     public static ArrayList<Trophy> sTrophyList;
-    public static String sQuoteText;
-    public static String sQuoteAuthor;
+
     // Firebase related
-    public static DatabaseReference sGoalsDatabaseReference; // TODO: Adjust to correct node. -> include users
+    public static DatabaseReference sGoalsDatabaseReference;
     public static DatabaseReference sTrophiesDatabaseReference;
     public static FirebaseDatabase sFirebaseDatabase;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
-    // API related
-    private QuotesController mQuotesController;
-    private boolean mIsRestoredFromState = false;
+
+    // AsyncTaskLoader related
+    public static final int QUOTE_FROM_CONTENT_PROVIDER_LOADER = 23;
+    public static final String OPERATION_URL_EXTRA = "url_that_return_json_data";   // TODO change
+
     // IntentService related
     private PullQuoteBroadcastReceiver mPullQuoteBroadcastReceiver;
 
@@ -117,26 +122,18 @@ public class MainActivity extends AppCompatActivity
 
         // Initialize Firebase components
         initializeFirebaseAuth();
-         // loadQuote();
-         testWriteContentResolver();
-        // testReadContentResolver();
-        testStartIntentService();
-    }
-
-    private void testStartIntentService() {
-        // use this method later in if/else online or not
-
-        mPullQuoteBroadcastReceiver = new PullQuoteBroadcastReceiver(this);
-        launchPullQuoteIntentService();
+        loadQuote();
     }
 
     private void launchPullQuoteIntentService() {
+        mPullQuoteBroadcastReceiver = new PullQuoteBroadcastReceiver(this);
         Intent pullQuoteIntent = new Intent(MainActivity.this, PullQuoteIntentService.class);
         startService(pullQuoteIntent);
     }
 
-    private void testReadContentResolver() {
+    private Quote getQuoteFromContentResolver() {
         Uri uri = QuotesContract.QuotesEntry.CONTENT_URI;
+        Quote quote = new Quote();
         try {
             Cursor cursor = getContentResolver().query(
                 uri,
@@ -147,34 +144,22 @@ public class MainActivity extends AppCompatActivity
             for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
                 String text = cursor.getString(cursor.getColumnIndex(QuotesContract.QuotesEntry.COLUMN_TEXT));
                 String author = cursor.getString(cursor.getColumnIndex(QuotesContract.QuotesEntry.COLUMN_AUTHOR));
-                int i = 1;
+                quote.setQuoteText(text);
+                quote.setQuoteAuthor(author);
+                Timber.e("LOADED FROM CONTENT RESOLVER" + quote.getQuoteText());
+                return quote;   // TODO careful here, we leave the cursor iteration on first iteration
             }
         } catch (Exception e) {
             Timber.e(e.getMessage());
             e.printStackTrace();
         }
-        int i = 1;
-    }
-
-    private void testWriteContentResolver() {
-
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(QuotesContract.QuotesEntry.COLUMN_LINK, "Unique URL");
-        contentValues.put(QuotesContract.QuotesEntry.COLUMN_TEXT, "So war das.");
-        contentValues.put(QuotesContract.QuotesEntry.COLUMN_AUTHOR, "Horst");
-
-        // Insert the content values via a ContentResolver
-        Uri uri = getContentResolver().insert(QuotesContract.QuotesEntry.CONTENT_URI, contentValues);
-        if (uri != null) {
-            Toast.makeText(getBaseContext(), "Added to Content Provider", Toast.LENGTH_LONG).show();
-            Timber.e("added to content resolver");
-        }
+        return quote;
     }
 
     private void loadQuote() {
         if (!isOnline())
         {
-            loadQuoteFromContentProvider();
+            startAsyncTankLoader();
         }
         else
         {
@@ -182,7 +167,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void loadQuoteFromContentProvider() {
+    private void startAsyncTankLoader() {
+        // TODO expand to use a member var for the loader if triggered several times
+        // TODO  see https://medium.com/@sanjeevy133/an-idiots-guide-to-android-asynctaskloader-76f8bfb0a0c0
+        // TODO  paragraph 6.
+        getSupportLoaderManager().initLoader(QUOTE_FROM_CONTENT_PROVIDER_LOADER, null, this);
     }
 
     @Override
@@ -323,6 +312,9 @@ public class MainActivity extends AppCompatActivity
 
     public void updateViewsNotifyGoalChanged(int foundAtPosition) {
         mFixedTabsFragmentPagerAdapter.updateViewsNotifyGoalUpdated(foundAtPosition);
+    }
+    private void updateViewQuoteLoaded(String quoteText, String quoteAuthor) {
+        mFixedTabsFragmentPagerAdapter.updateViewNotifyQuoteChanged(quoteText, quoteAuthor);
     }
     //// end region updateViews ////
 
@@ -507,7 +499,6 @@ public class MainActivity extends AppCompatActivity
             //String quoteAuthor = quote.getQuoteAuthor();
 
             // TODO move following line to broadcast receiver!
-            mFixedTabsFragmentPagerAdapter.updateViewNotifyQuoteChanged(quoteText, quoteAuthor);
         } else {
             // showMainErrorMessage(); TODO handle error / log etc...
             int i = 0;
@@ -557,6 +548,58 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBroadcastReceived(String quoteText, String quoteAuthor) {
         // TODO handle view updating from here.
+        updateViewQuoteLoaded(quoteText, quoteAuthor);
         Timber.e("BROADCAST received." + quoteText);
     }
+
+    //================================================================================
+    // region Cursor Loader and Callbacks for the QuotesContentProvider
+    //================================================================================
+    @SuppressLint("StaticFieldLeak")    // ...why u lint me?
+    @NonNull
+    @Override
+    public Loader<Quote> onCreateLoader(int id, @Nullable Bundle args) {
+        return new AsyncTaskLoader<Quote>(this) {
+            Quote cacheQuote;   // keep the quote here as long as already retrieved via HTTP
+
+            @Override
+            protected void onStartLoading() {
+                // Think of this as AsyncTask onPreExecute() method,
+                //  you can start a progress bar and at the end call forceLoad();
+                if (cacheQuote!=null) {
+                    // To skip loadInBackground call
+                    deliverResult(cacheQuote);
+                } else {
+                    forceLoad();
+                }
+            }
+
+            @Override
+            public void deliverResult(Quote quote) {    // Quick delivery if cached
+                cacheQuote = quote;
+                super.deliverResult(quote);
+            }
+
+            @Override
+            public Quote loadInBackground() {
+                // Think of this as AsyncTask doInBackground() method,
+                //  here you will actually initiate Network call,
+                //  or any work that need to be done on background
+                return getQuoteFromContentResolver();
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<Quote> loader, Quote quote) {
+        updateViewQuoteLoaded(quote.getQuoteText(), quote.getQuoteAuthor());
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<Quote> loader) {
+
+    }
+    //================================================================================
+    // endregion Cursor Loader and Callbacks for the QuotesContentProvider
+    //================================================================================
 }
