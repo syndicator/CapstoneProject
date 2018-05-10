@@ -400,4 +400,19 @@ public class GoalHelper {
     public static LocalDate convertFromIsoDate(String IsoString) {
         return LocalDate.parse(IsoString, DateTimeFormatter.ISO_LOCAL_DATE);
     }
+
+    public static int calculateFinalAward(Goal goal) {
+        int totalPasses = GoalHelper.calculateNumberOfTotalPasses(goal);
+        if (totalPasses >= Config.NUMBER_FOR_GOLD) {
+            return GoalStatusPseudoEnum.GOLD_EARNED;
+        } else if (totalPasses >= Config.NUMBER_FOR_SILVER) {
+            return GoalStatusPseudoEnum.SILVER_EARNED;
+        } else if (totalPasses >= Config.NUMBER_FOR_BRONZE) {
+            return GoalStatusPseudoEnum.BRONZE_EARNED;
+        }
+        else
+        {
+            return 0;
+        }
+    }
 }

@@ -25,7 +25,6 @@ import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.TrackListAdapter;
 import info.weigandt.goalacademy.classes.AlertDialogFactory;
 import info.weigandt.goalacademy.classes.Constants;
-import info.weigandt.goalacademy.classes.FirebaseOperations;
 import info.weigandt.goalacademy.classes.Goal;
 import info.weigandt.goalacademy.classes.GoalHelper;
 import info.weigandt.goalacademy.classes.WrapLinearLayoutManager;
@@ -53,14 +52,12 @@ public class TrackFragment extends BaseFragment {
 
     @BindView(R.id.rv_track)
     RecyclerView mRecyclerView;
-    @BindView(R.id.button_week_current)
+    @BindView(R.id.button_current_week)
     Button mCurrentWeekButton;
     @BindView(R.id.button_week_increase)
     ImageButton mIncreaseWeekButton;
     @BindView(R.id.button_week_decrease)
     ImageButton mDecreaseWeekButton;
-    @BindView(R.id.LOGOUT_BUTTON)
-    Button mLogoutButton;
 
     public TrackFragment() { // Required empty public constructor
     }
@@ -93,18 +90,13 @@ public class TrackFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.fragment_track, container, false);
         ButterKnife.bind(this, view);
 
-
         if (!mIsRestoredFromState) {
             mCurrentWeekButton.setText(GoalHelper.convertToGuiString(LocalDate.now()));
         }
-
-        mLogoutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FirebaseOperations.deleteTest();
-            }
-        });
-
+        else
+        {
+            mCurrentWeekButton.setText(GoalHelper.convertToGuiString(mDisplayedWeek));
+        }
         mCurrentWeekButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -142,6 +134,7 @@ public class TrackFragment extends BaseFragment {
         if (savedInstanceState != null) {
             // Restore the fragment's state here... hmmm TODO not sure about that man
             String yo = "let's do it'";
+            // TODO Restore anything thats needs a completed Activity OnCreate here!!!
         }
     }
 
@@ -177,6 +170,8 @@ public class TrackFragment extends BaseFragment {
     }
 
     private void initializeAdapter() {
+
+        int i = sGoalList.size();
         mAdapter = new TrackListAdapter(getContext(), new TrackListAdapter.TrackListAdapterListener() {
             @Override
             public void button_0_OnClick(View v, int position, EventStateEnum state) {
@@ -295,19 +290,29 @@ public class TrackFragment extends BaseFragment {
                     // Version 2: If totally failed, open an dialog with the option to confirm
                     // failure or to reset this event!
                     String awardName;
-                    int award = GoalHelper.calculateAward(goal);
+                    // TODO not correct. Must calculate final award here!!!
+                    int award = GoalHelper.calculateFinalAward(goal);
                     if (award == GoalStatusPseudoEnum.GOLD_EARNED) {
                         awardName = GoalStatusPseudoEnum.GOLD_EARNED_STRING;
+                        goal.setStatus(GoalStatusPseudoEnum.GOLD_EARNED);
+                        // Invoke parent activity to handle the goal completion. We send the final award also.
+                        mFragmentInteractionListener.onGoalCompleted(goal, GoalStatusPseudoEnum.GOLD_EARNED_STRING);
 
                     } else if (award == GoalStatusPseudoEnum.SILVER_EARNED) {
                         awardName = GoalStatusPseudoEnum.SILVER_EARNED_STRING;
-
+                        goal.setStatus(GoalStatusPseudoEnum.SILVER_EARNED);
+                        // Invoke parent activity to handle the goal completion. We send the final award also.
+                        mFragmentInteractionListener.onGoalCompleted(goal, GoalStatusPseudoEnum.SILVER_EARNED_STRING);
                     } else if (award == GoalStatusPseudoEnum.BRONZE_EARNED) {
                         awardName = GoalStatusPseudoEnum.BRONZE_EARNED_STRING;
+                        goal.setStatus(GoalStatusPseudoEnum.BRONZE_EARNED);
+                        // Invoke parent activity to handle the goal completion. We send the final award also.
+                        mFragmentInteractionListener.onGoalCompleted(goal, GoalStatusPseudoEnum.BRONZE_EARNED_STRING);
                     } else {
                         awardName = GoalStatusPseudoEnum.BEGINNER_STRING;
+                        mFragmentInteractionListener.onGoalFailed(goal);
                     }
-                    mFragmentInteractionListener.onGoalFailed(goal);
+
                     AlertDialog alertDialog = AlertDialogFactory.createFailDialog(awardName, getActivity());
                     alertDialog.show();
 
@@ -417,8 +422,6 @@ public class TrackFragment extends BaseFragment {
             mIsRestoredFromState = true;    // TODO check if actually needed
         }
     }
-
-
 
     //=========================================================================
     //endregion Saving the state

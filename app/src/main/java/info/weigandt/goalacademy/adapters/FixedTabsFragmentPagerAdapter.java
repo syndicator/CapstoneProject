@@ -44,6 +44,8 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
         switch (position) {
             case 0:
                 Timber.d("getItem in FragmentPager called.");
+                return TrackFragment.newInstance();
+                /*
                 if (trackFragment == null)
                 {
                     return TrackFragment.newInstance();
@@ -52,6 +54,7 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
                 {
                     return this.trackFragment;
                 }
+                */
                 /* TODO tried to add a tag :/
                 mFragmentManager.beginTransaction()
                         .add(R.id.fragment_track, fragment, Constants.TRACK_FRAGMENT_TAG)
@@ -128,7 +131,8 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
         }
     }
 
-    public void updateGoalsFragmentNofifyGoalChanged(int position) {
+    public void updateGoalsFragmentNofifyGoalChanged(int position) {    // TODO check if  still in use
+        trackFragment.updateViewNotifyGoalChanged(position);
         goalsFragment.updateViewNotifyGoalChanged(position);
     }
 
