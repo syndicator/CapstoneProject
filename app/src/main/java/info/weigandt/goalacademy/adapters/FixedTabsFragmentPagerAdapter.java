@@ -6,25 +6,27 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.fragments.BaseFragment;
 import info.weigandt.goalacademy.fragments.GoalsFragment;
 import info.weigandt.goalacademy.fragments.TrackFragment;
 import info.weigandt.goalacademy.fragments.TrophiesFragment;
+import timber.log.Timber;
 
 public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
     private final Context mContext;
-    private TrackFragment mTrackFragment;
-    private GoalsFragment mGoalsFragment;
-    private TrophiesFragment mTrophiesFragment;
-    public ArrayList<BaseFragment> fragmentList;
+    private final FragmentManager mFragmentManager;
+    public TrackFragment trackFragment;
+    public GoalsFragment goalsFragment;
+    public TrophiesFragment trophiesFragment;
 
-    public FixedTabsFragmentPagerAdapter(FragmentManager fm, Context context) {
+    public FixedTabsFragmentPagerAdapter(FragmentManager fm, Context context, TrackFragment trackFragment) {
         super(fm);
         mContext = context;
-        fragmentList = new ArrayList<>();
+        mFragmentManager = fm;
+        if (trackFragment != null) {
+            this.trackFragment = trackFragment;
+        }
     }
 
     @Override
@@ -41,8 +43,20 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
         BaseFragment fragment;
         switch (position) {
             case 0:
-                fragment = TrackFragment.newInstance(null, null);
-                return fragment;
+                Timber.d("getItem in FragmentPager called.");
+                if (trackFragment == null)
+                {
+                    return TrackFragment.newInstance();
+                }
+                else
+                {
+                    return this.trackFragment;
+                }
+                /* TODO tried to add a tag :/
+                mFragmentManager.beginTransaction()
+                        .add(R.id.fragment_track, fragment, Constants.TRACK_FRAGMENT_TAG)
+                        .commit();
+                        */
             case 1:
                 fragment = GoalsFragment.newInstance(null, null);
                 return fragment;
@@ -61,20 +75,20 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
     // on the ViewPager position.   ->     #loveIt :)
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
+
+
         Fragment createdFragment = (Fragment) super.instantiateItem(container, position);
         // save the appropriate reference depending on position
         switch (position) {
             case 0:
-                mTrackFragment = ((TrackFragment) createdFragment);
-                fragmentList.add(mTrackFragment);
+                Timber.d("instantiateItem in FragmentPager called.");
+                trackFragment = ((TrackFragment) createdFragment);
                 break;
             case 1:
-                mGoalsFragment = ((GoalsFragment) createdFragment);
-                fragmentList.add(mGoalsFragment);
+                goalsFragment = ((GoalsFragment) createdFragment);
                 break;
             case 2:
-                mTrophiesFragment = ((TrophiesFragment) createdFragment);
-                fragmentList.add(mTrophiesFragment);
+                trophiesFragment = ((TrophiesFragment) createdFragment);
                 break;
         }
         return createdFragment;
@@ -92,47 +106,47 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
     }
 
     public void updateViewsNotifyGoalInserted() {
-        mTrackFragment.updateViewNotifyGoalInserted();
-        mGoalsFragment.updateViewNotifyGoalInserted();
+        trackFragment.updateViewNotifyGoalInserted();
+        goalsFragment.updateViewNotifyGoalInserted();
     }
 
     public void updateViewsNotifyGoalRemoved(int position) {
         // TODO maybe not needed if listener is set??? hmmmmm
-        mTrackFragment.updateViewNotifyGoalRemoved();
-        mGoalsFragment.updateViewNotifyGoalRemoved();
+        trackFragment.updateViewNotifyGoalRemoved();
+        goalsFragment.updateViewNotifyGoalRemoved();
 
     }
 
     public void updateViewsNotifyGoalUpdated(int position) {
-        mGoalsFragment.updateViewNotifyGoalChanged(position);
-        mTrackFragment.updateViewNotifyGoalChanged(position);
+        goalsFragment.updateViewNotifyGoalChanged(position);
+        trackFragment.updateViewNotifyGoalChanged(position);
     }
 
     public void updateViewNotifyTrophyInserted() {
-        if (mTrophiesFragment != null) {
-            mTrophiesFragment.updateViewNotifyTrophyInserted();
+        if (trophiesFragment != null) {
+            trophiesFragment.updateViewNotifyTrophyInserted();
         }
     }
 
     public void updateGoalsFragmentNofifyGoalChanged(int position) {
-        mGoalsFragment.updateViewNotifyGoalChanged(position);
+        goalsFragment.updateViewNotifyGoalChanged(position);
     }
 
     public void clearAdapters(int sizeGoalList, int sizeTrophyList) {
-        if (mTrackFragment != null) {
-            mTrackFragment.clearAdapter(sizeGoalList);
+        if (trackFragment != null) {
+            trackFragment.clearAdapter(sizeGoalList);
         }
-        if (mGoalsFragment != null) {
-            mGoalsFragment.clearAdapter(sizeGoalList);
+        if (goalsFragment != null) {
+            goalsFragment.clearAdapter(sizeGoalList);
         }
-        if (mTrophiesFragment != null) {
-            mTrophiesFragment.clearAdapter(sizeTrophyList);
+        if (trophiesFragment != null) {
+            trophiesFragment.clearAdapter(sizeTrophyList);
         }
     }
 
     public void updateViewNotifyQuoteChanged(String quoteText, String quoteAuthor) {
-        if (mGoalsFragment != null) {
-            mGoalsFragment.updateViewQuoteChanged(quoteText, quoteAuthor);
+        if (goalsFragment != null) {
+            goalsFragment.updateViewQuoteChanged(quoteText, quoteAuthor);
         }
     }
 }

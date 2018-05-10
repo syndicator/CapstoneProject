@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -34,10 +35,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.threeten.bp.LocalDate;
-import org.threeten.bp.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,6 +47,7 @@ import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.FixedTabsFragmentPagerAdapter;
 import info.weigandt.goalacademy.classes.FirebaseOperations;
 import info.weigandt.goalacademy.classes.Goal;
+import info.weigandt.goalacademy.classes.GoalHelper;
 import info.weigandt.goalacademy.classes.Trophy;
 import info.weigandt.goalacademy.data.Quote;
 import info.weigandt.goalacademy.data.QuotesContract;
@@ -73,7 +72,6 @@ public class MainActivity extends AppCompatActivity
     public static DatabaseReference sGoalsDatabaseReference;
     public static DatabaseReference sTrophiesDatabaseReference;
     public static FirebaseDatabase sFirebaseDatabase;
-    private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
     // AsyncTaskLoader related
@@ -95,10 +93,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // RESTORING THE STATE
         if (savedInstanceState != null)
         {
-            //restoreFromSavedInstanceState(savedInstanceState);
+            restoreFromSavedInstanceState(savedInstanceState);
         }
         setContentView(R.layout.activity_main);
         // ThreeTen Android Backport: Includes Java8 java.time features to replace outdated Java7 time / date classes
@@ -113,11 +110,15 @@ public class MainActivity extends AppCompatActivity
         } else {
             // Online-crash-reporting may be added here later on for release versions
         }
+        initializeTabsAdapter();
         // Create an adapter that knows which fragment should be shown on each page
-        mFixedTabsFragmentPagerAdapter = new FixedTabsFragmentPagerAdapter(getSupportFragmentManager(), this);
+        if (mFixedTabsFragmentPagerAdapter == null) // if not restored from savedInstanceState
+        {
+            mFixedTabsFragmentPagerAdapter = new FixedTabsFragmentPagerAdapter(getSupportFragmentManager(), this, null);
+        }
+
         // Set the adapter onto the view pager
         mViewPager.setAdapter(mFixedTabsFragmentPagerAdapter);
-
         // Connect the tab layout with the view pager. This will
         //   1. Update the tab layout when the view pager is swiped
         //   2. Update the view pager when a tab is selected
@@ -137,11 +138,12 @@ public class MainActivity extends AppCompatActivity
         // quote loading moved to: onSignedInInitialize (only if signed in!)
     }
 
+    private void initializeTabsAdapter() {
 
+    }
 
     private void launchPullQuoteIntentService() {
         Intent pullQuoteIntent = new Intent(MainActivity.this, PullQuoteIntentService.class);
-        registerBroadcastReceiver();
         startService(pullQuoteIntent);
     }
 
@@ -205,7 +207,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initializeFirebaseAuth() {
-        mFirebaseAuth = FirebaseAuth.getInstance();
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -219,13 +220,13 @@ public class MainActivity extends AppCompatActivity
                     // user is signed out
                     onSignedOutCleanup();
                     startActivityForResult(
-                            AuthUI.getInstance()
-                                    .createSignInIntentBuilder()
-                                    .setAvailableProviders(Arrays.asList(
-                                            new AuthUI.IdpConfig.EmailBuilder().build(),
-                                            new AuthUI.IdpConfig.GoogleBuilder().build()))
-                                    .build(),
-                            RC_SIGN_IN);
+                        AuthUI.getInstance()
+                                .createSignInIntentBuilder()
+                                .setAvailableProviders(Arrays.asList(
+                                        new AuthUI.IdpConfig.EmailBuilder().build(),
+                                        new AuthUI.IdpConfig.GoogleBuilder().build()))
+                                .build(),
+                        RC_SIGN_IN);
                 }
             }
         };
@@ -234,7 +235,10 @@ public class MainActivity extends AppCompatActivity
     private void onSignedInInitialize() {
         initializeFirebaseDb();
         attachFirebaseDbListener();
-         loadQuote();
+        if (!mIsRestoredFromState)
+        {
+            loadQuote();
+        }
     }
 
     private void onSignedOutCleanup() {
@@ -276,7 +280,7 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         // This will trigger onSigninInitialize() if user is logged in
-        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+        FirebaseAuth.getInstance().addAuthStateListener(mAuthStateListener);
         registerBroadcastReceiver();
 
          /*
@@ -388,9 +392,8 @@ public class MainActivity extends AppCompatActivity
 
     private void createTrophyFromCompletedGoal(Goal goal, String award) {
         Trophy trophy = new Trophy();
-        LocalDate date = LocalDate.now();
         // see https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html
-        String isoDateString = date.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        String isoDateString = GoalHelper.convertToIsoDate(LocalDate.now());
         trophy.setCompletionDate(isoDateString);
         trophy.setGoalName(goal.getName());
         trophy.setAward(award);
@@ -648,7 +651,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-/*
+        super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(BUNDLE_GOAL_LIST,
                 (ArrayList<? extends Parcelable>) sGoalList);
         outState.putParcelableArrayList(BUNDLE_TROPHY_LIST,
@@ -657,22 +660,10 @@ public class MainActivity extends AppCompatActivity
         // TODO Save list state <- fragment?
         //mListState = mTabLayout.onSaveInstanceState();
         //outState.putParcelable(LIST_STATE_KEY, mListState);
-        */
-        super.onSaveInstanceState(outState);
-    }
 
-    private ArrayList<JSONObject> convertToJsonArray(ArrayList<String> stringList)
-    {
-        ArrayList<JSONObject> jsonList= new ArrayList<>();
-        for (String movie:stringList) {
-            try {
-                JSONObject json =new JSONObject(movie);
-                jsonList.add(json);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        return jsonList;
+        // Save the fragment's instance
+        getSupportFragmentManager().putFragment(outState, "TrackFragment",
+                mFixedTabsFragmentPagerAdapter.trackFragment);
     }
 
     private void restoreFromSavedInstanceState(Bundle savedInstanceState) {
@@ -684,10 +675,16 @@ public class MainActivity extends AppCompatActivity
         sGoalList  = savedInstanceState.getParcelableArrayList(BUNDLE_GOAL_LIST);
         sTrophyList  = savedInstanceState.getParcelableArrayList(BUNDLE_TROPHY_LIST);
 
-        // TODO - in fragment? - Retrieve list state and list/item positions
-
+        /*
+        //Restore the fragment's instance
+        if (mFixedTabsFragmentPagerAdapter == null)
+        {
+            TrackFragment trackFragment = (TrackFragment)getSupportFragmentManager().getFragment(savedInstanceState, "TrackFragment");
+            mFixedTabsFragmentPagerAdapter = new FixedTabsFragmentPagerAdapter(getSupportFragmentManager(), this, trackFragment);
+        }
+        */
         //mListState = savedInstanceState.getParcelable(LIST_STATE_KEY);
-        //mIsRestoredFromState = true;
+        mIsRestoredFromState = true;
     }
 
     //================================================================================

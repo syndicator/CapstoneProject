@@ -2,6 +2,7 @@ package info.weigandt.goalacademy.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,12 +24,14 @@ import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.TrackListAdapter;
 import info.weigandt.goalacademy.classes.AlertDialogFactory;
+import info.weigandt.goalacademy.classes.Constants;
 import info.weigandt.goalacademy.classes.FirebaseOperations;
 import info.weigandt.goalacademy.classes.Goal;
 import info.weigandt.goalacademy.classes.GoalHelper;
 import info.weigandt.goalacademy.classes.WrapLinearLayoutManager;
 import info.weigandt.goalacademy.enums.EventStateEnum;
 import info.weigandt.goalacademy.enums.GoalStatusPseudoEnum;
+import timber.log.Timber;
 
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
 
@@ -40,23 +43,14 @@ import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
  * create an instance of this fragment.
  */
 public class TrackFragment extends BaseFragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
     private OnFragmentInteractionListener mFragmentInteractionListener;
-
-    public void setDisplayedWeek(LocalDate displayedWeek) {
-        mDisplayedWeek = displayedWeek;
-        sYearWeekString = GoalHelper.convertDateToYearWeekString(mDisplayedWeek);   // TODO: optionally check helper class to superflous conversions
-    }
-
-    // private String mYearWeekString;
+    private Parcelable mListState;
+    private boolean mIsRestoredFromState = false;
     private LocalDate mDisplayedWeek;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+    public static String sYearWeekString;   // TODO this has to be recreated from state
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
     @BindView(R.id.rv_track)
     RecyclerView mRecyclerView;
     @BindView(R.id.button_week_current)
@@ -65,72 +59,45 @@ public class TrackFragment extends BaseFragment {
     ImageButton mIncreaseWeekButton;
     @BindView(R.id.button_week_decrease)
     ImageButton mDecreaseWeekButton;
-
-    /*@BindView(R.id.DELETE_BUTTON)
-    Button mDeleteButton;
-*/
     @BindView(R.id.LOGOUT_BUTTON)
     Button mLogoutButton;
 
-
-    //private TrackListAdapter mAdapter;
-    private RecyclerView.Adapter mAdapter;  // TODO is this sup  class enough?
-    private RecyclerView.LayoutManager mLayoutManager;
-    public static String sYearWeekString;
-
-
-    // private OnFragmentInteractionListener mListener; TODO keep only if...
-
-    public TrackFragment() {
-        // Required empty public constructor
+    public TrackFragment() { // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment TrackFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static TrackFragment newInstance(String param1, String param2) {
+    public static TrackFragment newInstance() {
         TrackFragment fragment = new TrackFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+        if (savedInstanceState != null) {
+            restoreFromSavedInstanceState(savedInstanceState);
         }
+        if (savedInstanceState == null) {
+            setDisplayedWeek(LocalDate.now());
+        }
+    }
+
+    private void restoreFromSavedInstanceState(Bundle savedInstanceState) {
+        String isoDate = savedInstanceState.getString(Constants.BUNDLE_ISO_DATE_DISPLAYED_WEEK);
+        setDisplayedWeek(GoalHelper.convertFromIsoDate(isoDate)); // this also sets sYearWeekString
+        mIsRestoredFromState = true;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_track, container, false);
         ButterKnife.bind(this, view);
-        // TODO debug!!!!!
-        setDisplayedWeek(LocalDate.now());
-        sYearWeekString = "2018-18";    // TODO used by whom?....
-        // TODO end debug!!!!!
-        initializeAdapter();
-        /*
-        mDeleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FirebaseOperations.deleteTest();
-            }
-        });
-      */
+
+
+        if (!mIsRestoredFromState) {
+            mCurrentWeekButton.setText(GoalHelper.convertToGuiString(LocalDate.now()));
+        }
+
         mLogoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -138,16 +105,12 @@ public class TrackFragment extends BaseFragment {
             }
         });
 
-
-        // Set button_week_current to current week
-        LocalDate nowLocalDate = LocalDate.now();
-        mCurrentWeekButton.setText(getWeekNumberYearStringForView(nowLocalDate));
         mCurrentWeekButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!(getWeekFrom(mDisplayedWeek).equals(getWeekFrom(LocalDate.now())))) {
                     setDisplayedWeek(LocalDate.now());
-                    mCurrentWeekButton.setText(getWeekNumberYearStringForView(mDisplayedWeek));
+                    mCurrentWeekButton.setText(GoalHelper.convertToGuiString(mDisplayedWeek));
                     updateRecyclerView();
                 }
             }
@@ -156,7 +119,7 @@ public class TrackFragment extends BaseFragment {
             @Override
             public void onClick(View view) {
                 setDisplayedWeek(mDisplayedWeek.plusWeeks(1));
-                mCurrentWeekButton.setText(getWeekNumberYearStringForView(mDisplayedWeek));
+                mCurrentWeekButton.setText(GoalHelper.convertToGuiString(mDisplayedWeek));
                 updateRecyclerView();
             }
         });
@@ -164,12 +127,29 @@ public class TrackFragment extends BaseFragment {
             @Override
             public void onClick(View view) {
                 setDisplayedWeek(mDisplayedWeek.minusWeeks(1));
-                mCurrentWeekButton.setText(getWeekNumberYearStringForView(mDisplayedWeek));
+                mCurrentWeekButton.setText(GoalHelper.convertToGuiString(mDisplayedWeek));
                 updateRecyclerView();
             }
         });
         return view;
     }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Timber.d("onActivityCreated called.");
+        initializeAdapter();
+        if (savedInstanceState != null) {
+            // Restore the fragment's state here... hmmm TODO not sure about that man
+            String yo = "let's do it'";
+        }
+    }
+
+    public void setDisplayedWeek(LocalDate displayedWeek) {
+        mDisplayedWeek = displayedWeek;
+        sYearWeekString = GoalHelper.convertToFirebaseString(mDisplayedWeek);   // TODO: optionally check helper class to superflous conversions
+    }
+
     public void onViewCreated(View view, Bundle savedInstanceState) {
         // updateRecyclerView();
     }
@@ -178,7 +158,7 @@ public class TrackFragment extends BaseFragment {
         mAdapter.notifyDataSetChanged();
     }
 
-    private String getWeekNumberYearStringForView(LocalDate localDate) {
+    private String convertToGuiString(LocalDate localDate) {
         TemporalField weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
         int weekNumber = localDate.get(weekOfYear);
         String format = "%1$02d"; // Two digits
@@ -232,15 +212,14 @@ public class TrackFragment extends BaseFragment {
             public void button_6_OnClick(View v, int position, EventStateEnum state) {
                 processButtonClick(position, state, 6);
             }
-        });  // TODO change signature later
+        });
         mRecyclerView.setAdapter(mAdapter);
         // Using a linear layout manager
         mLayoutManager = new WrapLinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
         // Set only if rv doesn't change size // TODO check if this setting is right
         mRecyclerView.setHasFixedSize(true);
-        // mAdapter.notifyDataSetChanged(); TODO: needed? (presumably not here)
-
+         //mAdapter.notifyDataSetChanged(); // TODO: needed? (presumably not here)
     }
 
     private void processButtonClick(int position, EventStateEnum state, int weekday) {
@@ -294,9 +273,7 @@ public class TrackFragment extends BaseFragment {
             } else if (award == GoalStatusPseudoEnum.BRONZE_EARNED) {
                 goal.setStatus(GoalStatusPseudoEnum.BRONZE_EARNED);
                 mFragmentInteractionListener.onGoalChangedByFragment(goal);
-            }
-            else
-            {
+            } else {
                 // This a "normal" pass with an increase in streak only
                 mFragmentInteractionListener.onGoalChangedByFragment(goal);
             }
@@ -327,9 +304,7 @@ public class TrackFragment extends BaseFragment {
 
                     } else if (award == GoalStatusPseudoEnum.BRONZE_EARNED) {
                         awardName = GoalStatusPseudoEnum.BRONZE_EARNED_STRING;
-                    }
-                    else
-                    {
+                    } else {
                         awardName = GoalStatusPseudoEnum.BEGINNER_STRING;
                     }
                     mFragmentInteractionListener.onGoalFailed(goal);
@@ -339,16 +314,12 @@ public class TrackFragment extends BaseFragment {
                 } else if (criticalSum == 1) {
                     // Version 2: If nearly failed == last day to complete the goal for this week,
                     // change the GUI to critical for this item
-                }
-                else
-                {
+                } else {
                     // "Normal" fail
                     mFragmentInteractionListener.onGoalChangedByFragment(goal);
                 }
                 // END HANDLING THE CRITICAL STATES
-            }
-            else
-            {
+            } else {
                 // TODO will be a total fail in every case!!! But ask first if this setting is intentionally
                 String awardName;
                 int award = GoalHelper.calculateAward(goal);
@@ -360,9 +331,7 @@ public class TrackFragment extends BaseFragment {
 
                 } else if (award == GoalStatusPseudoEnum.BRONZE_EARNED) {
                     awardName = GoalStatusPseudoEnum.BRONZE_EARNED_STRING;
-                }
-                else
-                {
+                } else {
                     awardName = GoalStatusPseudoEnum.BEGINNER_STRING;
                 }
                 mFragmentInteractionListener.onGoalFailed(goal);
@@ -382,6 +351,9 @@ public class TrackFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
+        if (mListState != null) {
+            mLayoutManager.onRestoreInstanceState(mListState);
+        }
     }
 
     @Override
@@ -423,25 +395,30 @@ public class TrackFragment extends BaseFragment {
     //=========================================================================
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        /*
-        if (outState != null)
-        {
-            super.onSaveInstanceState(outState);
-            outState.putParcelable(BUNDLE_TRACK_RECYCLER_LAYOUT, mRecyclerView.getLayoutManager().onSaveInstanceState());
-        }
-        */
+        super.onSaveInstanceState(outState);
+
+        // Save variables
+        outState.putString(Constants.BUNDLE_ISO_DATE_DISPLAYED_WEEK,
+                GoalHelper.convertToIsoDate(mDisplayedWeek));
+
+        // Save the List state
+        mListState = mRecyclerView.getLayoutManager().onSaveInstanceState();
+        outState.putParcelable(Constants.BUNDLE_TRACK_RECYCLER_LAYOUT, mListState);
     }
+
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        /*
-        if(savedInstanceState != null)
-        {
-            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_TRACK_RECYCLER_LAYOUT);
-            mRecyclerView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
+
+        // Retrieve list state and list/item positions. Update it in onResume!
+        if (savedInstanceState != null) {
+            mListState = savedInstanceState.getParcelable(Constants.BUNDLE_TRACK_RECYCLER_LAYOUT);
+            mRecyclerView.getLayoutManager().onRestoreInstanceState(mListState);
+            mIsRestoredFromState = true;    // TODO check if actually needed
         }
-        */
     }
+
+
 
     //=========================================================================
     //endregion Saving the state

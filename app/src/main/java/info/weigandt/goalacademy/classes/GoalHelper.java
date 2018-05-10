@@ -1,6 +1,7 @@
 package info.weigandt.goalacademy.classes;
 
 import org.threeten.bp.LocalDate;
+import org.threeten.bp.format.DateTimeFormatter;
 import org.threeten.bp.temporal.TemporalField;
 import org.threeten.bp.temporal.WeekFields;
 
@@ -14,7 +15,7 @@ import info.weigandt.goalacademy.enums.GoalStatusPseudoEnum;
 public class GoalHelper {
     public static Goal ChangeEventEntryInGoal(Goal goal, EventStateEnum newState, int clickedWeekday, LocalDate currentlyDisplayedLocalDate)
     {
-        String currentlyDisplayedYearWeekString = convertDateToYearWeekString(currentlyDisplayedLocalDate);
+        String currentlyDisplayedYearWeekString = convertToFirebaseString(currentlyDisplayedLocalDate);
 
         // #case0   Status is now PASS: this means, before it has been NEUTRAL
         //  -> add the pass to the list
@@ -111,12 +112,26 @@ public class GoalHelper {
         return goal;
     }
 
-    public static String convertDateToYearWeekString(LocalDate localDate) {
+    public static String convertToFirebaseString(LocalDate localDate) {
         String yearWeekString = String.valueOf(localDate.getYear());
         TemporalField weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
         int weekNumber = localDate.get(weekOfYear);
         return yearWeekString + "-" + String.valueOf(weekNumber);
     }
+
+    public static String convertToGuiString(LocalDate localDate) {
+        TemporalField weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
+        int weekNumber = localDate.get(weekOfYear);
+        String format = "%1$02d"; // Two digits
+        String formattedWeekNumber = (String.format(format, weekNumber));
+
+        String year = String.valueOf(localDate.getYear());
+
+        String yearWeekString = "Week " + formattedWeekNumber + " (" + year + ")";
+
+        return yearWeekString;
+    }
+
 
     private static int AddEventToCounter(int weekCounter, int clickedWeekday) {
         switch (clickedWeekday) {
@@ -325,7 +340,7 @@ public class GoalHelper {
     public static int calculateNumberOfPassesGivenWeek(Goal goal, LocalDate displayedWeek) {
         int totalPasses = 0;
         for (Goal.WeeklyEventCounter weeklyEventCounter : goal.getWeeklyEventCounterList()) {
-            if (weeklyEventCounter.getYearWeekString().equals(convertDateToYearWeekString(displayedWeek))) {
+            if (weeklyEventCounter.getYearWeekString().equals(convertToFirebaseString(displayedWeek))) {
                 totalPasses += calculateNumberOfEvents(weeklyEventCounter.getWeekPassCounter());
             }
         }
@@ -356,7 +371,7 @@ public class GoalHelper {
     public static int calculateNumberOfFails(Goal goal, LocalDate displayedWeek) {
         int totalFails = 0;
         for (Goal.WeeklyEventCounter weeklyEventCounter : goal.getWeeklyEventCounterList()) {
-            if (weeklyEventCounter.getYearWeekString().equals(convertDateToYearWeekString(displayedWeek))) {
+            if (weeklyEventCounter.getYearWeekString().equals(convertToFirebaseString(displayedWeek))) {
                 totalFails += calculateNumberOfEvents(weeklyEventCounter.getWeekFailCounter());
             }
         }
@@ -376,5 +391,13 @@ public class GoalHelper {
         {
             return 0;
         }
+    }
+
+    public static String convertToIsoDate(LocalDate localDate) {
+        return localDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
+    }
+
+    public static LocalDate convertFromIsoDate(String IsoString) {
+        return LocalDate.parse(IsoString, DateTimeFormatter.ISO_LOCAL_DATE);
     }
 }
