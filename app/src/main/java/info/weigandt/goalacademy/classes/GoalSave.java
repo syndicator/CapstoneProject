@@ -1,12 +1,8 @@
 package info.weigandt.goalacademy.classes;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import java.util.ArrayList;
 import java.util.List;
 
-public class Goal implements Parcelable {
+public class GoalSave {
     private String pushId;
     private String name;
     private int timesPerWeek;
@@ -91,54 +87,4 @@ public class Goal implements Parcelable {
             this.weekFailCounter = weekFailCounter;
         }
     }
-
-    public Goal() {
-    }
-
-    protected Goal(Parcel in) {
-        pushId = in.readString();
-        name = in.readString();
-        timesPerWeek = in.readInt();
-        scheduledWeekdays = in.readInt();
-        status = in.readInt();
-        if (in.readByte() == 0x01) {
-            WeeklyEventCounterList = new ArrayList<WeeklyEventCounter>();
-            in.readList(WeeklyEventCounterList, WeeklyEventCounter.class.getClassLoader());
-        } else {
-            WeeklyEventCounterList = null;
-        }
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(pushId);
-        dest.writeString(name);
-        dest.writeInt(timesPerWeek);
-        dest.writeInt(scheduledWeekdays);
-        dest.writeInt(status);
-        if (WeeklyEventCounterList == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeList(WeeklyEventCounterList);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Goal> CREATOR = new Parcelable.Creator<Goal>() {
-        @Override
-        public Goal createFromParcel(Parcel in) {
-            return new Goal(in);
-        }
-
-        @Override
-        public Goal[] newArray(int size) {
-            return new Goal[size];
-        }
-    };
 }

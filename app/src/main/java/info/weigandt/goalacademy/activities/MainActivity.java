@@ -31,8 +31,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.gson.Gson;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.format.DateTimeFormatter;
 
@@ -53,6 +56,9 @@ import info.weigandt.goalacademy.fragments.BaseFragment;
 import info.weigandt.goalacademy.service.PullQuoteBroadcastReceiver;
 import info.weigandt.goalacademy.service.PullQuoteIntentService;
 import timber.log.Timber;
+
+import static info.weigandt.goalacademy.classes.Constants.BUNDLE_GOAL_LIST;
+import static info.weigandt.goalacademy.classes.Constants.BUNDLE_TROPHY_LIST;
 
 public class MainActivity extends AppCompatActivity
         implements BaseFragment.OnFragmentInteractionListener,
@@ -89,6 +95,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // RESTORING THE STATE
+        if (savedInstanceState != null)
+        {
+            //restoreFromSavedInstanceState(savedInstanceState);
+        }
         setContentView(R.layout.activity_main);
         // ThreeTen Android Backport: Includes Java8 java.time features to replace outdated Java7 time / date classes
         AndroidThreeTen.init(this);
@@ -122,12 +133,15 @@ public class MainActivity extends AppCompatActivity
 
         // Initialize Firebase components
         initializeFirebaseAuth();
-        loadQuote();
+        //loadQuote();
+        // quote loading moved to: onSignedInInitialize (only if signed in!)
     }
 
+
+
     private void launchPullQuoteIntentService() {
-        mPullQuoteBroadcastReceiver = new PullQuoteBroadcastReceiver(this);
         Intent pullQuoteIntent = new Intent(MainActivity.this, PullQuoteIntentService.class);
+        registerBroadcastReceiver();
         startService(pullQuoteIntent);
     }
 
@@ -159,7 +173,7 @@ public class MainActivity extends AppCompatActivity
     private void loadQuote() {
         if (!isOnline())
         {
-            startAsyncTankLoader();
+            startAsyncTaskLoader();
         }
         else
         {
@@ -167,7 +181,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void startAsyncTankLoader() {
+    private void startAsyncTaskLoader() {
         // TODO expand to use a member var for the loader if triggered several times
         // TODO  see https://medium.com/@sanjeevy133/an-idiots-guide-to-android-asynctaskloader-76f8bfb0a0c0
         // TODO  paragraph 6.
@@ -220,6 +234,7 @@ public class MainActivity extends AppCompatActivity
     private void onSignedInInitialize() {
         initializeFirebaseDb();
         attachFirebaseDbListener();
+         loadQuote();
     }
 
     private void onSignedOutCleanup() {
@@ -252,12 +267,25 @@ public class MainActivity extends AppCompatActivity
         sTrophiesDatabaseReference = sFirebaseDatabase.getReference().child("trophies").child(mUserId);
     }
 
+
+    /**
+     * This method is called after this activity has been paused or restarted
+     * Only needed for favorites, because this list can change by adding/removing from favorites
+     */
     @Override
     protected void onResume() {
         super.onResume();
         // This will trigger onSigninInitialize() if user is logged in
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
         registerBroadcastReceiver();
+
+         /*
+        if (mSelectionMode == INT_MODE_FAVORITES)
+        {
+            getSupportLoaderManager().restartLoader(FAVORITE_MOVIES_LOADER_ID, null, this);
+            int i = 1;
+        }
+        */
     }
 
     @Override
@@ -271,7 +299,7 @@ public class MainActivity extends AppCompatActivity
     // region BroadcastReceiver
 
     private void registerBroadcastReceiver() {
-        if  (mPullQuoteBroadcastReceiver  != null)
+        if  (mPullQuoteBroadcastReceiver == null)
         {
             mPullQuoteBroadcastReceiver = new PullQuoteBroadcastReceiver(this);
         }
@@ -602,4 +630,69 @@ public class MainActivity extends AppCompatActivity
     //================================================================================
     // endregion Cursor Loader and Callbacks for the QuotesContentProvider
     //================================================================================
+
+
+    //================================================================================
+    // Saving / restoring the state
+    //================================================================================
+
+    private ArrayList<String> convertToStringArray(ArrayList<Goal> goalList)
+    {
+        ArrayList<String> stringList = new ArrayList<>();
+        Gson gson = new Gson();
+        for (Goal goal : goalList) {
+            stringList.add(gson.toJson(goal));
+        }
+        return stringList;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+/*
+        outState.putParcelableArrayList(BUNDLE_GOAL_LIST,
+                (ArrayList<? extends Parcelable>) sGoalList);
+        outState.putParcelableArrayList(BUNDLE_TROPHY_LIST,
+                (ArrayList<? extends Parcelable>) sTrophyList);
+
+        // TODO Save list state <- fragment?
+        //mListState = mTabLayout.onSaveInstanceState();
+        //outState.putParcelable(LIST_STATE_KEY, mListState);
+        */
+        super.onSaveInstanceState(outState);
+    }
+
+    private ArrayList<JSONObject> convertToJsonArray(ArrayList<String> stringList)
+    {
+        ArrayList<JSONObject> jsonList= new ArrayList<>();
+        for (String movie:stringList) {
+            try {
+                JSONObject json =new JSONObject(movie);
+                jsonList.add(json);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return jsonList;
+    }
+
+    private void restoreFromSavedInstanceState(Bundle savedInstanceState) {
+        if (sFirebaseDatabase == null)
+        {
+            // initializeFirebaseDb(); // TODO check if needed
+        }
+        // recreate in onCreate:
+        sGoalList  = savedInstanceState.getParcelableArrayList(BUNDLE_GOAL_LIST);
+        sTrophyList  = savedInstanceState.getParcelableArrayList(BUNDLE_TROPHY_LIST);
+
+        // TODO - in fragment? - Retrieve list state and list/item positions
+
+        //mListState = savedInstanceState.getParcelable(LIST_STATE_KEY);
+        //mIsRestoredFromState = true;
+    }
+
+    //================================================================================
+    // END Saving / restoring the state
+    //================================================================================
+
+
 }

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "604869782967",
+    "firebase_url": "https://goalacademy-f6e8f.firebaseio.com",
+    "project_id": "goalacademy-f6e8f",
+    "storage_bucket": "goalacademy-f6e8f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:604869782967:android:46450382a90550a6",
+        "android_client_info": {
+          "package_name": "info.weigandt.goalacademy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "604869782967-141mmjhse57sl5ktas8ev49ie3o1ht3t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "info.weigandt.goalacademy",
+            "certificate_hash": "1a3284c67ce10e5686077f0a3c4ca8662456ffad"
+          }
+        },
+        {
+          "client_id": "604869782967-vjpfqke4ah2ga5417vbcr1kseet7gq5q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0eOia-HmDioo7bZS_Ey2wwV-lpq6ZuD4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "604869782967-vjpfqke4ah2ga5417vbcr1kseet7gq5q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

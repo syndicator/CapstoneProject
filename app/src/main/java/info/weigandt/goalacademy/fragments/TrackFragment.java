@@ -2,6 +2,7 @@ package info.weigandt.goalacademy.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -416,4 +417,33 @@ public class TrackFragment extends BaseFragment {
     public void clearAdapter(int size) {
         mAdapter.notifyItemRangeRemoved(0, size);
     }
+
+    //=========================================================================
+    //region Saving the state
+    //=========================================================================
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        /*
+        if (outState != null)
+        {
+            super.onSaveInstanceState(outState);
+            outState.putParcelable(BUNDLE_TRACK_RECYCLER_LAYOUT, mRecyclerView.getLayoutManager().onSaveInstanceState());
+        }
+        */
+    }
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        /*
+        if(savedInstanceState != null)
+        {
+            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_TRACK_RECYCLER_LAYOUT);
+            mRecyclerView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
+        }
+        */
+    }
+
+    //=========================================================================
+    //endregion Saving the state
+    //=========================================================================
 }
