@@ -3,6 +3,7 @@ package info.weigandt.goalacademy.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -59,6 +60,7 @@ public class TrackFragment extends BaseFragment {
     ImageButton mIncreaseWeekButton;
     @BindView(R.id.button_week_decrease)
     ImageButton mDecreaseWeekButton;
+    private long mLastClickTime;
 
     public TrackFragment() { // Required empty public constructor
     }
@@ -101,6 +103,7 @@ public class TrackFragment extends BaseFragment {
         mCurrentWeekButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (isSafeClick()) return;
                 if (!(getWeekFrom(mDisplayedWeek).equals(getWeekFrom(LocalDate.now())))) {
                     setDisplayedWeek(LocalDate.now());
                     mCurrentWeekButton.setText(GoalHelper.convertToGuiString(mDisplayedWeek));
@@ -111,6 +114,7 @@ public class TrackFragment extends BaseFragment {
         mIncreaseWeekButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (isSafeClick()) return;
                 setDisplayedWeek(mDisplayedWeek.plusWeeks(1));
                 mCurrentWeekButton.setText(GoalHelper.convertToGuiString(mDisplayedWeek));
                 updateRecyclerView();
@@ -119,12 +123,22 @@ public class TrackFragment extends BaseFragment {
         mDecreaseWeekButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (isSafeClick()) return;
                 setDisplayedWeek(mDisplayedWeek.minusWeeks(1));
                 mCurrentWeekButton.setText(GoalHelper.convertToGuiString(mDisplayedWeek));
                 updateRecyclerView();
             }
         });
         return view;
+    }
+
+    private boolean isSafeClick() {
+        // Mis-clicking prevention, using threshold of 100 ms
+        if (SystemClock.elapsedRealtime() - mLastClickTime < 100){
+            return true;
+        }
+        mLastClickTime = SystemClock.elapsedRealtime();
+        return false;
     }
 
     @Override
@@ -174,41 +188,47 @@ public class TrackFragment extends BaseFragment {
 
     private void initializeAdapter() {
 
-        int i = sGoalList.size();
         mAdapter = new TrackListAdapter(getContext(), new TrackListAdapter.TrackListAdapterListener() {
             @Override
             public void button_0_OnClick(View v, int position, EventStateEnum state) {
-                processButtonClick(position, state, 0);
+                ImageButton imageButton = v.findViewById(R.id.tsb_0);
+                processButtonClick(position, state, 0, imageButton);
             }
 
             @Override
             public void button_1_OnClick(View v, int position, EventStateEnum state) {
-                processButtonClick(position, state, 1);
+                ImageButton imageButton = v.findViewById(R.id.tsb_1);
+                processButtonClick(position, state, 1, imageButton);
             }
 
             @Override
             public void button_2_OnClick(View v, int position, EventStateEnum state) {
-                processButtonClick(position, state, 2);
+                ImageButton imageButton = v.findViewById(R.id.tsb_2);
+                processButtonClick(position, state, 2, imageButton);
             }
 
             @Override
             public void button_3_OnClick(View v, int position, EventStateEnum state) {
-                processButtonClick(position, state, 3);
+                ImageButton imageButton = v.findViewById(R.id.tsb_3);
+                processButtonClick(position, state, 3, imageButton);
             }
 
             @Override
             public void button_4_OnClick(View v, int position, EventStateEnum state) {
-                processButtonClick(position, state, 4);
+                ImageButton imageButton = v.findViewById(R.id.tsb_4);
+                processButtonClick(position, state, 4, imageButton);
             }
 
             @Override
             public void button_5_OnClick(View v, int position, EventStateEnum state) {
-                processButtonClick(position, state, 5);
+                ImageButton imageButton = v.findViewById(R.id.tsb_5);
+                processButtonClick(position, state, 5, imageButton);
             }
 
             @Override
             public void button_6_OnClick(View v, int position, EventStateEnum state) {
-                processButtonClick(position, state, 6);
+                ImageButton imageButton = v.findViewById(R.id.tsb_6);
+                processButtonClick(position, state, 6, imageButton);
             }
         });
         mRecyclerView.setAdapter(mAdapter);
@@ -219,24 +239,34 @@ public class TrackFragment extends BaseFragment {
         mRecyclerView.setHasFixedSize(true);
     }
 
-    private void processButtonClick(int position, EventStateEnum state, int weekday) {
+    private void processButtonClick(int position, EventStateEnum state, int weekday, ImageButton imageButton) {
         Goal goal = sGoalList.get(position);
         Goal changedGoal;
+        String description;
         // DANGER: the state committed is the previous state BEFORE clicking.
         switch (state) {
             case PASS:
                 changedGoal = GoalHelper.ChangeEventEntryInGoal(goal, EventStateEnum.FAIL, weekday, mDisplayedWeek);
                 // this day was a fail! check if goal is failed also now
                 calculateStatusOfGoal(changedGoal, EventStateEnum.FAIL);
+
+                description =  getResources().getString(R.string.description_three_states_button_fail);
+                imageButton.setContentDescription(description);
                 break;
             case FAIL:
                 changedGoal = GoalHelper.ChangeEventEntryInGoal(goal, EventStateEnum.NEUTRAL, weekday, mDisplayedWeek);
                 calculateStatusOfGoal(changedGoal, EventStateEnum.NEUTRAL);
+
+                description =  getResources().getString(R.string.description_three_states_button_neutral);
+                imageButton.setContentDescription(description);
                 break;
             case NEUTRAL:
                 changedGoal = GoalHelper.ChangeEventEntryInGoal(goal, EventStateEnum.PASS, weekday, mDisplayedWeek);
                 // this day was a pass! check if goal is progressing now
                 calculateStatusOfGoal(changedGoal, EventStateEnum.PASS);
+
+                description =  getResources().getString(R.string.description_three_states_button_pass);
+                imageButton.setContentDescription(description);
                 break;
         }
         // mFragmentInteractionListener.onGoalChangedByFragment(goal, position);

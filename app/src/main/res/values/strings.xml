@@ -44,5 +44,14 @@
     <string name="sign_out">Sign out</string>
     <string name="share_text">I just finished a goal in Goal Academy! My achievement is:</string>
     <string name="action_share">Share</string>
+    <string name="description_add_new_goal">Tap here to add a new goal.</string>
+    <string name="description_week_decrease">Tap this button to show the progress one week earlier.</string>
+    <string name="description_week_increase">Tap this button to show the progress one week later.</string>
+    <string name="description_current_week">This button displays the shown week number. Tap it switch to the current week.</string>
+    <string name="description_share_button">Tap this button to share your goal.</string>
+    <string name="description_trophy_image">This image shows the type of trophy you have been awarded. It can be Bronze, Silver or Gold.</string>
+    <string name="description_three_states_button_neutral">Status: Neutral. This button can be neutral, pass or fail. Tap to switch the state.</string>
+    <string name="description_three_states_button_fail">Status: Fail. This button can be neutral, pass or fail. Tap to switch the state.</string>
+    <string name="description_three_states_button_pass">Status: Pass. This button can be neutral, pass or fail. Tap to switch the state.</string>
 
 </resources>

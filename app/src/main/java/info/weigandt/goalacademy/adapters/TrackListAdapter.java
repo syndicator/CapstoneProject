@@ -1,6 +1,7 @@
 package info.weigandt.goalacademy.adapters;
 
 import android.content.Context;
+import android.os.SystemClock;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,8 +12,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.classes.GoalHelper;
-import info.weigandt.goalacademy.enums.EventStateEnum;
 import info.weigandt.goalacademy.classes.ThreeStatesButton;
+import info.weigandt.goalacademy.enums.EventStateEnum;
 
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
 import static info.weigandt.goalacademy.fragments.TrackFragment.sYearWeekString;
@@ -23,6 +24,7 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
     private Context mContext;
     // List is accessible as static from MainActivity
     public TrackListAdapterListener onClickListener;
+    private long mLastClickTime;
     // endregion Variables
 
     // region Constructor
@@ -34,6 +36,7 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
     // endregion Constructor
 
     // region Overrides
+
     /**
      * This is called for each new ViewHolder
      */
@@ -89,10 +92,8 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
     }
 
     // endregion Interface
-
-
-
     // region Inner Class
+
     /**
      * Inner Class - ViewHolder (Holding Views in ViewHolders reduces find_by_id calls).
      * Provide a reference to the views for each data item.
@@ -124,49 +125,51 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
             mThreeStatesButton0.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    onClickListener.button_0_OnClick (
+                    onClickListener.button_0_OnClick(
                             v, getAdapterPosition(), mThreeStatesButton0.getState());
                 }
             });
             mThreeStatesButton1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    onClickListener.button_1_OnClick (
+                    onClickListener.button_1_OnClick(
                             v, getAdapterPosition(), mThreeStatesButton1.getState());
                 }
             });
             mThreeStatesButton2.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    onClickListener.button_2_OnClick (
+                    onClickListener.button_2_OnClick(
                             v, getAdapterPosition(), mThreeStatesButton2.getState());
                 }
             });
             mThreeStatesButton3.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    onClickListener.button_3_OnClick (
+                    onClickListener.button_3_OnClick(
                             v, getAdapterPosition(), mThreeStatesButton3.getState());
                 }
             });
             mThreeStatesButton4.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    onClickListener.button_4_OnClick (
+                    onClickListener.button_4_OnClick(
                             v, getAdapterPosition(), mThreeStatesButton4.getState());
                 }
             });
             mThreeStatesButton5.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    onClickListener.button_5_OnClick (
+                    if (isSafeClick()) return;
+                    onClickListener.button_5_OnClick(
                             v, getAdapterPosition(), mThreeStatesButton5.getState());
                 }
             });
             mThreeStatesButton6.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    onClickListener.button_6_OnClick (
+                    if (isSafeClick()) return;
+                    onClickListener.button_6_OnClick(
                             v, getAdapterPosition(), mThreeStatesButton6.getState());
                 }
             });
@@ -185,37 +188,70 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
             state = GoalHelper.getEventState(sGoalList.get(listIndex), 0, sYearWeekString);
             mThreeStatesButton0.setState(state);
             boolean isBlocked = GoalHelper.isDayBlockedInScheme(0, sGoalList.get(listIndex));
-            if (isBlocked) { mThreeStatesButton0.setVisibility(View.INVISIBLE); }
+            if (isBlocked) {
+                mThreeStatesButton0.setVisibility(View.INVISIBLE);
+            } else {
+                mThreeStatesButton0.setVisibility(View.VISIBLE);
+            }
 
             state = GoalHelper.getEventState(sGoalList.get(listIndex), 1, sYearWeekString);
             mThreeStatesButton1.setState(state);
             isBlocked = GoalHelper.isDayBlockedInScheme(1, sGoalList.get(listIndex));
-            if (isBlocked) { mThreeStatesButton1.setVisibility(View.INVISIBLE); }
+            if (isBlocked) {
+                mThreeStatesButton1.setVisibility(View.INVISIBLE);
+            } else {
+                mThreeStatesButton1.setVisibility(View.VISIBLE);
+            }
 
             state = GoalHelper.getEventState(sGoalList.get(listIndex), 2, sYearWeekString);
             mThreeStatesButton2.setState(state);
             isBlocked = GoalHelper.isDayBlockedInScheme(2, sGoalList.get(listIndex));
-            if (isBlocked) { mThreeStatesButton2.setVisibility(View.INVISIBLE); }
+            if (isBlocked) {
+                mThreeStatesButton2.setVisibility(View.INVISIBLE);
+            }
+            else {
+                mThreeStatesButton2.setVisibility(View.VISIBLE);
+            }
 
             state = GoalHelper.getEventState(sGoalList.get(listIndex), 3, sYearWeekString);
             mThreeStatesButton3.setState(state);
             isBlocked = GoalHelper.isDayBlockedInScheme(3, sGoalList.get(listIndex));
-            if (isBlocked) { mThreeStatesButton3.setVisibility(View.INVISIBLE); }
+            if (isBlocked) {
+                mThreeStatesButton3.setVisibility(View.INVISIBLE);
+            } else {
+                mThreeStatesButton3.setVisibility(View.VISIBLE);
+            }
+
 
             state = GoalHelper.getEventState(sGoalList.get(listIndex), 4, sYearWeekString);
             mThreeStatesButton4.setState(state);
             isBlocked = GoalHelper.isDayBlockedInScheme(4, sGoalList.get(listIndex));
-            if (isBlocked) { mThreeStatesButton4.setVisibility(View.INVISIBLE); }
+            if (isBlocked) {
+                mThreeStatesButton4.setVisibility(View.INVISIBLE);
+            }
+            else {
+                mThreeStatesButton4.setVisibility(View.VISIBLE);
+            }
 
             state = GoalHelper.getEventState(sGoalList.get(listIndex), 5, sYearWeekString);
             mThreeStatesButton5.setState(state);
             isBlocked = GoalHelper.isDayBlockedInScheme(5, sGoalList.get(listIndex));
-            if (isBlocked) { mThreeStatesButton5.setVisibility(View.INVISIBLE); }
+            if (isBlocked) {
+                mThreeStatesButton5.setVisibility(View.INVISIBLE);
+            }
+            else {
+                mThreeStatesButton5.setVisibility(View.VISIBLE);
+            }
 
             state = GoalHelper.getEventState(sGoalList.get(listIndex), 6, sYearWeekString);
             mThreeStatesButton6.setState(state);
             isBlocked = GoalHelper.isDayBlockedInScheme(6, sGoalList.get(listIndex));
-            if (isBlocked) { mThreeStatesButton6.setVisibility(View.INVISIBLE); }
+            if (isBlocked) {
+                mThreeStatesButton6.setVisibility(View.INVISIBLE);
+            }
+            else {
+                mThreeStatesButton6.setVisibility(View.VISIBLE);
+            }
         }
 
         /*  TODO not needed anymore!? after change from codeproject
@@ -230,6 +266,15 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
             // mOnClickListener.onListItemClick(clickedPosition);   // TODO fix
         }
         */
+    }
+
+    private boolean isSafeClick() {
+        // Mis-clicking prevention, using threshold of 150 ms
+        if (SystemClock.elapsedRealtime() - mLastClickTime < 500){
+            return true;
+        }
+        mLastClickTime = SystemClock.elapsedRealtime();
+        return false;
     }
     // endregion Inner Class
 

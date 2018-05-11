@@ -105,10 +105,13 @@ public class TrophyListAdapter extends RecyclerView.Adapter<TrophyListAdapter.Tr
             mTextViewGoalName.setText(sTrophyList.get(listIndex).getGoalName());
             if (sTrophyList.get(listIndex).getAward().equals(GoalStatusPseudoEnum.BRONZE_EARNED_STRING)) {
                 mImageViewAward.setImageResource(R.drawable.ic_trophy_bronze);
+                mImageViewAward.setContentDescription(GoalStatusPseudoEnum.BRONZE_EARNED_STRING);
             } else if (sTrophyList.get(listIndex).getAward().equals(GoalStatusPseudoEnum.SILVER_EARNED_STRING)) {
                 mImageViewAward.setImageResource(R.drawable.ic_trophy_silver);
+                mImageViewAward.setContentDescription(GoalStatusPseudoEnum.SILVER_EARNED_STRING);
             } else if (sTrophyList.get(listIndex).getAward().equals(GoalStatusPseudoEnum.GOLD_EARNED_STRING)) {
                 mImageViewAward.setImageResource(R.drawable.ic_trophy_gold);
+                mImageViewAward.setContentDescription(GoalStatusPseudoEnum.GOLD_EARNED_STRING);
             }
             mTextViewCompletionDate.setText(String.valueOf(sTrophyList.get(listIndex).getCompletionDate()));
             mImageButtonShare.setOnClickListener(new View.OnClickListener() {

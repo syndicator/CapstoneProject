@@ -14,6 +14,7 @@
        android:id="@+id/iv_award"
        android:layout_width="0dp"
        android:layout_height="wrap_content"
+       android:contentDescription="@string/description_trophy_image"
        android:src="@drawable/ic_trophy_bronze"
        android:layout_weight="1"
        />
@@ -27,6 +28,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/ib_share"
+        android:contentDescription="@string/description_share_button"
         android:src="@drawable/ic_share"
         android:layout_weight="1"
         />

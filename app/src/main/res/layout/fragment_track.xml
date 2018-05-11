@@ -3,8 +3,8 @@
     android:id="@+id/fragment_track"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="#1CB4B5"
+    android:orientation="vertical"
     tools:context=".fragments.TrackFragment">
 
     <LinearLayout
@@ -18,12 +18,14 @@
             android:id="@+id/button_week_decrease"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/description_week_decrease"
             android:src="@drawable/ic_chevron_left" />
 
         <Button
             android:id="@+id/button_current_week"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/description_current_week"
             android:text="@string/fallback_week_number"
             android:textSize="@dimen/font_size_week_number" />
 
@@ -31,13 +33,15 @@
             android:id="@+id/button_week_increase"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/description_week_increase"
             android:src="@drawable/ic_chevron_right" />
     </LinearLayout>
+
     <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_track"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"
-        android:id="@+id/rv_track"
-        android:background="#444444" />
+        android:background="#444444"
+        android:scrollbars="vertical" />
 
 </LinearLayout>

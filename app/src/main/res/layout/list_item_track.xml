@@ -73,6 +73,7 @@
             android:layout_height="wrap_content">
 
             <info.weigandt.goalacademy.classes.ThreeStatesButton
+                android:contentDescription="@string/description_three_states_button_neutral"
                 android:id="@+id/tsb_0"
                 android:layout_weight="1"
                 android:background="@drawable/cell_shape"

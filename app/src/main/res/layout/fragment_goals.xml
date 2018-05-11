@@ -82,6 +82,7 @@
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_add"
+        android:contentDescription="@string/description_add_new_goal"
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_marginBottom="@dimen/fab_margin"
