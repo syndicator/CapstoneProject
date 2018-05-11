@@ -45,6 +45,7 @@ import butterknife.ButterKnife;
 import info.weigandt.goalacademy.BuildConfig;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.FixedTabsFragmentPagerAdapter;
+import info.weigandt.goalacademy.classes.Constants;
 import info.weigandt.goalacademy.classes.FirebaseOperations;
 import info.weigandt.goalacademy.classes.Goal;
 import info.weigandt.goalacademy.classes.GoalHelper;
@@ -81,6 +82,9 @@ public class MainActivity extends AppCompatActivity
     // IntentService related
     private PullQuoteBroadcastReceiver mPullQuoteBroadcastReceiver;
 
+    // FragmentsListStates
+    public static Parcelable sTrackFragmentListState;
+
     @BindView(R.id.viewpager)
     ViewPager mViewPager;
     @BindView(R.id.tablayout)
@@ -93,6 +97,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initializeLists();   // TODO this kills my retored lists! :( if needed add  somewhere else if null...
         if (savedInstanceState != null)
         {
             restoreFromSavedInstanceState(savedInstanceState);
@@ -103,7 +108,7 @@ public class MainActivity extends AppCompatActivity
 
         // Initialize Butterknife
         ButterKnife.bind(this);
-        initializeLists();
+
         // Initialize Timber
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
@@ -258,11 +263,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void clearAdapters() {
+        // TODO warning: this deletes goalList before it can be saved for instanceState!
+        /*
         final int sizeGoalList = sGoalList.size();
         sGoalList.clear();
         final int sizeTrophyList = sTrophyList.size();
         sTrophyList.clear();
         mFixedTabsFragmentPagerAdapter.clearAdapters(sizeGoalList, sizeTrophyList);
+        */
     }
 
     private void initializeFirebaseDb() {
@@ -290,6 +298,10 @@ public class MainActivity extends AppCompatActivity
             int i = 1;
         }
         */
+         if (mIsRestoredFromState)
+         {
+             mFixedTabsFragmentPagerAdapter.updateViewsUpdateRecyclerViews();   // TODO move call to method
+         }
     }
 
     @Override
@@ -656,14 +668,17 @@ public class MainActivity extends AppCompatActivity
                 (ArrayList<? extends Parcelable>) sGoalList);
         outState.putParcelableArrayList(BUNDLE_TROPHY_LIST,
                 (ArrayList<? extends Parcelable>) sTrophyList);
+        outState.putParcelable(Constants.BUNDLE_TRACK_RECYCLER_LAYOUT, sTrackFragmentListState);
 
         // TODO Save list state <- fragment?
         //mListState = mTabLayout.onSaveInstanceState();
         //outState.putParcelable(LIST_STATE_KEY, mListState);
 
         // Save the fragment's instance
+        /* TODO not working. Problem is fragmentadapter / view pager
         getSupportFragmentManager().putFragment(outState, "TrackFragment",
                 mFixedTabsFragmentPagerAdapter.trackFragment);
+                */
     }
 
     private void restoreFromSavedInstanceState(Bundle savedInstanceState) {
@@ -674,7 +689,9 @@ public class MainActivity extends AppCompatActivity
         // recreate in onCreate:
         sGoalList  = savedInstanceState.getParcelableArrayList(BUNDLE_GOAL_LIST);
         sTrophyList  = savedInstanceState.getParcelableArrayList(BUNDLE_TROPHY_LIST);
-
+        sTrackFragmentListState = savedInstanceState.getParcelable(Constants.BUNDLE_TRACK_RECYCLER_LAYOUT);
+        int i = 0;
+        int b = 1;
         /*
         //Restore the fragment's instance
         if (mFixedTabsFragmentPagerAdapter == null)

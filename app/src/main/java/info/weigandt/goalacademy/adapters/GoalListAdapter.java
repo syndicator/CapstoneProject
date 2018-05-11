@@ -76,13 +76,13 @@ public class GoalListAdapter extends RecyclerView.Adapter<GoalListAdapter.TrackV
      */
     public class TrackViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.tv_goal_name)
-        TextView mTextViewGoalName;
+        TextView mGoalNameTextView;
         @BindView(R.id.tv_streak)
-        TextView mTextViewStreak;
+        TextView mStreakTextView;
         @BindView(R.id.tv_completed)
-        TextView mTextViewCompleted;
+        TextView mCompletedTextView;
         @BindView(R.id.tv_next_level)
-        TextView mTextViewNextLevel;
+        TextView mNextLevelTextView;
 
         public TrackViewHolder(View itemView) {
             super(itemView);
@@ -98,11 +98,11 @@ public class GoalListAdapter extends RecyclerView.Adapter<GoalListAdapter.TrackV
         void bind(int listIndex) {
             Goal goal = sGoalList.get(listIndex);
             // Name
-            mTextViewGoalName.setText(goal.getName());
+            mGoalNameTextView.setText(goal.getName());
 
             // Streak
             int streakNumber = GoalHelper.calculateNumberOfTotalPasses(goal);
-            mTextViewStreak.setText(String.valueOf(streakNumber));
+            mStreakTextView.setText(String.valueOf(streakNumber));
 
             // Percentage & Next stage
             int eventsNeededToReachNextLevel = 1;
@@ -126,8 +126,8 @@ public class GoalListAdapter extends RecyclerView.Adapter<GoalListAdapter.TrackV
                 subtractSmaller = Config.NUMBER_FOR_SILVER;
             }
             int percentage = ((streakNumber-subtractSmaller)*100) / eventsNeededToReachNextLevel;
-            mTextViewCompleted.setText(String.valueOf(percentage));
-            mTextViewNextLevel.setText(nextLevel);
+            mCompletedTextView.setText(String.valueOf(percentage)+ "%");
+            mNextLevelTextView.setText(nextLevel);
         }
     }
     // endregion Inner Class

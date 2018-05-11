@@ -108,6 +108,13 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
         }
     }
 
+    public void updateViewsUpdateRecyclerViews() {
+        // not possible, null pointer
+        // trackFragment.updateRecyclerView();
+        // goalsFragment.upda
+        // TODO enter those fragments also
+    }
+
     public void updateViewsNotifyGoalInserted() {
         trackFragment.updateViewNotifyGoalInserted();
         goalsFragment.updateViewNotifyGoalInserted();

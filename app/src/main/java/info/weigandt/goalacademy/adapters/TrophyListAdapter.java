@@ -1,6 +1,9 @@
 package info.weigandt.goalacademy.adapters;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.support.v4.app.ShareCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +15,7 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
-import info.weigandt.goalacademy.enums.AwardEnum;
+import info.weigandt.goalacademy.classes.GoalHelper;
 import info.weigandt.goalacademy.enums.GoalStatusPseudoEnum;
 
 import static info.weigandt.goalacademy.activities.MainActivity.sTrophyList;
@@ -32,6 +35,7 @@ public class TrophyListAdapter extends RecyclerView.Adapter<TrophyListAdapter.Tr
     // endregion Constructor
 
     // region Overrides
+
     /**
      * This is called for each new ViewHolder
      */
@@ -63,37 +67,13 @@ public class TrophyListAdapter extends RecyclerView.Adapter<TrophyListAdapter.Tr
     public void onBindViewHolder(TrophyViewHolder holder, int position)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     {
         holder.bind(position);
     }
     // endregion Overrides
 
     // region Inner Class
+
     /**
      * Inner Class - ViewHolder (Holding Views in ViewHolders reduces find_by_id calls).
      * Provide a reference to the views for each data item.
@@ -121,41 +101,25 @@ public class TrophyListAdapter extends RecyclerView.Adapter<TrophyListAdapter.Tr
          *
          * @param listIndex Position of the item in the list
          */
-        void bind(int listIndex) {
+        void bind(final int listIndex) {
             mTextViewGoalName.setText(sTrophyList.get(listIndex).getGoalName());
-            if (sTrophyList.get(listIndex).getAward().equals(GoalStatusPseudoEnum.BRONZE_EARNED_STRING))
-            {
+            if (sTrophyList.get(listIndex).getAward().equals(GoalStatusPseudoEnum.BRONZE_EARNED_STRING)) {
                 mImageViewAward.setImageResource(R.drawable.ic_trophy_bronze);
-            }
-            else if (sTrophyList.get(listIndex).getAward().equals(GoalStatusPseudoEnum.SILVER_EARNED_STRING))
-            {
+            } else if (sTrophyList.get(listIndex).getAward().equals(GoalStatusPseudoEnum.SILVER_EARNED_STRING)) {
                 mImageViewAward.setImageResource(R.drawable.ic_trophy_silver);
-            }
-            else if (sTrophyList.get(listIndex).getAward().equals(GoalStatusPseudoEnum.GOLD_EARNED_STRING))
-            {
+            } else if (sTrophyList.get(listIndex).getAward().equals(GoalStatusPseudoEnum.GOLD_EARNED_STRING)) {
                 mImageViewAward.setImageResource(R.drawable.ic_trophy_gold);
             }
             mTextViewCompletionDate.setText(String.valueOf(sTrophyList.get(listIndex).getCompletionDate()));
-            // mImageButtonShare... TODO complete this
-
+            mImageButtonShare.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mContext.startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from((Activity) mContext)
+                            .setType("text/plain")
+                            .setText(GoalHelper.buildShareText(sTrophyList.get(listIndex)))
+                            .getIntent(), mContext.getString(R.string.action_share)));
+                }
+            });
         }
-
-        /*  TODO not needed anymore!? after change from codeproject
-        /**
-         * Called when a user clicks on an item in the list
-         *
-         * @param v The View that was clicked
-
-        @Override
-        public void onClick(View v) {
-            int clickedPosition = getAdapterPosition();
-            // mOnClickListener.onListItemClick(clickedPosition);   // TODO fix
-        }
-        */
     }
-    // endregion Inner Class
-
-
-
-
 }

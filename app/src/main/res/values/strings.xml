@@ -15,7 +15,7 @@
     <!-- TODO This is the test ad id!!!  -->
     <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
     <string name="fallback_streak_number">250</string>
-    <string name="fallback_finished_percent">10</string>
+    <string name="fallback_finished_percent">10%</string>
     <string name="fallback_next_level">Bronce</string>
     <string name="streak">Streak</string>
     <string name="completion">Completion</string>
@@ -42,5 +42,7 @@
     <string name="fail_message">Alas! You failed to progress any further. Your achieved level is:</string>
     <string name="fail_title">Fail.</string>
     <string name="sign_out">Sign out</string>
+    <string name="share_text">I just finished a goal in Goal Academy! My achievement is:</string>
+    <string name="action_share">Share</string>
 
 </resources>
