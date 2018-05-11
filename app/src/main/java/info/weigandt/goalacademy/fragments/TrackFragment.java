@@ -417,11 +417,14 @@ public class TrackFragment extends BaseFragment {
                 GoalHelper.convertToIsoDate(mDisplayedWeek));
 
         // Save the List state
-        mListState = mRecyclerView.getLayoutManager().onSaveInstanceState();
-        outState.putParcelable(Constants.BUNDLE_TRACK_RECYCLER_LAYOUT, mListState);
+        if (mRecyclerView != null)  // might be "out of view" when TrophyFragment is active
+        {
+            mListState = mRecyclerView.getLayoutManager().onSaveInstanceState();
+            outState.putParcelable(Constants.BUNDLE_TRACK_RECYCLER_LAYOUT, mListState);
 
-        // Saving the List state to main
-        sTrackFragmentListState = mListState;
+            // Saving the List state to main
+            sTrackFragmentListState = mListState;
+        }
     }
 
     @Override

@@ -62,7 +62,7 @@ public class Goal implements Parcelable {
         this.pushId = pushId;
     }
 
-    public static class WeeklyEventCounter {
+    public static class WeeklyEventCounter implements Parcelable {
         private String yearWeekString;
         private int weekPassCounter;
         private int weekFailCounter;
@@ -90,6 +90,40 @@ public class Goal implements Parcelable {
         public void setWeekFailCounter(int weekFailCounter) {
             this.weekFailCounter = weekFailCounter;
         }
+
+        public WeeklyEventCounter() {
+        }
+
+        protected WeeklyEventCounter(Parcel in) {
+            yearWeekString = in.readString();
+            weekPassCounter = in.readInt();
+            weekFailCounter = in.readInt();
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(yearWeekString);
+            dest.writeInt(weekPassCounter);
+            dest.writeInt(weekFailCounter);
+        }
+
+        @SuppressWarnings("unused")
+        public static final Parcelable.Creator<WeeklyEventCounter> CREATOR = new Parcelable.Creator<WeeklyEventCounter>() {
+            @Override
+            public WeeklyEventCounter createFromParcel(Parcel in) {
+                return new WeeklyEventCounter(in);
+            }
+
+            @Override
+            public WeeklyEventCounter[] newArray(int size) {
+                return new WeeklyEventCounter[size];
+            }
+        };
     }
 
     public Goal() {

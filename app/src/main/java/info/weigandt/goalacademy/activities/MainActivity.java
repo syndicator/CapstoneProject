@@ -419,8 +419,8 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     Goal goal = dataSnapshot.getValue(Goal.class);
-                    sGoalList.add(goal);
-                    updateViewsNotifyGoalInserted();  // TODO check if fragment list not null in subclass tab....
+                    addGoal(goal);
+                      // TODO check if fragment list not null in subclass tab....
                     // TODO replace with proper method (inserted instead of former general update)
 
                     // change the sGoalList now and then call:
@@ -520,6 +520,18 @@ public class MainActivity extends AppCompatActivity
             };
             sTrophiesDatabaseReference.addChildEventListener(mTrophiesEventListener);
         }
+    }
+    // This method is needed because sGoalList might have been recreated by restoreFromInstanceState
+    private void addGoal(Goal goalToAdd) {
+        for (Goal goal : sGoalList)
+        {
+            if (goal.getPushId().equals(goalToAdd.getPushId()))
+            {
+                return;
+            }
+        }
+        sGoalList.add(goalToAdd);
+        updateViewsNotifyGoalInserted();
     }
 
     private void updateGoalsFragmentNotifyGoalChanged(int foundAtPosition) {
