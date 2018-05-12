@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.view.ViewGroup;
 
 import info.weigandt.goalacademy.R;
+import info.weigandt.goalacademy.classes.Config;
 import info.weigandt.goalacademy.fragments.BaseFragment;
 import info.weigandt.goalacademy.fragments.GoalsFragment;
 import info.weigandt.goalacademy.fragments.TrackFragment;
@@ -31,7 +32,7 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 3;
+        return Config.PAGE_COUNT;
     }
 
     @Override
@@ -138,8 +139,8 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
         }
     }
 
-    public void updateGoalsFragmentNofifyGoalChanged(int position) {    // TODO check if  still in use
-        trackFragment.updateViewNotifyGoalChanged(position);
+    public void updateGoalsFragmentNotifyGoalChanged(int position) {    // TODO check if  still in use
+        trackFragment.updateViewNotifyGoalChanged(position); // handled by button view logic also :/
         goalsFragment.updateViewNotifyGoalChanged(position);
     }
 

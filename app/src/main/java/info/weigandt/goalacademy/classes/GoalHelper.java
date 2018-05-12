@@ -1,5 +1,7 @@
 package info.weigandt.goalacademy.classes;
 
+import android.content.Context;
+
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.format.DateTimeFormatter;
 import org.threeten.bp.temporal.TemporalField;
@@ -9,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.enums.EventStateEnum;
 import info.weigandt.goalacademy.enums.GoalStatusPseudoEnum;
 
@@ -423,4 +426,6 @@ public class GoalHelper {
             + "\\n Date of award: " + trophy.getCompletionDate();
         return completeText.replace("\\n", System.getProperty("line.separator"));
     }
+
+
 }

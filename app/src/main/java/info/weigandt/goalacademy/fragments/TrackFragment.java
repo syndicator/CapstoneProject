@@ -28,6 +28,7 @@ import info.weigandt.goalacademy.classes.AlertDialogFactory;
 import info.weigandt.goalacademy.classes.Constants;
 import info.weigandt.goalacademy.classes.Goal;
 import info.weigandt.goalacademy.classes.GoalHelper;
+import info.weigandt.goalacademy.classes.ThreeStatesButton;
 import info.weigandt.goalacademy.classes.WrapLinearLayoutManager;
 import info.weigandt.goalacademy.enums.EventStateEnum;
 import info.weigandt.goalacademy.enums.GoalStatusPseudoEnum;
@@ -51,6 +52,7 @@ public class TrackFragment extends BaseFragment {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     public static String sYearWeekString;
+    public static long sLastClickTime;
 
     @BindView(R.id.rv_track)
     RecyclerView mRecyclerView;
@@ -168,19 +170,6 @@ public class TrackFragment extends BaseFragment {
         mAdapter.notifyDataSetChanged();
     }
 
-    private String convertToGuiString(LocalDate localDate) {
-        TemporalField weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
-        int weekNumber = localDate.get(weekOfYear);
-        String format = "%1$02d"; // Two digits
-        String formattedWeekNumber = (String.format(format, weekNumber));
-
-        String year = String.valueOf(localDate.getYear());
-
-        String yearWeekString = "Week " + formattedWeekNumber + " (" + year + ")";
-
-        return yearWeekString;
-    }
-
     private String getWeekFrom(LocalDate localDate) {
         TemporalField weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
         return (String.valueOf(localDate.get(weekOfYear)));
@@ -190,45 +179,45 @@ public class TrackFragment extends BaseFragment {
 
         mAdapter = new TrackListAdapter(getContext(), new TrackListAdapter.TrackListAdapterListener() {
             @Override
-            public void button_0_OnClick(View v, int position, EventStateEnum state) {
-                ImageButton imageButton = v.findViewById(R.id.tsb_0);
-                processButtonClick(position, state, 0, imageButton);
+            public void button_0_OnClick(ThreeStatesButton threeStatesButton, int position) {
+                EventStateEnum state = threeStatesButton.getState();
+                processButtonClick(position, state, 0, threeStatesButton);
             }
 
             @Override
-            public void button_1_OnClick(View v, int position, EventStateEnum state) {
-                ImageButton imageButton = v.findViewById(R.id.tsb_1);
-                processButtonClick(position, state, 1, imageButton);
+            public void button_1_OnClick(ThreeStatesButton threeStatesButton, int position) {
+                EventStateEnum state = threeStatesButton.getState();
+                processButtonClick(position, state, 1, threeStatesButton);
             }
 
             @Override
-            public void button_2_OnClick(View v, int position, EventStateEnum state) {
-                ImageButton imageButton = v.findViewById(R.id.tsb_2);
-                processButtonClick(position, state, 2, imageButton);
+            public void button_2_OnClick(ThreeStatesButton threeStatesButton, int position) {
+                EventStateEnum state = threeStatesButton.getState();
+                processButtonClick(position, state, 2, threeStatesButton);
             }
 
             @Override
-            public void button_3_OnClick(View v, int position, EventStateEnum state) {
-                ImageButton imageButton = v.findViewById(R.id.tsb_3);
-                processButtonClick(position, state, 3, imageButton);
+            public void button_3_OnClick(ThreeStatesButton threeStatesButton, int position) {
+                EventStateEnum state = threeStatesButton.getState();
+                processButtonClick(position, state, 3, threeStatesButton);
             }
 
             @Override
-            public void button_4_OnClick(View v, int position, EventStateEnum state) {
-                ImageButton imageButton = v.findViewById(R.id.tsb_4);
-                processButtonClick(position, state, 4, imageButton);
+            public void button_4_OnClick(ThreeStatesButton threeStatesButton, int position) {
+                EventStateEnum state = threeStatesButton.getState();
+                processButtonClick(position, state, 4, threeStatesButton);
             }
 
             @Override
-            public void button_5_OnClick(View v, int position, EventStateEnum state) {
-                ImageButton imageButton = v.findViewById(R.id.tsb_5);
-                processButtonClick(position, state, 5, imageButton);
+            public void button_5_OnClick(ThreeStatesButton threeStatesButton, int position) {
+                EventStateEnum state = threeStatesButton.getState();
+                processButtonClick(position, state, 5, threeStatesButton);
             }
 
             @Override
-            public void button_6_OnClick(View v, int position, EventStateEnum state) {
-                ImageButton imageButton = v.findViewById(R.id.tsb_6);
-                processButtonClick(position, state, 6, imageButton);
+            public void button_6_OnClick(ThreeStatesButton threeStatesButton, int position) {
+                EventStateEnum state = threeStatesButton.getState();
+                processButtonClick(position, state, 6, threeStatesButton);
             }
         });
         mRecyclerView.setAdapter(mAdapter);

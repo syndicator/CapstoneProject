@@ -12,6 +12,7 @@
         style="@style/CategoryTab"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:nextFocusUp="@+id/sign_out_menu"
         android:background="#69004C" />
 
     <android.support.v4.view.ViewPager

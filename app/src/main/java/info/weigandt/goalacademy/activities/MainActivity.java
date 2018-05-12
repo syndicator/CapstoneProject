@@ -122,6 +122,7 @@ public class MainActivity extends AppCompatActivity
             mFixedTabsFragmentPagerAdapter = new FixedTabsFragmentPagerAdapter(getSupportFragmentManager(), this, null);
         }
 
+
         // Set the adapter onto the view pager
         mViewPager.setAdapter(mFixedTabsFragmentPagerAdapter);
         // Connect the tab layout with the view pager. This will
@@ -131,11 +132,9 @@ public class MainActivity extends AppCompatActivity
         //      by calling onPageTitle()
         mTabLayout.setupWithViewPager(mViewPager);
 
-        // TODO maybe needed at some point?
-        //adapter.startUpdate(viewPager);
-        //tab0 = (Fragment0) adapter.instantiateItem(viewPager, 0);
-        //tab1 = (Fragment1) adapter.instantiateItem(viewPager, 1);
-        //adapter.finishUpdate(viewPager);
+        // TODO not working (no id stored)
+        //View trackTab = ((ViewGroup)mTabLayout.getChildAt(0)).getChildAt(0);
+        //trackTab.setNextFocusUpId(R.id.sign_out_menu);
 
         // Initialize Firebase components
         initializeFirebaseAuth();
@@ -535,7 +534,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateGoalsFragmentNotifyGoalChanged(int foundAtPosition) {
-        mFixedTabsFragmentPagerAdapter.updateGoalsFragmentNofifyGoalChanged(foundAtPosition);
+        mFixedTabsFragmentPagerAdapter.updateGoalsFragmentNotifyGoalChanged(foundAtPosition);
     }
 
     /* TODO check this for processing. method has been moved to service

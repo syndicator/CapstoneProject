@@ -6,9 +6,18 @@
     android:paddingTop="@dimen/pad_2">
 
     <TextView
+        android:textAlignment="viewStart"
+        android:layout_gravity="start"
+        android:textDirection="locale"
         android:id="@+id/tv_goal_name"
+        style="@android:style/TextAppearance.Medium"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/pad_0"
+        android:paddingEnd="@dimen/pad_0"
+        android:paddingLeft="@dimen/pad_0"
+        android:paddingRight="@dimen/pad_0"
+        android:paddingStart="@dimen/pad_0"
         android:text="@string/fallback_trackname" />
 
     <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -19,64 +28,118 @@
         android:stretchColumns="*">
 
         <!-- Row 0 with 7 columns -->
+        <!--- Note: Arabic calendar also displays weekdays ltr! -->
         <TableRow
+            android:layoutDirection="ltr"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+
             android:gravity="center_horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="start"
                 android:background="#b0b0b0"
-                android:text="@string/monday_short" />
+                android:paddingEnd="@dimen/pad_0"
+                android:paddingLeft="@dimen/pad_0"
+                android:paddingRight="@dimen/pad_0"
+                android:paddingStart="@dimen/pad_0"
+                android:text="@string/monday_short"
+                android:textAlignment="viewStart"
+                android:textDirection="locale" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="start"
                 android:background="#b0b0b0"
-                android:text="@string/tuesday_short" />
+                android:paddingEnd="@dimen/pad_0"
+                android:paddingLeft="@dimen/pad_0"
+                android:paddingRight="@dimen/pad_0"
+                android:paddingStart="@dimen/pad_0"
+                android:text="@string/tuesday_short"
+                android:textAlignment="viewStart"
+                android:textDirection="locale" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="start"
                 android:background="#b0b0b0"
-                android:text="@string/wednesday_short" />
+                android:paddingEnd="@dimen/pad_0"
+                android:paddingLeft="@dimen/pad_0"
+                android:paddingRight="@dimen/pad_0"
+                android:paddingStart="@dimen/pad_0"
+                android:text="@string/wednesday_short"
+                android:textAlignment="viewStart"
+                android:textDirection="locale" />
 
             <TextView
+                android:textDirection="locale"
+                android:textAlignment="viewStart"
+                android:layout_gravity="start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#b0b0b0"
+                android:paddingEnd="@dimen/pad_0"
+                android:paddingLeft="@dimen/pad_0"
+                android:paddingRight="@dimen/pad_0"
+                android:paddingStart="@dimen/pad_0"
                 android:text="@string/thursday_short" />
 
             <TextView
+                android:textDirection="locale"
+                android:textAlignment="viewStart"
+                android:layout_gravity="start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#b0b0b0"
+                android:paddingEnd="@dimen/pad_0"
+                android:paddingLeft="@dimen/pad_0"
+                android:paddingRight="@dimen/pad_0"
+                android:paddingStart="@dimen/pad_0"
                 android:text="@string/friday_short" />
 
             <TextView
+                android:textDirection="locale"
+                android:textAlignment="viewStart"
+                android:layout_gravity="start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#b0b0b0"
+                android:paddingEnd="@dimen/pad_0"
+                android:paddingLeft="@dimen/pad_0"
+                android:paddingRight="@dimen/pad_0"
+                android:paddingStart="@dimen/pad_0"
                 android:text="@string/saturday_short" />
 
             <TextView
+                android:textDirection="locale"
+                android:textAlignment="viewStart"
+                android:layout_gravity="start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#b0b0b0"
+                android:paddingEnd="@dimen/pad_0"
+                android:paddingLeft="@dimen/pad_0"
+                android:paddingRight="@dimen/pad_0"
+                android:paddingStart="@dimen/pad_0"
                 android:text="@string/sunday_short" />
         </TableRow>
 
         <!-- Row 1 with 7 columns -->
+        <!--- Note: Arabic calendar also displays weekdays ltr! -->
         <TableRow
+            android:layoutDirection="ltr"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <info.weigandt.goalacademy.classes.ThreeStatesButton
-                android:contentDescription="@string/description_three_states_button_neutral"
                 android:id="@+id/tsb_0"
                 android:layout_weight="1"
                 android:background="@drawable/cell_shape"
+                android:contentDescription="@string/description_three_states_button_neutral"
                 android:gravity="center"
                 android:padding="20dip"
                 android:textColor="#000000" />

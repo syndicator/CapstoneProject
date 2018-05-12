@@ -13,24 +13,40 @@
         android:paddingTop="@dimen/pad_2">
 
         <TextView
+            android:paddingStart="@dimen/pad_0"
+            android:paddingLeft="@dimen/pad_0"
+            android:paddingEnd="@dimen/pad_0"
+            android:paddingRight="@dimen/pad_0"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/goal" />
 
         <TextView
+            android:paddingStart="@dimen/pad_0"
+            android:paddingLeft="@dimen/pad_0"
+            android:paddingEnd="@dimen/pad_0"
+            android:paddingRight="@dimen/pad_0"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/award" />
 
         <TextView
+            android:paddingStart="@dimen/pad_0"
+            android:paddingLeft="@dimen/pad_0"
+            android:paddingEnd="@dimen/pad_0"
+            android:paddingRight="@dimen/pad_0"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/date" />
 
         <TextView
+            android:paddingStart="@dimen/pad_0"
+            android:paddingLeft="@dimen/pad_0"
+            android:paddingEnd="@dimen/pad_0"
+            android:paddingRight="@dimen/pad_0"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
