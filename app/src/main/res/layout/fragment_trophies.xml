@@ -13,6 +13,9 @@
         android:paddingTop="@dimen/pad_2">
 
         <TextView
+            android:textAlignment="viewStart"
+            android:textDirection="locale"
+            android:layout_gravity="start"
             android:paddingStart="@dimen/pad_0"
             android:paddingLeft="@dimen/pad_0"
             android:paddingEnd="@dimen/pad_0"
@@ -23,6 +26,9 @@
             android:text="@string/goal" />
 
         <TextView
+            android:textAlignment="viewStart"
+            android:textDirection="locale"
+            android:layout_gravity="start"
             android:paddingStart="@dimen/pad_0"
             android:paddingLeft="@dimen/pad_0"
             android:paddingEnd="@dimen/pad_0"
@@ -33,6 +39,9 @@
             android:text="@string/award" />
 
         <TextView
+            android:textAlignment="viewStart"
+            android:textDirection="locale"
+            android:layout_gravity="start"
             android:paddingStart="@dimen/pad_0"
             android:paddingLeft="@dimen/pad_0"
             android:paddingEnd="@dimen/pad_0"
@@ -43,6 +52,9 @@
             android:text="@string/date" />
 
         <TextView
+            android:textAlignment="viewStart"
+            android:textDirection="locale"
+            android:layout_gravity="start"
             android:paddingStart="@dimen/pad_0"
             android:paddingLeft="@dimen/pad_0"
             android:paddingEnd="@dimen/pad_0"

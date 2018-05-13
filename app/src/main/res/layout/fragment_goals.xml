@@ -50,6 +50,9 @@
                 android:text="@string/streak" />
 
             <TextView
+                android:textAlignment="viewStart"
+                android:textDirection="locale"
+                android:layout_gravity="start"
                 android:paddingStart="@dimen/pad_0"
                 android:paddingLeft="@dimen/pad_0"
                 android:paddingEnd="@dimen/pad_0"

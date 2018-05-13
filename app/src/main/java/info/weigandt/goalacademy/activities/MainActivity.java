@@ -122,7 +122,6 @@ public class MainActivity extends AppCompatActivity
             mFixedTabsFragmentPagerAdapter = new FixedTabsFragmentPagerAdapter(getSupportFragmentManager(), this, null);
         }
 
-
         // Set the adapter onto the view pager
         mViewPager.setAdapter(mFixedTabsFragmentPagerAdapter);
         // Connect the tab layout with the view pager. This will
@@ -177,13 +176,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void loadQuote() {
-        if (!isOnline())
+        //if (isOnline())
+        if (false)
         {
-            startAsyncTaskLoader();
+            launchPullQuoteIntentService();
         }
         else
         {
-            launchPullQuoteIntentService();
+            startAsyncTaskLoader();
         }
     }
 
@@ -646,6 +646,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(@NonNull Loader<Quote> loader, Quote quote) {
+
         updateViewQuoteLoaded(quote.getQuoteText(), quote.getQuoteAuthor());
     }
 
@@ -718,6 +719,4 @@ public class MainActivity extends AppCompatActivity
     //================================================================================
     // END Saving / restoring the state
     //================================================================================
-
-
 }

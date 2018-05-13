@@ -18,7 +18,7 @@
     <string name="fallback_finished_percent">10%</string>
     <string name="fallback_next_level">Bronce</string>
     <string name="streak">Streak</string>
-    <string name="completion">Completion</string>
+    <string name="completion">Stage completion</string>
     <string name="next_level">Next Level</string>
     <string name="goal">Goal</string>
     <string name="award">Award</string>

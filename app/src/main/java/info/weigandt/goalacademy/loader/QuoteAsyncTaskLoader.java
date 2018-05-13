@@ -1,22 +1,24 @@
 package info.weigandt.goalacademy.loader;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.content.AsyncTaskLoader;
 
-public class CustomAsyncTaskLoader extends AsyncTaskLoader<Cursor> {
+import info.weigandt.goalacademy.data.Quote;
 
-    public CustomAsyncTaskLoader(@NonNull Context context) {
+public class QuoteAsyncTaskLoader extends AsyncTaskLoader<Quote> {
+    public boolean hasResult = false;
+
+    public QuoteAsyncTaskLoader(@NonNull Context context) {
         super(context);
     }
 
-    @Nullable
     @Override
-    public Cursor loadInBackground() {
+    public Quote loadInBackground() {
         return null;
     }
+
+
     @Override
     protected void onStartLoading() {
         //Think of this as AsyncTask onPreExecute() method,you can start your progress bar,and at the end call forceLoad();
