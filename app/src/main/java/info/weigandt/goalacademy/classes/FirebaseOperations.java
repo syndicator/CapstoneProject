@@ -1,9 +1,6 @@
 package info.weigandt.goalacademy.classes;
 
-import android.provider.ContactsContract;
-
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalsDatabaseReference;

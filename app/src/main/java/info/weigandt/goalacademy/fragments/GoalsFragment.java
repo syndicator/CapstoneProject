@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.ads.AdRequest;
@@ -23,6 +24,7 @@ import info.weigandt.goalacademy.classes.FirebaseOperations;
 import info.weigandt.goalacademy.classes.Goal;
 
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
+import static info.weigandt.goalacademy.activities.MainActivity.sIsLoadingFromFirebase;
 
 /**
  * A fragment
@@ -52,6 +54,8 @@ public class GoalsFragment extends BaseFragment {
     @BindView(R.id.fab_add) FloatingActionButton mFloatingActionButtonAdd;
     @BindView(R.id.adView) AdView mAdView;
     @BindView(R.id.tv_quote) TextView mQuoteTextView;
+    @BindView(R.id.goals_loading_indicator)
+    ProgressBar mGoalsLoadingProgressBar;
 
     //private TrackListAdapter mAdapter;
     private RecyclerView.Adapter mAdapter;  // TODO is this sup  class enough?
@@ -152,6 +156,11 @@ public class GoalsFragment extends BaseFragment {
         mAdView.loadAd(adRequest);
     }
 
+    public void hideLoadingIndicator()
+    {
+        mGoalsLoadingProgressBar.setVisibility(View.INVISIBLE);
+    }
+
     private void showCustomFragmentDialog() {
         FragmentManager fm = getFragmentManager();
         CustomDialogFragment customDialogFragment = CustomDialogFragment.newInstance("New goal TODO check code"); // TODO enter resource string here
@@ -202,6 +211,15 @@ public class GoalsFragment extends BaseFragment {
     public void onDetach() {
         super.onDetach();
         mFragmentInteractionListener = null; // TODO remove if no needed
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (sIsLoadingFromFirebase)
+        {
+            mGoalsLoadingProgressBar.setVisibility(View.VISIBLE);
+        }
     }
 
     public void clearAdapter(int size) {

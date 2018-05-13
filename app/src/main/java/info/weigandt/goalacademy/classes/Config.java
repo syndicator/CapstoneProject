@@ -6,7 +6,10 @@ public class Config {
     public static final int NUMBER_FOR_GOLD = 66;
     public static final String DIALOG_MESSAGE = "DIALOG_MESSAGE";
     public static final int PAGE_COUNT = 3;
-    public static String ShareText = "I completed a goal on Goal Academy :)";
+    public static final String ShareText = "I completed a goal on Goal Academy :)"; // Version 2: Replace with Remote config
+    public static final String LIMIT_QUOTES_STRING = "RANDOM() LIMIT 1";
+    public static final String AUTHOR_FALLBACK_STRING = "Unknown Author";     // TODO move to strings.xml;
+
     public Config() {
         // ShareText = Resources.getSystem().getString(android.R.string.share_text);
         // ShareText = "I won a trophy for a completing a goal on Goal Academy!";

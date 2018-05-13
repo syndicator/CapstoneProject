@@ -11,104 +11,119 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-<TableLayout
-    android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:layout_weight="1"
-    android:stretchColumns="1">
 
-        <TableRow xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/pad_2">
-
-            <TextView
-                android:textAlignment="viewStart"
-                android:textDirection="locale"
-                android:layout_gravity="start"
-                android:paddingStart="@dimen/pad_0"
-                android:paddingLeft="@dimen/pad_0"
-                android:paddingEnd="@dimen/pad_0"
-                android:paddingRight="@dimen/pad_0"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/goal" />
-
-            <TextView
-                android:textAlignment="viewStart"
-                android:textDirection="locale"
-                android:layout_gravity="start"
-                android:paddingStart="@dimen/pad_0"
-                android:paddingLeft="@dimen/pad_0"
-                android:paddingEnd="@dimen/pad_0"
-                android:paddingRight="@dimen/pad_0"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/streak" />
-
-            <TextView
-                android:textAlignment="viewStart"
-                android:textDirection="locale"
-                android:layout_gravity="start"
-                android:paddingStart="@dimen/pad_0"
-                android:paddingLeft="@dimen/pad_0"
-                android:paddingEnd="@dimen/pad_0"
-                android:paddingRight="@dimen/pad_0"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/completion" />
-
-            <TextView
-                android:textAlignment="viewStart"
-                android:textDirection="locale"
-                android:layout_gravity="start"
-                android:paddingStart="@dimen/pad_0"
-                android:paddingLeft="@dimen/pad_0"
-                android:paddingEnd="@dimen/pad_0"
-                android:paddingRight="@dimen/pad_0"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/next_level" />
-
-        </TableRow>
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_goals"
+        <TableLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="#444444"
-            android:scrollbars="vertical" />
-</TableLayout>
+            android:stretchColumns="1">
+
+            <TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/pad_2">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_weight="1"
+                    android:paddingEnd="@dimen/pad_0"
+                    android:paddingLeft="@dimen/pad_0"
+                    android:paddingRight="@dimen/pad_0"
+                    android:paddingStart="@dimen/pad_0"
+                    android:text="@string/goal"
+                    android:textAlignment="viewStart"
+                    android:textDirection="locale" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_weight="1"
+                    android:paddingEnd="@dimen/pad_0"
+                    android:paddingLeft="@dimen/pad_0"
+                    android:paddingRight="@dimen/pad_0"
+                    android:paddingStart="@dimen/pad_0"
+                    android:text="@string/streak"
+                    android:textAlignment="viewStart"
+                    android:textDirection="locale" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_weight="1"
+                    android:paddingEnd="@dimen/pad_0"
+                    android:paddingLeft="@dimen/pad_0"
+                    android:paddingRight="@dimen/pad_0"
+                    android:paddingStart="@dimen/pad_0"
+                    android:text="@string/completion"
+                    android:textAlignment="viewStart"
+                    android:textDirection="locale" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_weight="1"
+                    android:paddingEnd="@dimen/pad_0"
+                    android:paddingLeft="@dimen/pad_0"
+                    android:paddingRight="@dimen/pad_0"
+                    android:paddingStart="@dimen/pad_0"
+                    android:text="@string/next_level"
+                    android:textAlignment="viewStart"
+                    android:textDirection="locale" />
+
+            </TableRow>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rv_goals"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#444444"
+                    android:scrollbars="vertical" />
+
+                <ProgressBar
+                    android:id="@+id/goals_loading_indicator"
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/pad_3"
+                    android:visibility="invisible" />
+            </RelativeLayout>
+        </TableLayout>
+
         <TextView
             android:id="@+id/tv_quote"
-            android:textAlignment="viewStart"
-            android:textDirection="locale"
-            android:layout_gravity="start"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@id/rv_goals"
-            android:paddingStart="@dimen/pad_1"
-            android:paddingEnd="@dimen/pad_1"
-            android:paddingTop="@dimen/pad_1"
-            android:paddingBottom="@dimen/pad_2"
-            android:layout_marginStart="@dimen/pad_3"
+            android:layout_gravity="start"
             android:layout_marginEnd="@dimen/pad_3"
+            android:layout_marginStart="@dimen/pad_3"
             android:background="@color/cardview_light_background"
-            android:text="@string/fallback_motivation" />
+            android:paddingBottom="@dimen/pad_2"
+            android:paddingEnd="@dimen/pad_1"
+            android:paddingStart="@dimen/pad_1"
+            android:paddingTop="@dimen/pad_1"
+            android:text="@string/fallback_motivation"
+            android:textAlignment="viewStart"
+            android:textDirection="locale" />
 
         <com.google.android.gms.ads.AdView
             android:id="@+id/adView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="0dp"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
+            android:layout_marginBottom="0dp"
             app:adSize="BANNER"
             app:adUnitId="@string/banner_ad_unit_id" />
 
@@ -116,13 +131,13 @@
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_add"
-        android:contentDescription="@string/description_add_new_goal"
         android:layout_width="56dp"
         android:layout_height="56dp"
+        android:layout_gravity="bottom|right"
         android:layout_marginBottom="@dimen/fab_margin"
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginRight="24dp"
-        android:layout_gravity="bottom|right"
+        android:contentDescription="@string/description_add_new_goal"
         android:elevation="@dimen/fab_elevation"
         android:src="@drawable/ic_add"
         app:borderWidth="0dp"

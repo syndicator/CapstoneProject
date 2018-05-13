@@ -1,20 +1,17 @@
 package info.weigandt.goalacademy.activities;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
@@ -32,6 +29,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
@@ -45,6 +43,7 @@ import butterknife.ButterKnife;
 import info.weigandt.goalacademy.BuildConfig;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.FixedTabsFragmentPagerAdapter;
+import info.weigandt.goalacademy.classes.Config;
 import info.weigandt.goalacademy.classes.Constants;
 import info.weigandt.goalacademy.classes.FirebaseOperations;
 import info.weigandt.goalacademy.classes.Goal;
@@ -53,6 +52,7 @@ import info.weigandt.goalacademy.classes.Trophy;
 import info.weigandt.goalacademy.data.Quote;
 import info.weigandt.goalacademy.data.QuotesContract;
 import info.weigandt.goalacademy.fragments.BaseFragment;
+import info.weigandt.goalacademy.loader.QuoteAsyncTaskLoader;
 import info.weigandt.goalacademy.service.PullQuoteBroadcastReceiver;
 import info.weigandt.goalacademy.service.PullQuoteIntentService;
 import timber.log.Timber;
@@ -62,12 +62,13 @@ import static info.weigandt.goalacademy.classes.Constants.BUNDLE_TROPHY_LIST;
 
 public class MainActivity extends AppCompatActivity
         implements BaseFragment.OnFragmentInteractionListener,
-        PullQuoteBroadcastReceiver.BroadcastReceiverListener, LoaderManager.LoaderCallbacks<Quote> {
+        PullQuoteBroadcastReceiver.BroadcastReceiverListener, LoaderManager.LoaderCallbacks<Cursor> {
     private static final int RC_SIGN_IN = 0;
     private boolean mIsRestoredFromState = false;
     public FixedTabsFragmentPagerAdapter mFixedTabsFragmentPagerAdapter;
     public static ArrayList<Goal> sGoalList;
     public static ArrayList<Trophy> sTrophyList;
+    public static boolean sIsLoadingFromFirebase;
 
     // Firebase related
     public static DatabaseReference sGoalsDatabaseReference;
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initializeLists();   // TODO this kills my retored lists! :( if needed add  somewhere else if null...
+        initializeLists();   // TODO this kills my restored lists! :( if needed add  somewhere else if null...
         if (savedInstanceState != null)
         {
             restoreFromSavedInstanceState(savedInstanceState);
@@ -148,31 +149,6 @@ public class MainActivity extends AppCompatActivity
     private void launchPullQuoteIntentService() {
         Intent pullQuoteIntent = new Intent(MainActivity.this, PullQuoteIntentService.class);
         startService(pullQuoteIntent);
-    }
-
-    private Quote getQuoteFromContentResolver() {
-        Uri uri = QuotesContract.QuotesEntry.CONTENT_URI;
-        Quote quote = new Quote();
-        try {
-            Cursor cursor = getContentResolver().query(
-                uri,
-                null,
-                null,
-                null,
-                null);
-            for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-                String text = cursor.getString(cursor.getColumnIndex(QuotesContract.QuotesEntry.COLUMN_TEXT));
-                String author = cursor.getString(cursor.getColumnIndex(QuotesContract.QuotesEntry.COLUMN_AUTHOR));
-                quote.setQuoteText(text);
-                quote.setQuoteAuthor(author);
-                Timber.e("LOADED FROM CONTENT RESOLVER" + quote.getQuoteText());
-                return quote;   // TODO careful here, we leave the cursor iteration on first iteration
-            }
-        } catch (Exception e) {
-            Timber.e(e.getMessage());
-            e.printStackTrace();
-        }
-        return quote;
     }
 
     private void loadQuote() {
@@ -237,12 +213,31 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void onSignedInInitialize() {
+        sIsLoadingFromFirebase = true;
         initializeFirebaseDb();
-        attachFirebaseDbListener();
+        checkForEmptyFirebaseDb();
+        attachFirebaseDbListeners();
         if (!mIsRestoredFromState)
         {
             loadQuote();
         }
+    }
+
+    private void checkForEmptyFirebaseDb() {
+        sGoalsDatabaseReference.limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.exists()) {
+                    sIsLoadingFromFirebase = false;
+                    hideLoadingIndicators();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void onSignedOutCleanup() {
@@ -333,7 +328,6 @@ public class MainActivity extends AppCompatActivity
 
     // endregion BroadcastReceiver
 
-
     private void initializeLists() {
         sGoalList = new ArrayList<>();
         sTrophyList = new ArrayList<>();
@@ -357,6 +351,9 @@ public class MainActivity extends AppCompatActivity
         mFixedTabsFragmentPagerAdapter.updateViewsNotifyGoalUpdated(foundAtPosition);
     }
     private void updateViewQuoteLoaded(String quoteText, String quoteAuthor) {
+        if (quoteAuthor.equals("")) {
+            quoteAuthor = Config.AUTHOR_FALLBACK_STRING;
+        }
         mFixedTabsFragmentPagerAdapter.updateViewNotifyQuoteChanged(quoteText, quoteAuthor);
     }
     //// end region updateViews ////
@@ -411,12 +408,13 @@ public class MainActivity extends AppCompatActivity
         FirebaseOperations.addTrophyToDatabase(trophy);
     }
 
-    private void attachFirebaseDbListener() {
+    private void attachFirebaseDbListeners() {
         if (mGoalsEventListener == null) {
             mGoalsEventListener = new ChildEventListener() {
 
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    hideLoadingIndicators();
                     Goal goal = dataSnapshot.getValue(Goal.class);
                     addGoal(goal);
                       // TODO check if fragment list not null in subclass tab....
@@ -520,6 +518,20 @@ public class MainActivity extends AppCompatActivity
             sTrophiesDatabaseReference.addChildEventListener(mTrophiesEventListener);
         }
     }
+
+    private void hideLoadingIndicators() {
+        sIsLoadingFromFirebase = false;
+        if (mFixedTabsFragmentPagerAdapter.trackFragment != null) {
+            mFixedTabsFragmentPagerAdapter.trackFragment.hideLoadingIndicator();
+        }
+        if (mFixedTabsFragmentPagerAdapter.goalsFragment != null) {
+            mFixedTabsFragmentPagerAdapter.goalsFragment.hideLoadingIndicator();
+        }
+        if (mFixedTabsFragmentPagerAdapter.trophiesFragment != null) {
+            mFixedTabsFragmentPagerAdapter.trophiesFragment.hideLoadingIndicator();
+        }
+    }
+
     // This method is needed because sGoalList might have been recreated by restoreFromInstanceState
     private void addGoal(Goal goalToAdd) {
         for (Goal goal : sGoalList)
@@ -577,6 +589,7 @@ public class MainActivity extends AppCompatActivity
                 String url = NetworkHelper.buildPosterUrl(movie.getMoviePoster()).toString();
                 mPosterList.add(url);
                 JSONObject json = new JSONObject();
+                JSONObject json = new JSONObject();
                 json.put(NetworkHelper.PROPERTY_POSTER_PATH, movie.getMoviePoster());
                 json.put(NetworkHelper.PROPERTY_OVERVIEW, movie.getMoviePlot());
                 json.put(NetworkHelper.PROPERTY_RELEASE, movie.getMovieRelease());
@@ -601,7 +614,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBroadcastReceived(String quoteText, String quoteAuthor) {
-        // TODO handle view updating from here.
         updateViewQuoteLoaded(quoteText, quoteAuthor);
         Timber.e("BROADCAST received." + quoteText);
     }
@@ -609,55 +621,31 @@ public class MainActivity extends AppCompatActivity
     //================================================================================
     // region Cursor Loader and Callbacks for the QuotesContentProvider
     //================================================================================
-    @SuppressLint("StaticFieldLeak")    // ...why u lint me?
     @NonNull
     @Override
-    public Loader<Quote> onCreateLoader(int id, @Nullable Bundle args) {
-        return new AsyncTaskLoader<Quote>(this) {
-            Quote cacheQuote;   // keep the quote here as long as already retrieved via HTTP
-
-            @Override
-            protected void onStartLoading() {
-                // Think of this as AsyncTask onPreExecute() method,
-                //  you can start a progress bar and at the end call forceLoad();
-                if (cacheQuote!=null) {
-                    // To skip loadInBackground call
-                    deliverResult(cacheQuote);
-                } else {
-                    forceLoad();
-                }
-            }
-
-            @Override
-            public void deliverResult(Quote quote) {    // Quick delivery if cached
-                cacheQuote = quote;
-                super.deliverResult(quote);
-            }
-
-            @Override
-            public Quote loadInBackground() {
-                // Think of this as AsyncTask doInBackground() method,
-                //  here you will actually initiate Network call,
-                //  or any work that need to be done on background
-                return getQuoteFromContentResolver();
-            }
-        };
+    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
+        return new QuoteAsyncTaskLoader(this);
     }
 
     @Override
-    public void onLoadFinished(@NonNull Loader<Quote> loader, Quote quote) {
-
-        updateViewQuoteLoaded(quote.getQuoteText(), quote.getQuoteAuthor());
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
+        //updateViewQuoteLoaded(cursor.getQuoteText(), cursor.getQuoteAuthor());
+        Quote quote = new Quote();
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            String text = cursor.getString(cursor.getColumnIndex(QuotesContract.QuotesEntry.COLUMN_TEXT));
+            String author = cursor.getString(cursor.getColumnIndex(QuotesContract.QuotesEntry.COLUMN_AUTHOR));
+            updateViewQuoteLoaded(text, author);
+            Timber.e("LOADED FROM CONTENT RESOLVER" + quote.getQuoteText());
+        }
     }
 
     @Override
-    public void onLoaderReset(@NonNull Loader<Quote> loader) {
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
 
     }
     //================================================================================
     // endregion Cursor Loader and Callbacks for the QuotesContentProvider
     //================================================================================
-
 
     //================================================================================
     // Saving / restoring the state

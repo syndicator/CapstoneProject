@@ -65,12 +65,22 @@
             android:text="@string/share" />
 
     </TableRow>
-
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1">
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_trophies"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
         android:background="#444444"
         android:scrollbars="vertical" />
+    <ProgressBar
+        android:id="@+id/trophies_loading_indicator"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/pad_3"
+        android:visibility="invisible" />
+</RelativeLayout>
 </LinearLayout>

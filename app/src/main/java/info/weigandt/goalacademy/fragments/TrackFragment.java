@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.temporal.TemporalField;
@@ -35,6 +36,7 @@ import info.weigandt.goalacademy.enums.GoalStatusPseudoEnum;
 import timber.log.Timber;
 
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
+import static info.weigandt.goalacademy.activities.MainActivity.sIsLoadingFromFirebase;
 import static info.weigandt.goalacademy.activities.MainActivity.sTrackFragmentListState;
 
 /**
@@ -62,6 +64,9 @@ public class TrackFragment extends BaseFragment {
     ImageButton mIncreaseWeekButton;
     @BindView(R.id.button_week_decrease)
     ImageButton mDecreaseWeekButton;
+    @BindView(R.id.track_loading_indicator)
+    ProgressBar mTrackLoadingProgressBar;
+
     private long mLastClickTime;
 
     public TrackFragment() { // Required empty public constructor
@@ -83,6 +88,11 @@ public class TrackFragment extends BaseFragment {
         }
     }
 
+    public void hideLoadingIndicator()
+    {
+        mTrackLoadingProgressBar.setVisibility(View.INVISIBLE);
+    }
+
     private void restoreFromSavedInstanceState(Bundle savedInstanceState) {
         String isoDate = savedInstanceState.getString(Constants.BUNDLE_ISO_DATE_DISPLAYED_WEEK);
         setDisplayedWeek(GoalHelper.convertFromIsoDate(isoDate)); // this also sets sYearWeekString
@@ -94,6 +104,7 @@ public class TrackFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_track, container, false);
         ButterKnife.bind(this, view);
+
 
         if (!mIsRestoredFromState) {
             mCurrentWeekButton.setText(GoalHelper.convertToGuiString(LocalDate.now()));
@@ -154,7 +165,10 @@ public class TrackFragment extends BaseFragment {
             // TODO Restore anything thats needs a completed Activity OnCreate here!!!
         }
         mAdapter.notifyDataSetChanged(); // TODO: needed? (presumably not here)
-
+        if (sIsLoadingFromFirebase)
+        {
+            mTrackLoadingProgressBar.setVisibility(View.VISIBLE);
+        }
     }
 
     public void setDisplayedWeek(LocalDate displayedWeek) {
@@ -253,7 +267,6 @@ public class TrackFragment extends BaseFragment {
                 changedGoal = GoalHelper.ChangeEventEntryInGoal(goal, EventStateEnum.PASS, weekday, mDisplayedWeek);
                 // this day was a pass! check if goal is progressing now
                 calculateStatusOfGoal(changedGoal, EventStateEnum.PASS);
-
                 description =  getResources().getString(R.string.description_three_states_button_pass);
                 imageButton.setContentDescription(description);
                 break;

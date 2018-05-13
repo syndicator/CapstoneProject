@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,6 +32,8 @@ public class TrophiesFragment extends BaseFragment {
     private String mParam1;
     private String mParam2;
     @BindView(R.id.rv_trophies) RecyclerView mRecyclerView;
+    @BindView(R.id.trophies_loading_indicator)
+    ProgressBar mTrophiesLoadingProgressBar;
     //private TrackListAdapter mAdapter;
     private RecyclerView.Adapter mAdapter;  // TODO is this sup  class enough?
     private RecyclerView.LayoutManager mLayoutManager;
@@ -88,6 +91,11 @@ public class TrophiesFragment extends BaseFragment {
         mRecyclerView.setHasFixedSize(true);
         // mAdapter.notifyDataSetChanged(); TODO: needed? (presumably not here)
 
+    }
+
+    public void hideLoadingIndicator()
+    {
+        mTrophiesLoadingProgressBar.setVisibility(View.INVISIBLE);
     }
 
     @Override

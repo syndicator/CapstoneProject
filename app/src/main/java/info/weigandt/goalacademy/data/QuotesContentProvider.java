@@ -126,7 +126,7 @@ public class QuotesContentProvider extends ContentProvider {
 
         int match = sUriMatcher.match(uri);
         // Keep track of the number of deleted items
-        int favoritesDeleted; // starts as 0
+        int quotesDeleted; // Starts with 0
 
         switch (match) {
             // Handle the single item case, recognized by the ID included in the URI path
@@ -134,18 +134,18 @@ public class QuotesContentProvider extends ContentProvider {
                 // Get the task ID from the URI path
                 String id = uri.getPathSegments().get(1);
                 // Use selections/selectionArgs to filter for this ID
-                favoritesDeleted = db.delete(TABLE_NAME, COLUMN_LINK + "=?", new String[]{id});
+                quotesDeleted = db.delete(TABLE_NAME, COLUMN_LINK + "=?", new String[]{id});
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        if (favoritesDeleted != 0) {
+        if (quotesDeleted != 0) {
             // A favorite was deleted, set notification
             getContext().getContentResolver().notifyChange(uri, null);
         }
 
         // Return the number of items deleted
-        return favoritesDeleted;
+        return quotesDeleted;
     }
 
     @Override
