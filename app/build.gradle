@@ -13,10 +13,10 @@ android {
     }
     signingConfigs {
         release {
-            keyAlias 'key0'
-            keyPassword 'goalacademy'
-            storeFile file('C:/owncloud/Udacity/Projects/CapstoneProject/keystore.jks')
-            storePassword 'goalacademy'
+            keyAlias 'udacity_test_key'
+            keyPassword 'test1234'
+            storeFile file('/keystore/keystore.jks')
+            storePassword 'test1234'
         }
     }
     buildTypes {
