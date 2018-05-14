@@ -14,6 +14,7 @@ import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.TrophyListAdapter;
 
+import static info.weigandt.goalacademy.activities.MainActivity.sIsLoadingFromFirebase;
 import static info.weigandt.goalacademy.activities.MainActivity.sTrophyList;
 
 /**
@@ -79,6 +80,16 @@ public class TrophiesFragment extends BaseFragment {
         ButterKnife.bind(this, view);
         initializeAdapter();
         return view;
+    }
+
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (sIsLoadingFromFirebase)
+        {
+            mTrophiesLoadingProgressBar.setVisibility(View.VISIBLE);
+        }
     }
 
     private void initializeAdapter() {

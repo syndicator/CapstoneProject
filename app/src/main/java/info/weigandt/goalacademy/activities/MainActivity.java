@@ -215,7 +215,7 @@ public class MainActivity extends AppCompatActivity
     private void onSignedInInitialize() {
         sIsLoadingFromFirebase = true;
         initializeFirebaseDb();
-        checkForEmptyFirebaseDb();
+        checkForEmptyFirebaseDbs();
         attachFirebaseDbListeners();
         if (!mIsRestoredFromState)
         {
@@ -223,13 +223,27 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void checkForEmptyFirebaseDb() {
+    private void checkForEmptyFirebaseDbs() {
         sGoalsDatabaseReference.limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.exists()) {
                     sIsLoadingFromFirebase = false;
-                    hideLoadingIndicators();
+                    hideGoalsLoadingIndicators();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        sTrophiesDatabaseReference.limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.exists()) {
+                    sIsLoadingFromFirebase = false;
+                    hideTrophiesLoadingIndicator();
                 }
             }
 
@@ -414,7 +428,7 @@ public class MainActivity extends AppCompatActivity
 
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    hideLoadingIndicators();
+                    hideGoalsLoadingIndicators();
                     Goal goal = dataSnapshot.getValue(Goal.class);
                     addGoal(goal);
                       // TODO check if fragment list not null in subclass tab....
@@ -477,7 +491,7 @@ public class MainActivity extends AppCompatActivity
                 // "Add Trophy"
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
+                    hideTrophiesLoadingIndicator();
                     Trophy trophy = dataSnapshot.getValue(Trophy.class);
                     if (trophy.getPushId() == null) {
                         trophy.setPushId(dataSnapshot.getKey());
@@ -519,7 +533,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void hideLoadingIndicators() {
+    private void hideGoalsLoadingIndicators() {
         sIsLoadingFromFirebase = false;
         if (mFixedTabsFragmentPagerAdapter.trackFragment != null) {
             mFixedTabsFragmentPagerAdapter.trackFragment.hideLoadingIndicator();
@@ -527,6 +541,10 @@ public class MainActivity extends AppCompatActivity
         if (mFixedTabsFragmentPagerAdapter.goalsFragment != null) {
             mFixedTabsFragmentPagerAdapter.goalsFragment.hideLoadingIndicator();
         }
+    }
+
+    private void hideTrophiesLoadingIndicator() {
+        sIsLoadingFromFirebase = false;
         if (mFixedTabsFragmentPagerAdapter.trophiesFragment != null) {
             mFixedTabsFragmentPagerAdapter.trophiesFragment.hideLoadingIndicator();
         }
