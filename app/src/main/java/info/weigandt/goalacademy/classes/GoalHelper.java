@@ -1,19 +1,21 @@
 package info.weigandt.goalacademy.classes;
 
-import android.content.Context;
-
+import org.threeten.bp.DayOfWeek;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.format.DateTimeFormatter;
 import org.threeten.bp.temporal.TemporalField;
 import org.threeten.bp.temporal.WeekFields;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.enums.EventStateEnum;
 import info.weigandt.goalacademy.enums.GoalStatusPseudoEnum;
+import info.weigandt.goalacademy.widget.WidgetData;
+
+import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
 
 public class GoalHelper {
     public static Goal ChangeEventEntryInGoal(Goal goal, EventStateEnum newState, int clickedWeekday, LocalDate currentlyDisplayedLocalDate)
@@ -340,10 +342,10 @@ public class GoalHelper {
         return total;
     }
 
-    public static int calculateNumberOfPassesGivenWeek(Goal goal, LocalDate displayedWeek) {
+    public static int calculateNumberOfPassesGivenWeek(Goal goal, LocalDate week) {
         int totalPasses = 0;
         for (Goal.WeeklyEventCounter weeklyEventCounter : goal.getWeeklyEventCounterList()) {
-            if (weeklyEventCounter.getYearWeekString().equals(convertToFirebaseString(displayedWeek))) {
+            if (weeklyEventCounter.getYearWeekString().equals(convertToFirebaseString(week))) {
                 totalPasses += calculateNumberOfEvents(weeklyEventCounter.getWeekPassCounter());
             }
         }
@@ -427,5 +429,55 @@ public class GoalHelper {
         return completeText.replace("\\n", System.getProperty("line.separator"));
     }
 
+    public static int getDayInWeek (LocalDate localDate) {
+        DayOfWeek day = localDate.getDayOfWeek();
+        switch (day) {
+            case MONDAY: return 0;
+            case TUESDAY: return 1;
+            case WEDNESDAY: return 2;
+            case THURSDAY: return 3;
+            case FRIDAY: return 4;
+            case SATURDAY: return 5;
+            case SUNDAY: return 6;
+        }
+        return -1;
+    }
 
+    public static WidgetData calculateWidgetData() {
+        WidgetData widgetData = new WidgetData();
+        widgetData.criticalEvents = new HashMap<Integer, List<String>>();
+        widgetData.normalEvents = new HashMap<Integer, List<String>>();
+
+        int current = GoalHelper.getDayInWeek(LocalDate.now());
+
+        for (int iterationWeekday = current; iterationWeekday <7; iterationWeekday++) {
+            ArrayList<String> criticalGoals = new ArrayList<>();
+            ArrayList<String> normalGoals = new ArrayList<>();
+            for (Goal goal : sGoalList) {
+                // TODO #0: get critical goals from scheduled weekdays
+                if ((goal.getTimesPerWeek() == 0)) {
+                    if (!GoalHelper.isDayBlockedInScheme(iterationWeekday, goal)) {
+                        // this day is not blocked, means it is available to score on that day
+                        // and has to be added to the critical goals list for this day
+                        criticalGoals.add(goal.getName());
+                    }
+                } else {
+                    // TODO #1: get numbers for per-week-goals
+                    int availableDays = 7 - current;
+                    int passesStillNeeded = goal.getTimesPerWeek()
+                            - GoalHelper.calculateNumberOfPassesGivenWeek(goal, LocalDate.now());
+                    int buffer = availableDays - passesStillNeeded;
+                    if (buffer < 1)
+                    {
+                        criticalGoals.add(goal.getName());
+                    } else {
+                        normalGoals.add(goal.getName());
+                    }
+                }
+            }
+            widgetData.criticalEvents.put(iterationWeekday, criticalGoals);
+            widgetData.normalEvents.put(iterationWeekday, normalGoals);
+        }
+        return widgetData;
+    }
 }

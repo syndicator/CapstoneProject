@@ -15,7 +15,7 @@ android {
         release {
             keyAlias 'udacity_test_key'
             keyPassword 'test1234'
-            storeFile file('/keystore/keystore.jks')
+            storeFile file('../keystore/keystore.jks')
             storePassword 'test1234'
         }
     }

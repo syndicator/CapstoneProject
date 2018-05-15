@@ -18,6 +18,9 @@ public class GoalAcademyWidgetRemoteViewsFactory implements RemoteViewsService.R
     public GoalAcademyWidgetRemoteViewsFactory(Context applicationContext, Intent intent)
     {
         mContext = applicationContext;
+
+
+
     }
 
     @Override
@@ -25,10 +28,16 @@ public class GoalAcademyWidgetRemoteViewsFactory implements RemoteViewsService.R
     {
 
     }
-
+    // TODO initial loading of data here? also when triggered..?
     @Override
     public void onDataSetChanged()
     {
+        // iterate over goals
+        // if there is an entry for the current WEEK, check further:
+        // is it scheduled for today? (week days set)
+        // when numbers scheduled, is number reached already? if not, display it!
+        // if an event is passed for today, do not display it.
+
 
     }
 
@@ -50,10 +59,14 @@ public class GoalAcademyWidgetRemoteViewsFactory implements RemoteViewsService.R
     @Override
     public RemoteViews getViewAt(int position) {
 
-        RemoteViews remoteview = new RemoteViews(mContext.getPackageName(), R.layout.collection_widget_list_item);
-        remoteview.setTextViewText(R.id.tv_widget_goal_name, "TEST");
+
+
+        RemoteViews remoteView = new RemoteViews(mContext.getPackageName(), R.layout.collection_widget_list_item);
+        remoteView.setTextViewText(R.id.tv_widget_goal_name, "TEST");
+
+
         // TODO retrieve data here. e.g. "goalList.getString(1))" - from Firebase or cursor or what?
-        return remoteview;
+        return remoteView;
     }
     @Override
     public RemoteViews getLoadingView() {
@@ -77,4 +90,3 @@ public class GoalAcademyWidgetRemoteViewsFactory implements RemoteViewsService.R
     }
 
 }
-

@@ -198,8 +198,8 @@ public class GoalsFragment extends BaseFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        if (context instanceof BaseFragment.OnFragmentInteractionListener) {
-            mFragmentInteractionListener = (BaseFragment.OnFragmentInteractionListener) context;
+        if (context instanceof OnFragmentInteractionListener) {
+            mFragmentInteractionListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");

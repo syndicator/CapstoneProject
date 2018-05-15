@@ -1,5 +1,7 @@
 package info.weigandt.goalacademy.activities;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -55,6 +57,8 @@ import info.weigandt.goalacademy.fragments.BaseFragment;
 import info.weigandt.goalacademy.loader.QuoteAsyncTaskLoader;
 import info.weigandt.goalacademy.service.PullQuoteBroadcastReceiver;
 import info.weigandt.goalacademy.service.PullQuoteIntentService;
+import info.weigandt.goalacademy.widget.GoalAcademyWidgetProvider;
+import info.weigandt.goalacademy.widget.WidgetData;
 import timber.log.Timber;
 
 import static info.weigandt.goalacademy.classes.Constants.BUNDLE_GOAL_LIST;
@@ -137,6 +141,9 @@ public class MainActivity extends AppCompatActivity
         //trackTab.setNextFocusUpId(R.id.sign_out_menu);
 
         // Initialize Firebase components
+
+        sendBroadcastToWidget();
+
         initializeFirebaseAuth();
         //loadQuote();
         // quote loading moved to: onSignedInInitialize (only if signed in!)
@@ -453,6 +460,7 @@ public class MainActivity extends AppCompatActivity
                             break;
                         }
                     }
+                    sendBroadcastToWidget();    // TODO debug
                     sGoalList.set(foundAtPosition, changedGoal);
                     // updateViewsNotifyGoalChanged(foundAtPosition);
                     updateGoalsFragmentNotifyGoalChanged(foundAtPosition);
@@ -661,6 +669,40 @@ public class MainActivity extends AppCompatActivity
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
 
     }
+
+    /**
+     * The Widget cannot access the Firebase Realtime Database, because no authorization can be
+     * provided from within the widget (saving the credentials is not an option).
+     * So the Widget gets supplied with the needed data until the end of the week in the form of a
+     * WidgetData object, which is stored in the the Shared Preferences.
+     * This method should be called either to the end of Activity lifecycle (onStop?) or after
+     * the data change, or in onResume() maybe
+     */
+    private void sendBroadcastToWidget() {
+
+        // get the critical events for the remaining days of the weeks
+        // store it where?...->     Map<Integer,List<String>> criticalEvents;
+        // int is the weekday 0,1,2,3,4,5 or 6
+        // String List will be all Goals who are critical on that day
+
+        //  TODO check to call this method after the FB data update
+        if (sGoalList != null && sGoalList.size() > 0)
+        {
+            WidgetData widgetData = GoalHelper.calculateWidgetData();
+
+            Gson gson = new Gson();
+            String serializedWidgetData = gson.toJson(widgetData);
+
+            Intent intent = new Intent(this, GoalAcademyWidgetProvider.class);
+            intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+            ComponentName name = new ComponentName(getApplicationContext(), GoalAcademyWidgetProvider.class);
+            int[] ids = AppWidgetManager.getInstance(getApplicationContext()).getAppWidgetIds(name);
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+            intent.putExtra(Constants.SERIALIZED_WIDGET_DATA, serializedWidgetData);
+            sendBroadcast(intent);
+        }
+    }
+
     //================================================================================
     // endregion Cursor Loader and Callbacks for the QuotesContentProvider
     //================================================================================
@@ -708,8 +750,6 @@ public class MainActivity extends AppCompatActivity
         sGoalList  = savedInstanceState.getParcelableArrayList(BUNDLE_GOAL_LIST);
         sTrophyList  = savedInstanceState.getParcelableArrayList(BUNDLE_TROPHY_LIST);
         sTrackFragmentListState = savedInstanceState.getParcelable(Constants.BUNDLE_TRACK_RECYCLER_LAYOUT);
-        int i = 0;
-        int b = 1;
         /*
         //Restore the fragment's instance
         if (mFixedTabsFragmentPagerAdapter == null)
