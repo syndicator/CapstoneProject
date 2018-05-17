@@ -7,4 +7,5 @@ import java.util.Map;
 public class WidgetData implements Serializable {
     public Map<Integer,List<String>> criticalEvents;
     public Map<Integer,List<String>> normalEvents;
+    public String expiryDate;
 }

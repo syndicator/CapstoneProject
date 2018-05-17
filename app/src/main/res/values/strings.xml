@@ -53,6 +53,8 @@
     <string name="description_three_states_button_neutral">Status: Neutral. This button can be neutral, pass or fail. Tap to switch the state.</string>
     <string name="description_three_states_button_fail">Status: Fail. This button can be neutral, pass or fail. Tap to switch the state.</string>
     <string name="description_three_states_button_pass">Status: Pass. This button can be neutral, pass or fail. Tap to switch the state.</string>
-    <string name="fallback_info">urgent!</string>
+    <string name="fallback_info">Urgent!</string>
+    <string name="fallback_no_data_widget">No events today.</string>
+    <string name="widget_outdated_text">Widget data needs to be refreshed. Tap to launch GoalAcademy!</string>
 
 </resources>

@@ -448,9 +448,14 @@ public class GoalHelper {
         widgetData.criticalEvents = new HashMap<Integer, List<String>>();
         widgetData.normalEvents = new HashMap<Integer, List<String>>();
 
-        int current = GoalHelper.getDayInWeek(LocalDate.now());
+        LocalDate now = LocalDate.now();
+        int currentWeekDay = GoalHelper.getDayInWeek(now);
 
-        for (int iterationWeekday = current; iterationWeekday <7; iterationWeekday++) {
+        // expiry date
+        LocalDate expiryDate = now.plusDays(7-currentWeekDay);
+        widgetData.expiryDate =  convertToIsoDate(expiryDate);
+
+        for (int iterationWeekday = currentWeekDay; iterationWeekday <7; iterationWeekday++) {
             ArrayList<String> criticalGoals = new ArrayList<>();
             ArrayList<String> normalGoals = new ArrayList<>();
             for (Goal goal : sGoalList) {
@@ -471,13 +476,13 @@ public class GoalHelper {
                 }
                 else {
                     // #1: get numbers for per-week-goals
-                    // #2 check if passed already first
+                    // #2 check if passed or failed already first
 
                     EventStateEnum state = getEventState(goal, iterationWeekday,
                             convertToFirebaseString(LocalDate.now()));
-                    if (!state.equals(EventStateEnum.PASS))
+                    if (state.equals(EventStateEnum.NEUTRAL))
                     {
-                        int availableDays = 7 - current;
+                        int availableDays = 7 - currentWeekDay;
                         int passesStillNeeded = goal.getTimesPerWeek()
                                 - GoalHelper.calculateNumberOfPassesGivenWeek(goal, LocalDate.now());
                         int buffer = availableDays - passesStillNeeded;

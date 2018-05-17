@@ -42,10 +42,7 @@ public class GoalAcademyWidgetRemoteViewsFactory implements RemoteViewsService.R
     public void onDataSetChanged()
     {
         // TODO seems to be executed after onCreate
-        // if there is an entry for the current WEEK, check further:
-        // is it scheduled for today? (week days set)
-        // when numbers scheduled, is number reached already? if not, display it!
-        // if an event is passed for today, do not display it.
+
     }
 
     @Override

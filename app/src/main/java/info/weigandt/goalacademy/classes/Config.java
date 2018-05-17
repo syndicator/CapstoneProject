@@ -9,7 +9,7 @@ public class Config {
     public static final String ShareText = "I completed a goal on Goal Academy :)"; // Version 2: Replace with Remote config
     public static final String LIMIT_QUOTES_STRING = "RANDOM() LIMIT 1";
     public static final String AUTHOR_FALLBACK_STRING = "Unknown Author";     // TODO move to strings.xml;
-    public static final String CRITICAL_GOAL_WIDGET_TEXT = "urgent!";
+    public static final String CRITICAL_GOAL_WIDGET_TEXT = "Urgent!";
     public static final String NORMAL_GOAL_WIDGET_TEXT = "Just  do it.";
 
     public Config() {
