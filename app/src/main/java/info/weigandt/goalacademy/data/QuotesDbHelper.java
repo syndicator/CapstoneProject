@@ -4,8 +4,10 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import info.weigandt.goalacademy.classes.Config;
+
 public class QuotesDbHelper extends SQLiteOpenHelper{
-    private static final String DATABASE_NAME = "quotesDb.db";
+    private static final String DATABASE_NAME = Config.QUOTES_DB_NAME;
     private static final int VERSION = 1;
 
     // Constructor

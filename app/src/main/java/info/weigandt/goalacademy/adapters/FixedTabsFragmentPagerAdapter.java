@@ -44,7 +44,6 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
         BaseFragment fragment;
         switch (position) {
             case 0:
-                Timber.d("getItem in FragmentPager called.");
                 return TrackFragment.newInstance();
                 /*
                 if (trackFragment == null)
@@ -85,7 +84,6 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
         // save the appropriate reference depending on position
         switch (position) {
             case 0:
-                Timber.d("instantiateItem in FragmentPager called.");
                 trackFragment = ((TrackFragment) createdFragment);
                 break;
             case 1:

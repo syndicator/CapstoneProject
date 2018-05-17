@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
+import info.weigandt.goalacademy.classes.Config;
 import timber.log.Timber;
 
 import static info.weigandt.goalacademy.data.QuotesContract.QuotesEntry.COLUMN_LINK;
@@ -53,19 +54,24 @@ public class QuotesContentProvider extends ContentProvider {
         final SQLiteDatabase db = mQuotesDbHelper.getWritableDatabase();
         int match = sUriMatcher.match(uri);
         Uri returnUri;
-        switch (match) {
-            case QUOTES:
-                long id = db.insert(TABLE_NAME, null, values);
-                if (id > 0) {
-                    returnUri = ContentUris.withAppendedId(QuotesContract.QuotesEntry.CONTENT_URI, id);
-                    Timber.e("returnUri is: " + returnUri.toString());
-                } else {
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
-                }
-                break;
-            default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        try {
+            switch (match) {
+                case QUOTES:
+                    long id = db.insert(TABLE_NAME, null, values);
+                    if (id > 0) {
+                        returnUri = ContentUris.withAppendedId(QuotesContract.QuotesEntry.CONTENT_URI, id);
+                    } else {
+                        throw new android.database.SQLException(Config.SQL_ERROR_TEXT + uri);
+                    }
+                    break;
+                default:
+                    throw new UnsupportedOperationException(Config.URI_ERROR + uri);
+            }
+        } catch (Exception e) {
+            Timber.e(Config.ERROR_INSERT, e.toString());
+            returnUri = null;
         }
+
 
         // Notify the resolver if the uri has been changed, and return the newly inserted URI
         getContext().getContentResolver().notifyChange(uri, null);
@@ -84,34 +90,39 @@ public class QuotesContentProvider extends ContentProvider {
 
         int match = sUriMatcher.match(uri);
         Cursor retCursor;
-
-        switch (match) {
-            case QUOTES:
-                retCursor = db.query(TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder);
-                break;
-            case QUOTE_WITH_ID:
-                // Get the ID from the URI path
-                String id = uri.getPathSegments().get(1);
-                // Use selections/selectionArgs to filter for this ID
-                String mSelection = COLUMN_LINK + "=?";
-                String[] mSelectionArgs = new String[]{String.valueOf(id)};
-                retCursor = db.query(TABLE_NAME,
-                        projection,
-                        mSelection,
-                        mSelectionArgs,
-                        null,
-                        null,
-                        sortOrder);
-                break;
-            default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        try {
+            switch (match) {
+                case QUOTES:
+                    retCursor = db.query(TABLE_NAME,
+                            projection,
+                            selection,
+                            selectionArgs,
+                            null,
+                            null,
+                            sortOrder);
+                    break;
+                case QUOTE_WITH_ID:
+                    // Get the ID from the URI path
+                    String id = uri.getPathSegments().get(1);
+                    // Use selections/selectionArgs to filter for this ID
+                    String mSelection = COLUMN_LINK + "=?";
+                    String[] mSelectionArgs = new String[]{String.valueOf(id)};
+                    retCursor = db.query(TABLE_NAME,
+                            projection,
+                            mSelection,
+                            mSelectionArgs,
+                            null,
+                            null,
+                            sortOrder);
+                    break;
+                default:
+                    throw new UnsupportedOperationException(Config.URI_ERROR + uri);
+            }
+        } catch (Exception e) {
+            Timber.e(Config.QUERY_ERROR, e.toString());
+            retCursor = null;
         }
+
         retCursor.setNotificationUri(getContext().getContentResolver(), uri);
         return retCursor;
     }
@@ -137,7 +148,7 @@ public class QuotesContentProvider extends ContentProvider {
                 quotesDeleted = db.delete(TABLE_NAME, COLUMN_LINK + "=?", new String[]{id});
                 break;
             default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
+                throw new UnsupportedOperationException(Config.UNKNOWN_URI + uri);
         }
         if (quotesDeleted != 0) {
             // A favorite was deleted, set notification
@@ -151,13 +162,11 @@ public class QuotesContentProvider extends ContentProvider {
     @Override
     public int update(@NonNull Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
-
-        throw new UnsupportedOperationException("Not yet implemented");
+        throw new UnsupportedOperationException(Config.NOT_IMPLEMENTED);
     }
 
     @Override
     public String getType(@NonNull Uri uri) {
-
-        throw new UnsupportedOperationException("Not yet implemented");
+        throw new UnsupportedOperationException(Config.NOT_IMPLEMENTED);
     }
 }

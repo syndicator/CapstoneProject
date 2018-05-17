@@ -423,9 +423,9 @@ public class GoalHelper {
     public static String buildShareText(Trophy trophy)
     {
         String completeText = Config.ShareText
-            + "\\n Goal: " + trophy.getGoalName()
-            + "\\n Trophy gained: " + trophy.getAward()
-            + "\\n Date of award: " + trophy.getCompletionDate();
+            + Config.TROPHY_TEXT_A + trophy.getGoalName()
+            + Config.TROPHY_TEXT_B + trophy.getAward()
+            + Config.TROPHY_TEXT_C + trophy.getCompletionDate();
         return completeText.replace("\\n", System.getProperty("line.separator"));
     }
 

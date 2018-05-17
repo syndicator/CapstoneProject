@@ -108,11 +108,14 @@ public class TrophiesFragment extends BaseFragment {
     {
         mTrophiesLoadingProgressBar.setVisibility(View.INVISIBLE);
     }
+    public void showLoadingIndicator()
+    {
+        mTrophiesLoadingProgressBar.setVisibility(View.VISIBLE);
+    }
 
     @Override
     public void onResume() {
         super.onResume();
-
     }
 
     @Override

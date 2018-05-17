@@ -12,7 +12,6 @@ import timber.log.Timber;
 
 public class QuoteAsyncTaskLoader extends AsyncTaskLoader<Cursor> {
     private Context mContext;
-    public boolean hasResult = false;
     public Cursor cursorCache;   // keep the cursor here - already retrieved from Content Provider
 
     public QuoteAsyncTaskLoader(@NonNull Context context) {
@@ -52,8 +51,7 @@ public class QuoteAsyncTaskLoader extends AsyncTaskLoader<Cursor> {
                     null,
                     Config.LIMIT_QUOTES_STRING);
         } catch (Exception e) {
-            Timber.e(e.getMessage());
-            e.printStackTrace();
+            Timber.e(Config.QUOTES_ERROR, e.getMessage());
             return null;
         }
     }

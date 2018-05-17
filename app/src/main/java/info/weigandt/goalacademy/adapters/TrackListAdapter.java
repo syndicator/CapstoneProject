@@ -136,7 +136,6 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
                 @Override
                 public void onClick(View v) {
                     onClickListener.button_0_OnClick(mThreeStatesButton0, getAdapterPosition());
-                    Timber.v("Button 0 clicked.");
                 }
             });
             mButtonList.add(mThreeStatesButton0);
@@ -145,7 +144,6 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
                 @Override
                 public void onClick(View v) {
                     onClickListener.button_1_OnClick(mThreeStatesButton1, getAdapterPosition());
-                    Timber.v("Button 1 clicked.");
 
                 }
             });
@@ -155,7 +153,6 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
                 @Override
                 public void onClick(View v) {
                     onClickListener.button_2_OnClick(mThreeStatesButton2, getAdapterPosition());
-                    Timber.v("Button 2 clicked.");
 
                 }
             });
@@ -165,7 +162,6 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
                 @Override
                 public void onClick(View v) {
                     onClickListener.button_3_OnClick(mThreeStatesButton3, getAdapterPosition());
-                    Timber.v("Button 3 clicked.");
                 }
             });
             mButtonList.add(mThreeStatesButton3);
@@ -174,7 +170,6 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
                 @Override
                 public void onClick(View v) {
                     onClickListener.button_4_OnClick(mThreeStatesButton4, getAdapterPosition());
-                    Timber.v("Button 4 clicked.");
                 }
             });
             mButtonList.add(mThreeStatesButton4);
@@ -183,7 +178,6 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
                 @Override
                 public void onClick(View v) {
                     onClickListener.button_5_OnClick(mThreeStatesButton5, getAdapterPosition());
-                    Timber.v("Button 5 clicked.");
                 }
             });
             mButtonList.add(mThreeStatesButton5);
@@ -193,7 +187,6 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
                 public void onClick(View v) {
                     //if (!isSafeClick()) return;
                     onClickListener.button_6_OnClick(mThreeStatesButton6, getAdapterPosition());
-                    Timber.v("Button 6 clicked.");
                 }
             });
             mButtonList.add(mThreeStatesButton6);

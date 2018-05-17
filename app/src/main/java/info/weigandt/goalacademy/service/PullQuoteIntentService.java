@@ -5,8 +5,8 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
-import android.widget.Toast;
 
+import info.weigandt.goalacademy.classes.Config;
 import info.weigandt.goalacademy.data.PostRetrofitQuoteCallListener;
 import info.weigandt.goalacademy.data.Quote;
 import info.weigandt.goalacademy.data.QuotesContract;
@@ -46,7 +46,7 @@ public class PullQuoteIntentService extends IntentService implements PostRetrofi
         }
         else
         {
-            // TODO error handling
+            Timber.e("Error while loading quote from API.");
         }
     }
 
@@ -57,9 +57,8 @@ public class PullQuoteIntentService extends IntentService implements PostRetrofi
         contentValues.put(QuotesContract.QuotesEntry.COLUMN_AUTHOR, quoteAuthor);
         // Insert the content values via a ContentResolver
         Uri uri = getContentResolver().insert(QuotesContract.QuotesEntry.CONTENT_URI, contentValues);
-        if (uri != null) {
-            Toast.makeText(getBaseContext(), "Added to Content Provider", Toast.LENGTH_LONG).show();
-            Timber.e("added to content resolver");
+        if (uri == null) {
+            Timber.e(Config.PROBLEM_WRITING_CONTENT_PROVIDER);
         }
     }
 

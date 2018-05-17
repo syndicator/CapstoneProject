@@ -82,7 +82,6 @@ public class MainActivity extends AppCompatActivity
 
     // AsyncTaskLoader related
     public static final int QUOTE_FROM_CONTENT_PROVIDER_LOADER = 23;
-    public static final String OPERATION_URL_EXTRA = "url_that_return_json_data";   // TODO change
 
     // IntentService related
     private PullQuoteBroadcastReceiver mPullQuoteBroadcastReceiver;
@@ -119,6 +118,7 @@ public class MainActivity extends AppCompatActivity
             Timber.plant(new Timber.DebugTree());
         } else {
             // Online-crash-reporting may be added here later on for release versions
+            Timber.plant(new Timber.DebugTree());   // Udacity Rubic asks to add logging
         }
         initializeTabsAdapter();
         // Create an adapter that knows which fragment should be shown on each page
@@ -182,11 +182,10 @@ public class MainActivity extends AppCompatActivity
         if (requestCode == RC_SIGN_IN)
         {
             if (resultCode == RESULT_OK) {
-                Toast.makeText(this, "Signed in.", Toast.LENGTH_SHORT).show();
+                //
             }
             else if (resultCode == RESULT_CANCELED)
             {
-                Toast.makeText(this, "Sign in canceled.", Toast.LENGTH_SHORT).show();
                 finish();
             }
         }
@@ -201,7 +200,6 @@ public class MainActivity extends AppCompatActivity
                     // user is signed in
                     mUserId = user.getUid();
                     onSignedInInitialize();
-                    Toast.makeText(MainActivity.this, "You are now signed in to Goal Academy.", Toast.LENGTH_SHORT).show();
                 } else {
                     // user is signed out
                     onSignedOutCleanup();
@@ -220,6 +218,8 @@ public class MainActivity extends AppCompatActivity
 
     private void onSignedInInitialize() {
         sIsLoadingFromFirebase = true;
+        showGoalsLoadingIndicators();
+        showTrophiesLoadingIndicator();
         initializeFirebaseDb();
         checkForEmptyFirebaseDbs();
         attachFirebaseDbListeners();
@@ -234,14 +234,13 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.exists()) {
-                    sIsLoadingFromFirebase = false;
                     hideGoalsLoadingIndicators();
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Timber.e(getString(R.string.FIREBASE_ERROR_MESSAGE), databaseError.getMessage());
             }
         });
         sTrophiesDatabaseReference.limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -255,14 +254,15 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Timber.e(getString(R.string.FIREBASE_ERROR_MESSAGE), databaseError.getMessage());
             }
         });
     }
 
     private void onSignedOutCleanup() {
-        clearAdapters();
         detachFirebaseDbListener();
+        clearAdapters();
+        sendBroadcastToWidget(true);    // Clear widgets also if intentionally logged out
     }
 
     private void detachFirebaseDbListener() {
@@ -277,26 +277,25 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void clearAdapters() {
-        // TODO warning: this deletes goalList before it can be saved for instanceState!
-        /*
-        final int sizeGoalList = sGoalList.size();
+        // TODO warning: this deletes goalList before it can be saved for instanceState! ???? CHECK THIS
+
+        int sizeGoalList = sGoalList.size();
         sGoalList.clear();
-        final int sizeTrophyList = sTrophyList.size();
+        int sizeTrophyList = sTrophyList.size();
         sTrophyList.clear();
         mFixedTabsFragmentPagerAdapter.clearAdapters(sizeGoalList, sizeTrophyList);
-        */
+
     }
 
     private void initializeFirebaseDb() {
         sFirebaseDatabase = FirebaseDatabase.getInstance();
-        sGoalsDatabaseReference = sFirebaseDatabase.getReference().child("goals").child(mUserId);
-        sTrophiesDatabaseReference = sFirebaseDatabase.getReference().child("trophies").child(mUserId);
+        sGoalsDatabaseReference = sFirebaseDatabase.getReference().child(Config.GOALS_NODE_NAME).child(mUserId);
+        sTrophiesDatabaseReference = sFirebaseDatabase.getReference().child(Config.TROPHIES_NODE_NAME).child(mUserId);
     }
 
 
     /**
      * This method is called after this activity has been paused or restarted
-     * Only needed for favorites, because this list can change by adding/removing from favorites
      */
     @Override
     protected void onResume() {
@@ -305,31 +304,33 @@ public class MainActivity extends AppCompatActivity
         FirebaseAuth.getInstance().addAuthStateListener(mAuthStateListener);
         registerBroadcastReceiver();
 
-         /*
-        if (mSelectionMode == INT_MODE_FAVORITES)
-        {
-            getSupportLoaderManager().restartLoader(FAVORITE_MOVIES_LOADER_ID, null, this);
-            int i = 1;
-        }
-        */
          if (mIsRestoredFromState)
          {
              mFixedTabsFragmentPagerAdapter.updateViewsUpdateRecyclerViews();   // TODO move call to method
+             showGoalsLoadingIndicators();
+             showTrophiesLoadingIndicator();
          }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        sendBroadcastToWidget();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        sendBroadcastToWidget(false);
+        removeFirebaseAuthStateListener();
         detachFirebaseDbListener();
         clearAdapters();
         unregisterBroadcastReceiver();
+    }
+
+    private void removeFirebaseAuthStateListener() {
+        if (mAuthStateListener != null) {
+            FirebaseAuth.getInstance().removeAuthStateListener(mAuthStateListener);
+        }
     }
 
     // region BroadcastReceiver
@@ -536,10 +537,9 @@ public class MainActivity extends AppCompatActivity
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-                    Timber.e(databaseError.getMessage());
-                    Timber.e(databaseError.getDetails());
+                    Timber.e(getString(R.string.FIREBASE_ERROR_MESSAGE), databaseError.getMessage());
+                    Timber.e(getString(R.string.FIREBASE_ERROR_DETAILS, databaseError.getDetails());
                 }
-
             };
             sTrophiesDatabaseReference.addChildEventListener(mTrophiesEventListener);
         }
@@ -554,11 +554,26 @@ public class MainActivity extends AppCompatActivity
             mFixedTabsFragmentPagerAdapter.goalsFragment.hideLoadingIndicator();
         }
     }
+    private void showGoalsLoadingIndicators() {
+        sIsLoadingFromFirebase = false;
+        if (mFixedTabsFragmentPagerAdapter.trackFragment != null) {
+            mFixedTabsFragmentPagerAdapter.trackFragment.showLoadingIndicator();
+        }
+        if (mFixedTabsFragmentPagerAdapter.goalsFragment != null) {
+            mFixedTabsFragmentPagerAdapter.goalsFragment.showLoadingIndicator();
+        }
+    }
 
     private void hideTrophiesLoadingIndicator() {
         sIsLoadingFromFirebase = false;
         if (mFixedTabsFragmentPagerAdapter.trophiesFragment != null) {
             mFixedTabsFragmentPagerAdapter.trophiesFragment.hideLoadingIndicator();
+        }
+    }
+    private void showTrophiesLoadingIndicator() {
+        sIsLoadingFromFirebase = false;
+        if (mFixedTabsFragmentPagerAdapter.trophiesFragment != null) {
+            mFixedTabsFragmentPagerAdapter.trophiesFragment.showLoadingIndicator();
         }
     }
 
@@ -645,7 +660,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBroadcastReceived(String quoteText, String quoteAuthor) {
         updateViewQuoteLoaded(quoteText, quoteAuthor);
-        Timber.e("BROADCAST received." + quoteText);
+        if (BuildConfig.DEBUG) {
+            Timber.d(getString(R.string.BROADCAST_RECEIVED), quoteText);
+        }
     }
 
     //================================================================================
@@ -662,10 +679,18 @@ public class MainActivity extends AppCompatActivity
         //updateViewQuoteLoaded(cursor.getQuoteText(), cursor.getQuoteAuthor());
         Quote quote = new Quote();
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-            String text = cursor.getString(cursor.getColumnIndex(QuotesContract.QuotesEntry.COLUMN_TEXT));
-            String author = cursor.getString(cursor.getColumnIndex(QuotesContract.QuotesEntry.COLUMN_AUTHOR));
-            updateViewQuoteLoaded(text, author);
-            Timber.e("LOADED FROM CONTENT RESOLVER" + quote.getQuoteText());
+            try {
+                String text = cursor.getString(cursor.getColumnIndex(QuotesContract.QuotesEntry.COLUMN_TEXT));
+                String author = cursor.getString(cursor.getColumnIndex(QuotesContract.QuotesEntry.COLUMN_AUTHOR));
+                updateViewQuoteLoaded(text, author);
+                if (BuildConfig.DEBUG) {
+                    Timber.d(getString(R.string.LOADED_FROM_CONTENT_RESOLVER), quote.getQuoteText());
+                }
+            }
+            catch (Exception e) {
+                Timber.e(getString(R.string.ERROR_PROCESSING_CURSOR), e.toString());
+            }
+            break;
         }
     }
 
@@ -681,8 +706,9 @@ public class MainActivity extends AppCompatActivity
      * WidgetData object, which is stored in the the Shared Preferences.
      * This method should be called either to the end of Activity lifecycle (onStop?) or after
      * the data change, or in onResume() maybe
+     * @param force
      */
-    private void sendBroadcastToWidget() {
+    private void sendBroadcastToWidget(boolean force) {
 
         // get the critical events for the remaining days of the weeks
         // store it where?...->     Map<Integer,List<String>> criticalEvents;
@@ -690,13 +716,11 @@ public class MainActivity extends AppCompatActivity
         // String List will be all Goals who are critical on that day
 
         //  TODO check to call this method after the FB data update
-        if (sGoalList != null && sGoalList.size() > 0)
+        if (force || (sGoalList != null && sGoalList.size() > 0))
         {
             WidgetData widgetData = GoalHelper.calculateWidgetData();
-
             Gson gson = new Gson();
             String serializedWidgetData = gson.toJson(widgetData);
-
             Intent intent = new Intent(this, GoalAcademyWidgetProvider.class);
             intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
             ComponentName name = new ComponentName(getApplicationContext(), GoalAcademyWidgetProvider.class);
@@ -705,6 +729,7 @@ public class MainActivity extends AppCompatActivity
             intent.putExtra(Constants.SERIALIZED_WIDGET_DATA, serializedWidgetData);
             sendBroadcast(intent);
         }
+        String check = "Point charly";
     }
 
     //================================================================================

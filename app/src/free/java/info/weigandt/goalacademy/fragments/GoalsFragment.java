@@ -160,6 +160,10 @@ public class GoalsFragment extends BaseFragment {
     {
         mGoalsLoadingProgressBar.setVisibility(View.INVISIBLE);
     }
+    public void showLoadingIndicator()
+    {
+        mGoalsLoadingProgressBar.setVisibility(View.VISIBLE);
+    }
 
     private void showCustomFragmentDialog() {
         FragmentManager fm = getFragmentManager();

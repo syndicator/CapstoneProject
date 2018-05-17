@@ -1,8 +1,10 @@
 package info.weigandt.goalacademy.data;
 
+import info.weigandt.goalacademy.classes.Constants;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import timber.log.Timber;
 
 public class QuotesController implements retrofit2.Callback<Quote> {
 
@@ -25,13 +27,12 @@ public class QuotesController implements retrofit2.Callback<Quote> {
             // send the results to the MainActivity via Listener
             mPostRetrofitQuoteCallListener.onPostApiCall(quote);
         } else {
-            System.out.println(response.errorBody());
+            Timber.e(Constants.API_ERROR_TEXT, response.errorBody());
         }
     }
 
     @Override
     public void onFailure(Call<Quote> call, Throwable t) {
-        t.printStackTrace();
-    }   // TODO improve error handling
-
+        Timber.e(t.getMessage());
+    }
 }

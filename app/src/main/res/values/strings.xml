@@ -56,5 +56,10 @@
     <string name="fallback_info">Urgent!</string>
     <string name="fallback_no_data_widget">No events today.</string>
     <string name="widget_outdated_text">Widget data needs to be refreshed. Tap to launch GoalAcademy!</string>
+    <string name="LOADED_FROM_CONTENT_RESOLVER">LOADED FROM CONTENT RESOLVER%s</string>
+    <string name="ERROR_PROCESSING_CURSOR">Error while processing Cursor to Quote. %s</string>
+    <string name="BROADCAST_RECEIVED">BROADCAST received. %s</string>
+    <string name="FIREBASE_ERROR_MESSAGE">Firebase DB error. Message: %s</string>
+    <string name="FIREBASE_ERROR_DETAILS">Firebase DB error. Message: %s</string>
 
 </resources>

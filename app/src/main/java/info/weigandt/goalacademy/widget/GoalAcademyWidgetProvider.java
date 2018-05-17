@@ -16,6 +16,7 @@ import org.threeten.bp.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import info.weigandt.goalacademy.BuildConfig;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.activities.MainActivity;
 import info.weigandt.goalacademy.classes.Config;
@@ -48,10 +49,14 @@ public class GoalAcademyWidgetProvider extends AppWidgetProvider {
         // getting the data from SharedPreferences, if not provided by broadcast to onReceive!
         if (mSerializedWidgetData == null) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            mSerializedWidgetData = sharedPreferences.getString(Constants.GOAL_ACADEMY_PREFS_WIDGET_DATA, null);
-            mWidgetData = gson.fromJson(mSerializedWidgetData, WidgetData.class);
+            try {
+                mSerializedWidgetData = sharedPreferences.getString(Constants.GOAL_ACADEMY_PREFS_WIDGET_DATA, null);
+                mWidgetData = gson.fromJson(mSerializedWidgetData, WidgetData.class);
+            } catch (Exception e) {
+                Timber.e(Config.ERROR_READING_SP, e.toString());
+            }
             // Check if outdated
-            if (mWidgetData.expiryDate != null)
+            if (mWidgetData != null && mWidgetData.expiryDate != null)
             {
                 LocalDate expiryDate = GoalHelper.convertFromIsoDate(mWidgetData.expiryDate);
                 if (LocalDate.now().isAfter(expiryDate)) {
@@ -126,7 +131,6 @@ public class GoalAcademyWidgetProvider extends AppWidgetProvider {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
 
-
     /**
      * Catches the intent from MainActivity. Saves the provided data to SP.
      * Next method to be called: onUpdate
@@ -143,7 +147,9 @@ public class GoalAcademyWidgetProvider extends AppWidgetProvider {
                     mSerializedWidgetData).apply();
         }
         else {
-            Timber.w("Intent without SERIALIZED_WIDGET_DATA. Cannot update Widget correctly.");
+            if (BuildConfig.DEBUG) {
+                Timber.w(Config.WIDGET_ERROR);
+            }
         }
 
         /*

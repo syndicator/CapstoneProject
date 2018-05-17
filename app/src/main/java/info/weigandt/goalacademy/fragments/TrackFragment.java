@@ -26,6 +26,7 @@ import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.TrackListAdapter;
 import info.weigandt.goalacademy.classes.AlertDialogFactory;
+import info.weigandt.goalacademy.classes.Config;
 import info.weigandt.goalacademy.classes.Constants;
 import info.weigandt.goalacademy.classes.Goal;
 import info.weigandt.goalacademy.classes.GoalHelper;
@@ -33,7 +34,6 @@ import info.weigandt.goalacademy.classes.ThreeStatesButton;
 import info.weigandt.goalacademy.classes.WrapLinearLayoutManager;
 import info.weigandt.goalacademy.enums.EventStateEnum;
 import info.weigandt.goalacademy.enums.GoalStatusPseudoEnum;
-import timber.log.Timber;
 
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
 import static info.weigandt.goalacademy.activities.MainActivity.sIsLoadingFromFirebase;
@@ -92,6 +92,11 @@ public class TrackFragment extends BaseFragment {
     {
         mTrackLoadingProgressBar.setVisibility(View.INVISIBLE);
     }
+    public void showLoadingIndicator()
+    {
+        mTrackLoadingProgressBar.setVisibility(View.VISIBLE);
+    }
+
 
     private void restoreFromSavedInstanceState(Bundle savedInstanceState) {
         String isoDate = savedInstanceState.getString(Constants.BUNDLE_ISO_DATE_DISPLAYED_WEEK);
@@ -157,11 +162,9 @@ public class TrackFragment extends BaseFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Timber.d("onActivityCreated called.");
         initializeAdapter();
         if (savedInstanceState != null) {
             // Restore the fragment's state here... hmmm TODO not sure about that man
-            String yo = "let's do it'";
             // TODO Restore anything thats needs a completed Activity OnCreate here!!!
         }
         mAdapter.notifyDataSetChanged(); // TODO: needed? (presumably not here)
@@ -411,7 +414,7 @@ public class TrackFragment extends BaseFragment {
             mFragmentInteractionListener = (BaseFragment.OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + Config.MUST_IMPLEMENT_LISTENER);
         }
     }
 

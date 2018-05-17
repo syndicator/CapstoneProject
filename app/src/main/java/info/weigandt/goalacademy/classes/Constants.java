@@ -8,4 +8,6 @@ public class Constants {
     public static final String TRACK_FRAGMENT_TAG = "TRACK_FRAGMENT_TAG";
     public static final String GOAL_ACADEMY_PREFS_WIDGET_DATA = "GOAL_ACADEMY_PREFS_WIDGET_DATA";
     public static final String SERIALIZED_WIDGET_DATA = "SERIALIZED_WIDGET_DATA";
+
+    public static final String API_ERROR_TEXT = "Error while calling API. %s";
 }
