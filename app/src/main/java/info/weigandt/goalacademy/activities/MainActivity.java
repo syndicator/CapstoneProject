@@ -142,7 +142,6 @@ public class MainActivity extends AppCompatActivity
 
         // Initialize Firebase components
 
-        sendBroadcastToWidget();
 
         initializeFirebaseAuth();
         //loadQuote();
@@ -320,6 +319,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        sendBroadcastToWidget();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         detachFirebaseDbListener();
@@ -460,7 +465,6 @@ public class MainActivity extends AppCompatActivity
                             break;
                         }
                     }
-                    sendBroadcastToWidget();    // TODO debug
                     sGoalList.set(foundAtPosition, changedGoal);
                     // updateViewsNotifyGoalChanged(foundAtPosition);
                     updateGoalsFragmentNotifyGoalChanged(foundAtPosition);

@@ -454,24 +454,39 @@ public class GoalHelper {
             ArrayList<String> criticalGoals = new ArrayList<>();
             ArrayList<String> normalGoals = new ArrayList<>();
             for (Goal goal : sGoalList) {
-                // TODO #0: get critical goals from scheduled weekdays
+                // #0: get critical goals from scheduled weekdays
+
                 if ((goal.getTimesPerWeek() == 0)) {
                     if (!GoalHelper.isDayBlockedInScheme(iterationWeekday, goal)) {
                         // this day is not blocked, means it is available to score on that day
                         // and has to be added to the critical goals list for this day
-                        criticalGoals.add(goal.getName());
+                        EventStateEnum state = getEventState(goal, iterationWeekday,
+                                convertToFirebaseString(LocalDate.now()));
+                        // but only if not passed already
+                        if (!state.equals(EventStateEnum.PASS))
+                        {
+                            criticalGoals.add(goal.getName());
+                        }
                     }
-                } else {
-                    // TODO #1: get numbers for per-week-goals
-                    int availableDays = 7 - current;
-                    int passesStillNeeded = goal.getTimesPerWeek()
-                            - GoalHelper.calculateNumberOfPassesGivenWeek(goal, LocalDate.now());
-                    int buffer = availableDays - passesStillNeeded;
-                    if (buffer < 1)
+                }
+                else {
+                    // #1: get numbers for per-week-goals
+                    // #2 check if passed already first
+
+                    EventStateEnum state = getEventState(goal, iterationWeekday,
+                            convertToFirebaseString(LocalDate.now()));
+                    if (!state.equals(EventStateEnum.PASS))
                     {
-                        criticalGoals.add(goal.getName());
-                    } else {
-                        normalGoals.add(goal.getName());
+                        int availableDays = 7 - current;
+                        int passesStillNeeded = goal.getTimesPerWeek()
+                                - GoalHelper.calculateNumberOfPassesGivenWeek(goal, LocalDate.now());
+                        int buffer = availableDays - passesStillNeeded;
+                        if (buffer < 1)
+                        {
+                            criticalGoals.add(goal.getName());
+                        } else {
+                            normalGoals.add(goal.getName());
+                        }
                     }
                 }
             }

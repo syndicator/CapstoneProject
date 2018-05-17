@@ -6,6 +6,9 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import info.weigandt.goalacademy.R;
+import info.weigandt.goalacademy.activities.MainActivity;
+
+import static info.weigandt.goalacademy.widget.GoalAcademyWidgetProvider.sWidgetListItems;
 
 /**
  * RemoteViewsFactory serves the purpose of an adapter in the widget’s context.
@@ -18,9 +21,6 @@ public class GoalAcademyWidgetRemoteViewsFactory implements RemoteViewsService.R
     public GoalAcademyWidgetRemoteViewsFactory(Context applicationContext, Intent intent)
     {
         mContext = applicationContext;
-
-
-
     }
 
     @Override
@@ -28,17 +28,24 @@ public class GoalAcademyWidgetRemoteViewsFactory implements RemoteViewsService.R
     {
 
     }
-    // TODO initial loading of data here? also when triggered..?
+
+    /**
+     * Called when notifyDataSetChanged() is triggered on the remote adapter.
+     * This allows a RemoteViewsFactory to respond to data changes
+     * by updating any internal references.
+     * THIS SEEMS TO BE CALLED WHEN notifyAppWidgetViewDataChanged is called in the provider. onCreate gets skipped.
+     * So senseless when we have no way to pass in new data :(((((
+     * Oh well we use static member of provider but this is so ..phhhh
+     */
+
     @Override
     public void onDataSetChanged()
     {
-        // iterate over goals
+        // TODO seems to be executed after onCreate
         // if there is an entry for the current WEEK, check further:
         // is it scheduled for today? (week days set)
         // when numbers scheduled, is number reached already? if not, display it!
         // if an event is passed for today, do not display it.
-
-
     }
 
     @Override
@@ -48,7 +55,12 @@ public class GoalAcademyWidgetRemoteViewsFactory implements RemoteViewsService.R
 
     @Override
     public int getCount() {
-        return 2; // TODO enter number of list items here
+        if (sWidgetListItems != null) {
+            return sWidgetListItems.size(); // TODO enter number of list items here
+        }
+        else {
+            return 0;
+        }
     }
 
     /**
@@ -58,19 +70,21 @@ public class GoalAcademyWidgetRemoteViewsFactory implements RemoteViewsService.R
      */
     @Override
     public RemoteViews getViewAt(int position) {
-
-
-
         RemoteViews remoteView = new RemoteViews(mContext.getPackageName(), R.layout.collection_widget_list_item);
-        remoteView.setTextViewText(R.id.tv_widget_goal_name, "TEST");
+        remoteView.setTextViewText(R.id.tv_widget_goal_name, sWidgetListItems.get(position).getGoalName());
+        remoteView.setTextViewText(R.id.tv_widget_info, sWidgetListItems.get(position).getInfoText());
 
+        // Intent on click
+        Intent fillInIntent = new Intent(mContext, MainActivity.class);
+        fillInIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        remoteView.setOnClickFillInIntent(R.id.widgetItemContainer, fillInIntent);
 
-        // TODO retrieve data here. e.g. "goalList.getString(1))" - from Firebase or cursor or what?
         return remoteView;
     }
     @Override
     public RemoteViews getLoadingView() {
         return null;
+        // TODO nice, implement this also
     }
 
     @Override
@@ -80,13 +94,11 @@ public class GoalAcademyWidgetRemoteViewsFactory implements RemoteViewsService.R
 
     @Override
     public long getItemId(int position) {
-        //return mCursor.moveToPosition(position) ? mCursor.getLong(0) : position;
-        return 1; // TODO enter correct value
+        return position;
     }
 
     @Override
     public boolean hasStableIds() {
         return true;
     }
-
 }
