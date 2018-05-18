@@ -12,7 +12,6 @@ import info.weigandt.goalacademy.fragments.BaseFragment;
 import info.weigandt.goalacademy.fragments.GoalsFragment;
 import info.weigandt.goalacademy.fragments.TrackFragment;
 import info.weigandt.goalacademy.fragments.TrophiesFragment;
-import timber.log.Timber;
 
 public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
     private final Context mContext;
@@ -115,8 +114,12 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
     }
 
     public void updateViewsNotifyGoalInserted() {
-        trackFragment.updateViewNotifyGoalInserted();
-        goalsFragment.updateViewNotifyGoalInserted();
+        if (trackFragment != null) {
+            trackFragment.updateViewNotifyGoalInserted();
+        }
+        if (goalsFragment != null) {
+            goalsFragment.updateViewNotifyGoalInserted();
+        }
     }
 
     public void updateViewsNotifyGoalRemoved(int position) {

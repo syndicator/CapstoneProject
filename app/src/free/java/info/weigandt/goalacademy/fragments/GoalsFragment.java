@@ -22,9 +22,10 @@ import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.GoalListAdapter;
 import info.weigandt.goalacademy.classes.FirebaseOperations;
 import info.weigandt.goalacademy.classes.Goal;
+import info.weigandt.goalacademy.classes.WrapLinearLayoutManager;
 
+import static info.weigandt.goalacademy.activities.MainActivity.sAreGoalsLoadingFromFirebase;
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
-import static info.weigandt.goalacademy.activities.MainActivity.sIsLoadingFromFirebase;
 
 /**
  * A fragment
@@ -74,6 +75,7 @@ public class GoalsFragment extends BaseFragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     private OnFragmentInteractionListener mFragmentInteractionListener;
+    private boolean mIsRestoredFromState;
 
     public GoalsFragment() {
         // Required empty public constructor
@@ -104,7 +106,9 @@ public class GoalsFragment extends BaseFragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
+        if (savedInstanceState != null) {
+            mIsRestoredFromState = true;
+        }
     }
 
     @Override
@@ -127,7 +131,9 @@ public class GoalsFragment extends BaseFragment {
             }
         });
         initializeAdMob();
-
+        if (!mIsRestoredFromState && sAreGoalsLoadingFromFirebase) {
+            showLoadingIndicator();
+        }
         return view;
     }
 
@@ -184,7 +190,7 @@ public class GoalsFragment extends BaseFragment {
         mAdapter = new GoalListAdapter(getContext());
         mRecyclerView.setAdapter(mAdapter);
         // Using a linear layout manager
-        mLayoutManager = new LinearLayoutManager(getActivity());
+        mLayoutManager = new WrapLinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
         // Set only if rv doesn't change size // TODO check if this setting is right
         mRecyclerView.setHasFixedSize(true);
@@ -220,7 +226,7 @@ public class GoalsFragment extends BaseFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (sIsLoadingFromFirebase)
+        if (sAreGoalsLoadingFromFirebase)
         {
             mGoalsLoadingProgressBar.setVisibility(View.VISIBLE);
         }

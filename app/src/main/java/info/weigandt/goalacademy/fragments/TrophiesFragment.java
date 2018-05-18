@@ -13,8 +13,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.adapters.TrophyListAdapter;
+import info.weigandt.goalacademy.classes.WrapLinearLayoutManager;
 
-import static info.weigandt.goalacademy.activities.MainActivity.sIsLoadingFromFirebase;
+import static info.weigandt.goalacademy.activities.MainActivity.sAreTrophiesLoadingFromFirebase;
 import static info.weigandt.goalacademy.activities.MainActivity.sTrophyList;
 
 /**
@@ -38,6 +39,7 @@ public class TrophiesFragment extends BaseFragment {
     //private TrackListAdapter mAdapter;
     private RecyclerView.Adapter mAdapter;  // TODO is this sup  class enough?
     private RecyclerView.LayoutManager mLayoutManager;
+    private boolean mIsRestoredFromInstanceState = false;
 
     // private OnFragmentInteractionListener mListener; TODO keep only if...
 
@@ -70,6 +72,9 @@ public class TrophiesFragment extends BaseFragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        if (savedInstanceState != null) {
+            mIsRestoredFromInstanceState = true;
+        }
     }
 
     @Override
@@ -79,6 +84,9 @@ public class TrophiesFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.fragment_trophies, container, false);
         ButterKnife.bind(this, view);
         initializeAdapter();
+        if (!mIsRestoredFromInstanceState && sAreTrophiesLoadingFromFirebase) {
+            showLoadingIndicator();
+        }
         return view;
     }
 
@@ -86,7 +94,7 @@ public class TrophiesFragment extends BaseFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (sIsLoadingFromFirebase)
+        if (sAreTrophiesLoadingFromFirebase)
         {
             mTrophiesLoadingProgressBar.setVisibility(View.VISIBLE);
         }
@@ -96,7 +104,7 @@ public class TrophiesFragment extends BaseFragment {
         mAdapter = new TrophyListAdapter(getContext());
         mRecyclerView.setAdapter(mAdapter);
         // Using a linear layout manager
-        mLayoutManager = new LinearLayoutManager(getActivity());
+        mLayoutManager = new WrapLinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
         // Set only if rv doesn't change size // TODO check if this setting is right
         mRecyclerView.setHasFixedSize(true);

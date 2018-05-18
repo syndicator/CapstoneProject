@@ -21,7 +21,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -72,7 +71,8 @@ public class MainActivity extends AppCompatActivity
     public FixedTabsFragmentPagerAdapter mFixedTabsFragmentPagerAdapter;
     public static ArrayList<Goal> sGoalList;
     public static ArrayList<Trophy> sTrophyList;
-    public static boolean sIsLoadingFromFirebase;
+    public static boolean sAreGoalsLoadingFromFirebase = true;
+    public static boolean sAreTrophiesLoadingFromFirebase = true;
 
     // Firebase related
     public static DatabaseReference sGoalsDatabaseReference;
@@ -97,11 +97,17 @@ public class MainActivity extends AppCompatActivity
     private ChildEventListener mGoalsEventListener;
     private ChildEventListener mTrophiesEventListener;
     private String mUserId;
+    private ArrayList<Goal> mGoalListSave;
+    private ArrayList<Trophy> mTrophyListSave;
+    private Parcelable mTrackFragmentListStateSave;
+    private String test;
+    private int mRestoredGoalListSize;
+    private int mRestoredTrophyListSize;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initializeLists();   // TODO this kills my restored lists! :( if needed add  somewhere else if null...
+        initializeLists();   // TODO if needed add somewhere else if null exceptions occurs...
         if (savedInstanceState != null)
         {
             restoreFromSavedInstanceState(savedInstanceState);
@@ -126,6 +132,8 @@ public class MainActivity extends AppCompatActivity
         {
             mFixedTabsFragmentPagerAdapter = new FixedTabsFragmentPagerAdapter(getSupportFragmentManager(), this, null);
         }
+        // TODO DEBUG!!!
+        test = "test";
 
         // Set the adapter onto the view pager
         mViewPager.setAdapter(mFixedTabsFragmentPagerAdapter);
@@ -142,7 +150,8 @@ public class MainActivity extends AppCompatActivity
 
         // Initialize Firebase components
 
-
+        showGoalsLoadingIndicators();
+        showTrophiesLoadingIndicator();
         initializeFirebaseAuth();
         //loadQuote();
         // quote loading moved to: onSignedInInitialize (only if signed in!)
@@ -217,16 +226,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void onSignedInInitialize() {
-        sIsLoadingFromFirebase = true;
-        showGoalsLoadingIndicators();
-        showTrophiesLoadingIndicator();
+        if (!mIsRestoredFromState)  {
+            showGoalsLoadingIndicators();
+            showTrophiesLoadingIndicator();
+            loadQuote();
+        }
         initializeFirebaseDb();
         checkForEmptyFirebaseDbs();
         attachFirebaseDbListeners();
-        if (!mIsRestoredFromState)
-        {
-            loadQuote();
-        }
     }
 
     private void checkForEmptyFirebaseDbs() {
@@ -234,6 +241,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.exists()) {
+                    sAreGoalsLoadingFromFirebase = false;
                     hideGoalsLoadingIndicators();
                 }
             }
@@ -247,7 +255,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.exists()) {
-                    sIsLoadingFromFirebase = false;
+                    sAreTrophiesLoadingFromFirebase = false;
                     hideTrophiesLoadingIndicator();
                 }
             }
@@ -278,13 +286,11 @@ public class MainActivity extends AppCompatActivity
 
     private void clearAdapters() {
         // TODO warning: this deletes goalList before it can be saved for instanceState! ???? CHECK THIS
-
         int sizeGoalList = sGoalList.size();
         sGoalList.clear();
         int sizeTrophyList = sTrophyList.size();
         sTrophyList.clear();
         mFixedTabsFragmentPagerAdapter.clearAdapters(sizeGoalList, sizeTrophyList);
-
     }
 
     private void initializeFirebaseDb() {
@@ -292,7 +298,6 @@ public class MainActivity extends AppCompatActivity
         sGoalsDatabaseReference = sFirebaseDatabase.getReference().child(Config.GOALS_NODE_NAME).child(mUserId);
         sTrophiesDatabaseReference = sFirebaseDatabase.getReference().child(Config.TROPHIES_NODE_NAME).child(mUserId);
     }
-
 
     /**
      * This method is called after this activity has been paused or restarted
@@ -303,12 +308,11 @@ public class MainActivity extends AppCompatActivity
         // This will trigger onSigninInitialize() if user is logged in
         FirebaseAuth.getInstance().addAuthStateListener(mAuthStateListener);
         registerBroadcastReceiver();
-
          if (mIsRestoredFromState)
          {
              mFixedTabsFragmentPagerAdapter.updateViewsUpdateRecyclerViews();   // TODO move call to method
-             showGoalsLoadingIndicators();
-             showTrophiesLoadingIndicator();
+            // showGoalsLoadingIndicators();
+            // showTrophiesLoadingIndicator();
          }
     }
 
@@ -321,10 +325,20 @@ public class MainActivity extends AppCompatActivity
     protected void onPause() {
         super.onPause();
         sendBroadcastToWidget(false);
+        preSaveForOrientationChange();
         removeFirebaseAuthStateListener();
         detachFirebaseDbListener();
         clearAdapters();
         unregisterBroadcastReceiver();
+    }
+
+    /**
+     * This is needed to save the Lists to survive onPause cleanup before onSaveInstanceState
+     */
+    private void preSaveForOrientationChange() {
+        mGoalListSave = new ArrayList<>(sGoalList);
+        mTrophyListSave = new ArrayList<>(sTrophyList);
+        mTrackFragmentListStateSave =  sTrackFragmentListState;
     }
 
     private void removeFirebaseAuthStateListener() {
@@ -442,8 +456,18 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     hideGoalsLoadingIndicators();
+                    sAreGoalsLoadingFromFirebase = false;
                     Goal goal = dataSnapshot.getValue(Goal.class);
-                    addGoal(goal);
+                    // This prevents this Listener to "overwrite" the restored List
+                    if (mIsRestoredFromState && mRestoredGoalListSize > 0)
+                    {
+                        mRestoredGoalListSize -=1;
+                    }
+                    else
+                    {
+                        addGoal(goal);
+                    }
+
                       // TODO check if fragment list not null in subclass tab....
                     // TODO replace with proper method (inserted instead of former general update)
 
@@ -504,8 +528,8 @@ public class MainActivity extends AppCompatActivity
                 // "Add Trophy"
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    hideTrophiesLoadingIndicator();
                     Trophy trophy = dataSnapshot.getValue(Trophy.class);
+                    sAreTrophiesLoadingFromFirebase = false;
                     if (trophy.getPushId() == null) {
                         trophy.setPushId(dataSnapshot.getKey());
                     }
@@ -516,8 +540,18 @@ public class MainActivity extends AppCompatActivity
                     //                    //this line below gives you the animation and also updates the
                     //                    //list items after the deleted item
                     //                    notifyItemRangeChanged(position, getItemCount());
-                    sTrophyList.add(trophy);
+
+                    // This prevents this Listener to "overwrite" the restored List
+                    if (mIsRestoredFromState && mRestoredTrophyListSize > 0)
+                    {
+                        mRestoredTrophyListSize -=1;
+                    }
+                    else
+                    {
+                        sTrophyList.add(trophy);
+                    }
                     updateViewNotifyTrophyInserted();
+                    hideTrophiesLoadingIndicator();
                 }
 
                 @Override
@@ -537,8 +571,8 @@ public class MainActivity extends AppCompatActivity
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-                    Timber.e(getString(R.string.FIREBASE_ERROR_MESSAGE), databaseError.getMessage());
-                    Timber.e(getString(R.string.FIREBASE_ERROR_DETAILS, databaseError.getDetails());
+                    Timber.e(getString(R.string.FIREBASE_ERROR_MESSAGE, databaseError.getMessage()));
+                    Timber.e(getString(R.string.FIREBASE_ERROR_DETAILS, databaseError.getDetails()));
                 }
             };
             sTrophiesDatabaseReference.addChildEventListener(mTrophiesEventListener);
@@ -546,7 +580,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void hideGoalsLoadingIndicators() {
-        sIsLoadingFromFirebase = false;
         if (mFixedTabsFragmentPagerAdapter.trackFragment != null) {
             mFixedTabsFragmentPagerAdapter.trackFragment.hideLoadingIndicator();
         }
@@ -555,7 +588,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
     private void showGoalsLoadingIndicators() {
-        sIsLoadingFromFirebase = false;
         if (mFixedTabsFragmentPagerAdapter.trackFragment != null) {
             mFixedTabsFragmentPagerAdapter.trackFragment.showLoadingIndicator();
         }
@@ -565,13 +597,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void hideTrophiesLoadingIndicator() {
-        sIsLoadingFromFirebase = false;
         if (mFixedTabsFragmentPagerAdapter.trophiesFragment != null) {
             mFixedTabsFragmentPagerAdapter.trophiesFragment.hideLoadingIndicator();
         }
     }
     private void showTrophiesLoadingIndicator() {
-        sIsLoadingFromFirebase = false;
         if (mFixedTabsFragmentPagerAdapter.trophiesFragment != null) {
             mFixedTabsFragmentPagerAdapter.trophiesFragment.showLoadingIndicator();
         }
@@ -729,7 +759,6 @@ public class MainActivity extends AppCompatActivity
             intent.putExtra(Constants.SERIALIZED_WIDGET_DATA, serializedWidgetData);
             sendBroadcast(intent);
         }
-        String check = "Point charly";
     }
 
     //================================================================================
@@ -753,11 +782,12 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        String test3 = test;
         outState.putParcelableArrayList(BUNDLE_GOAL_LIST,
-                (ArrayList<? extends Parcelable>) sGoalList);
+                (ArrayList<? extends Parcelable>) mGoalListSave);
         outState.putParcelableArrayList(BUNDLE_TROPHY_LIST,
-                (ArrayList<? extends Parcelable>) sTrophyList);
-        outState.putParcelable(Constants.BUNDLE_TRACK_RECYCLER_LAYOUT, sTrackFragmentListState);
+                (ArrayList<? extends Parcelable>) mTrophyListSave);
+        outState.putParcelable(Constants.BUNDLE_TRACK_RECYCLER_LAYOUT, mTrackFragmentListStateSave);
 
         // TODO Save list state <- fragment?
         //mListState = mTabLayout.onSaveInstanceState();
@@ -771,14 +801,21 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void restoreFromSavedInstanceState(Bundle savedInstanceState) {
+        mIsRestoredFromState = true;
+
+        sGoalList  = savedInstanceState.getParcelableArrayList(BUNDLE_GOAL_LIST);
+        sTrophyList  = savedInstanceState.getParcelableArrayList(BUNDLE_TROPHY_LIST);
+        sTrackFragmentListState = savedInstanceState.getParcelable(Constants.BUNDLE_TRACK_RECYCLER_LAYOUT); // TODO not working now. Check later if loaded by fragment at all (var ready?)
+        if (sGoalList != null) {
+            mRestoredGoalListSize = sGoalList.size();
+        }
+        if (sTrophyList != null) {
+            mRestoredTrophyListSize = sTrophyList.size();
+        }
         if (sFirebaseDatabase == null)
         {
             // initializeFirebaseDb(); // TODO check if needed
         }
-        // recreate in onCreate:
-        sGoalList  = savedInstanceState.getParcelableArrayList(BUNDLE_GOAL_LIST);
-        sTrophyList  = savedInstanceState.getParcelableArrayList(BUNDLE_TROPHY_LIST);
-        sTrackFragmentListState = savedInstanceState.getParcelable(Constants.BUNDLE_TRACK_RECYCLER_LAYOUT);
         /*
         //Restore the fragment's instance
         if (mFixedTabsFragmentPagerAdapter == null)
@@ -788,7 +825,7 @@ public class MainActivity extends AppCompatActivity
         }
         */
         //mListState = savedInstanceState.getParcelable(LIST_STATE_KEY);
-        mIsRestoredFromState = true;
+
     }
 
     //================================================================================

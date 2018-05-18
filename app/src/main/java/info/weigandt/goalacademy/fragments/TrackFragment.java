@@ -35,8 +35,8 @@ import info.weigandt.goalacademy.classes.WrapLinearLayoutManager;
 import info.weigandt.goalacademy.enums.EventStateEnum;
 import info.weigandt.goalacademy.enums.GoalStatusPseudoEnum;
 
+import static info.weigandt.goalacademy.activities.MainActivity.sAreGoalsLoadingFromFirebase;
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
-import static info.weigandt.goalacademy.activities.MainActivity.sIsLoadingFromFirebase;
 import static info.weigandt.goalacademy.activities.MainActivity.sTrackFragmentListState;
 
 /**
@@ -147,6 +147,9 @@ public class TrackFragment extends BaseFragment {
                 updateRecyclerView();
             }
         });
+        if (!mIsRestoredFromState && sAreGoalsLoadingFromFirebase) {
+            showLoadingIndicator();
+        }
         return view;
     }
 
@@ -168,7 +171,7 @@ public class TrackFragment extends BaseFragment {
             // TODO Restore anything thats needs a completed Activity OnCreate here!!!
         }
         mAdapter.notifyDataSetChanged(); // TODO: needed? (presumably not here)
-        if (sIsLoadingFromFirebase)
+        if (sAreGoalsLoadingFromFirebase)
         {
             mTrackLoadingProgressBar.setVisibility(View.VISIBLE);
         }
