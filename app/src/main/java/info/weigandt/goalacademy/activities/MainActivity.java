@@ -29,7 +29,6 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.jakewharton.threetenabp.AndroidThreeTen;
@@ -77,7 +76,6 @@ public class MainActivity extends AppCompatActivity
     // Firebase related
     public static DatabaseReference sGoalsDatabaseReference;
     public static DatabaseReference sTrophiesDatabaseReference;
-    public static FirebaseDatabase sFirebaseDatabase;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
     // AsyncTaskLoader related
@@ -107,35 +105,34 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initializeLists();   // TODO if needed add somewhere else if null exceptions occurs...
+        initializeLists();
         if (savedInstanceState != null)
         {
             restoreFromSavedInstanceState(savedInstanceState);
         }
         setContentView(R.layout.activity_main);
-        // ThreeTen Android Backport: Includes Java8 java.time features to replace outdated Java7 time / date classes
         AndroidThreeTen.init(this);
-
-        // Initialize Butterknife
         ButterKnife.bind(this);
+        initializeTimber();
+        initializeTabsAdapter();
+        initializeFirebaseAuth();
+    }
 
-        // Initialize Timber
+    private void initializeTimber() {
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         } else {
             // Online-crash-reporting may be added here later on for release versions
-            Timber.plant(new Timber.DebugTree());   // Udacity Rubic asks to add logging
+            Timber.plant(new Timber.DebugTree());   // Udacity Rubics asks to add logging
         }
-        initializeTabsAdapter();
+    }
+
+    private void initializeTabsAdapter() {
         // Create an adapter that knows which fragment should be shown on each page
-        if (mFixedTabsFragmentPagerAdapter == null) // if not restored from savedInstanceState
+        if (mFixedTabsFragmentPagerAdapter == null)
         {
             mFixedTabsFragmentPagerAdapter = new FixedTabsFragmentPagerAdapter(getSupportFragmentManager(), this, null);
         }
-        // TODO DEBUG!!!
-        test = "test";
-
-        // Set the adapter onto the view pager
         mViewPager.setAdapter(mFixedTabsFragmentPagerAdapter);
         // Connect the tab layout with the view pager. This will
         //   1. Update the tab layout when the view pager is swiped
@@ -143,22 +140,6 @@ public class MainActivity extends AppCompatActivity
         //   3. Set the tab layout's tab names with the view pager's adapter's titles
         //      by calling onPageTitle()
         mTabLayout.setupWithViewPager(mViewPager);
-
-        // TODO not working (no id stored)
-        //View trackTab = ((ViewGroup)mTabLayout.getChildAt(0)).getChildAt(0);
-        //trackTab.setNextFocusUpId(R.id.sign_out_menu);
-
-        // Initialize Firebase components
-
-        showGoalsLoadingIndicators();
-        showTrophiesLoadingIndicator();
-        initializeFirebaseAuth();
-        //loadQuote();
-        // quote loading moved to: onSignedInInitialize (only if signed in!)
-    }
-
-    private void initializeTabsAdapter() {
-
     }
 
     private void launchPullQuoteIntentService() {
@@ -167,8 +148,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void loadQuote() {
-        //if (isOnline())
-        if (false)
+        if (isOnline())
         {
             launchPullQuoteIntentService();
         }
@@ -179,9 +159,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void startAsyncTaskLoader() {
-        // TODO expand to use a member var for the loader if triggered several times
-        // TODO  see https://medium.com/@sanjeevy133/an-idiots-guide-to-android-asynctaskloader-76f8bfb0a0c0
-        // TODO  paragraph 6.
         getSupportLoaderManager().initLoader(QUOTE_FROM_CONTENT_PROVIDER_LOADER, null, this);
     }
 
@@ -231,7 +208,7 @@ public class MainActivity extends AppCompatActivity
             showTrophiesLoadingIndicator();
             loadQuote();
         }
-        initializeFirebaseDb();
+        initializeFirebaseListeners();
         checkForEmptyFirebaseDbs();
         attachFirebaseDbListeners();
     }
@@ -270,7 +247,7 @@ public class MainActivity extends AppCompatActivity
     private void onSignedOutCleanup() {
         detachFirebaseDbListener();
         clearAdapters();
-        sendBroadcastToWidget(true);    // Clear widgets also if intentionally logged out
+        sendBroadcastToWidget(true);  // Clear widgets also if intentionally logged out
     }
 
     private void detachFirebaseDbListener() {
@@ -285,7 +262,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void clearAdapters() {
-        // TODO warning: this deletes goalList before it can be saved for instanceState! ???? CHECK THIS
         int sizeGoalList = sGoalList.size();
         sGoalList.clear();
         int sizeTrophyList = sTrophyList.size();
@@ -293,27 +269,17 @@ public class MainActivity extends AppCompatActivity
         mFixedTabsFragmentPagerAdapter.clearAdapters(sizeGoalList, sizeTrophyList);
     }
 
-    private void initializeFirebaseDb() {
-        sFirebaseDatabase = FirebaseDatabase.getInstance();
-        sGoalsDatabaseReference = sFirebaseDatabase.getReference().child(Config.GOALS_NODE_NAME).child(mUserId);
-        sTrophiesDatabaseReference = sFirebaseDatabase.getReference().child(Config.TROPHIES_NODE_NAME).child(mUserId);
+    private void initializeFirebaseListeners() {
+        sGoalsDatabaseReference = FirebaseOperations.getFirebase().getReference().child(Config.GOALS_NODE_NAME).child(mUserId);
+        sTrophiesDatabaseReference = FirebaseOperations.getFirebase().getReference().child(Config.TROPHIES_NODE_NAME).child(mUserId);
     }
 
-    /**
-     * This method is called after this activity has been paused or restarted
-     */
     @Override
     protected void onResume() {
         super.onResume();
         // This will trigger onSigninInitialize() if user is logged in
         FirebaseAuth.getInstance().addAuthStateListener(mAuthStateListener);
         registerBroadcastReceiver();
-         if (mIsRestoredFromState)
-         {
-             mFixedTabsFragmentPagerAdapter.updateViewsUpdateRecyclerViews();   // TODO move call to method
-            // showGoalsLoadingIndicators();
-            // showTrophiesLoadingIndicator();
-         }
     }
 
     @Override
@@ -324,7 +290,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
-        sendBroadcastToWidget(false);
+        sendBroadcastToWidget(true);
         preSaveForOrientationChange();
         removeFirebaseAuthStateListener();
         detachFirebaseDbListener();
@@ -347,8 +313,14 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    // region BroadcastReceiver
+    private void initializeLists() {
+        sGoalList = new ArrayList<>();
+        sTrophyList = new ArrayList<>();
+    }
 
+    //================================================================================
+    // region Broadcast Receiver
+    //================================================================================
     private void registerBroadcastReceiver() {
         if  (mPullQuoteBroadcastReceiver == null)
         {
@@ -361,18 +333,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void unregisterBroadcastReceiver() {
-        /*
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
         localBroadcastManager.unregisterReceiver(mPullQuoteBroadcastReceiver);
-        */
     }
 
-    // endregion BroadcastReceiver
-
-    private void initializeLists() {
-        sGoalList = new ArrayList<>();
-        sTrophyList = new ArrayList<>();
-    }
+    //================================================================================
+    // endregion Broadcast Receiver
+    //================================================================================
 
     //// region updateViews ////
 
@@ -467,17 +434,6 @@ public class MainActivity extends AppCompatActivity
                     {
                         addGoal(goal);
                     }
-
-                      // TODO check if fragment list not null in subclass tab....
-                    // TODO replace with proper method (inserted instead of former general update)
-
-                    // change the sGoalList now and then call:
-                    // mAdapter.notifyItemInserted(mItems.size() - 1);
-                    //  issues.remove(position);
-                    //                    notifyItemRemoved(position);
-                    //                    //this line below gives you the animation and also updates the
-                    //                    //list items after the deleted item
-                    //                    notifyItemRangeChanged(position, getItemCount());
                 }
 
                 @Override
@@ -491,7 +447,6 @@ public class MainActivity extends AppCompatActivity
                         }
                     }
                     sGoalList.set(foundAtPosition, changedGoal);
-                    // updateViewsNotifyGoalChanged(foundAtPosition);
                     updateGoalsFragmentNotifyGoalChanged(foundAtPosition);
                 }
 
@@ -507,6 +462,7 @@ public class MainActivity extends AppCompatActivity
                     }
                     sGoalList.remove(foundAtPosition);
                     updateViewsNotifyGoalRemoved(foundAtPosition);
+                    sendBroadcastToWidget(true);
                 }
 
                 @Override
@@ -533,14 +489,6 @@ public class MainActivity extends AppCompatActivity
                     if (trophy.getPushId() == null) {
                         trophy.setPushId(dataSnapshot.getKey());
                     }
-                    // change the sGoalList now and then call:
-                    // mAdapter.notifyItemInserted(mItems.size() - 1);
-                    //  issues.remove(position);
-                    //                    notifyItemRemoved(position);
-                    //                    //this line below gives you the animation and also updates the
-                    //                    //list items after the deleted item
-                    //                    notifyItemRangeChanged(position, getItemCount());
-
                     // This prevents this Listener to "overwrite" the restored List
                     if (mIsRestoredFromState && mRestoredTrophyListSize > 0)
                     {
@@ -556,17 +504,14 @@ public class MainActivity extends AppCompatActivity
 
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
                 }
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
-
                 }
 
                 @Override
                 public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
                 }
 
                 @Override
@@ -607,7 +552,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    // This method is needed because sGoalList might have been recreated by restoreFromInstanceState
+    /**
+     * This method is needed because sGoalList might have been recreated by restoreFromInstanceState
+     * @param goalToAdd
+     */
     private void addGoal(Goal goalToAdd) {
         for (Goal goal : sGoalList)
         {
@@ -623,62 +571,6 @@ public class MainActivity extends AppCompatActivity
     private void updateGoalsFragmentNotifyGoalChanged(int foundAtPosition) {
         mFixedTabsFragmentPagerAdapter.updateGoalsFragmentNotifyGoalChanged(foundAtPosition);
     }
-
-    /* TODO check this for processing. method has been moved to service
-    @Override
-    public void onPostApiCall(Quote quote) {
-        if (quote != null) {
-            if (mIsRestoredFromState == false)
-            {
-                saveRetrofitResponseToContentProvider(quote);
-            }
-            else
-            {
-
-            }
-            //String quoteText = quote.getQuoteText();
-            //String quoteAuthor = quote.getQuoteAuthor();
-
-            // TODO move following line to broadcast receiver!
-        } else {
-            // showMainErrorMessage(); TODO handle error / log etc...
-            int i = 0;
-        }
-    }
-    */
-
-    // region Content Provider
-
-    private void saveRetrofitResponseToContentProvider(Quote quote) {
-        // TODO implement. Old code below.
-        /*
-        JSONObject root = null;
-        JSONArray resultsArray = null;
-        try {
-            ArrayList<MovieResult.Movie> moviesList = movieResult.getItems();
-            mPosterList = new ArrayList<String>();
-            mMovieObjects = new ArrayList<JSONObject>();
-
-            for (MovieResult.Movie movie : moviesList) {
-
-                String url = NetworkHelper.buildPosterUrl(movie.getMoviePoster()).toString();
-                mPosterList.add(url);
-                JSONObject json = new JSONObject();
-                JSONObject json = new JSONObject();
-                json.put(NetworkHelper.PROPERTY_POSTER_PATH, movie.getMoviePoster());
-                json.put(NetworkHelper.PROPERTY_OVERVIEW, movie.getMoviePlot());
-                json.put(NetworkHelper.PROPERTY_RELEASE, movie.getMovieRelease());
-                json.put(NetworkHelper.PROPERTY_ID, movie.getId());
-                json.put(NetworkHelper.PROPERTY_TITLE, movie.getMovieTitle());
-                json.put(NetworkHelper.PROPERTY_RATING, movie.getMovieRating());
-                mMovieObjects.add(json);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        */
-    }
-    // endregion Content Provider
 
     public boolean isOnline() {
         ConnectivityManager cm =
@@ -706,7 +598,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-        //updateViewQuoteLoaded(cursor.getQuoteText(), cursor.getQuoteAuthor());
         Quote quote = new Quote();
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             try {
@@ -726,9 +617,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-
     }
-
     /**
      * The Widget cannot access the Firebase Realtime Database, because no authorization can be
      * provided from within the widget (saving the credentials is not an option).
@@ -739,13 +628,6 @@ public class MainActivity extends AppCompatActivity
      * @param force
      */
     private void sendBroadcastToWidget(boolean force) {
-
-        // get the critical events for the remaining days of the weeks
-        // store it where?...->     Map<Integer,List<String>> criticalEvents;
-        // int is the weekday 0,1,2,3,4,5 or 6
-        // String List will be all Goals who are critical on that day
-
-        //  TODO check to call this method after the FB data update
         if (force || (sGoalList != null && sGoalList.size() > 0))
         {
             WidgetData widgetData = GoalHelper.calculateWidgetData();
@@ -769,16 +651,6 @@ public class MainActivity extends AppCompatActivity
     // Saving / restoring the state
     //================================================================================
 
-    private ArrayList<String> convertToStringArray(ArrayList<Goal> goalList)
-    {
-        ArrayList<String> stringList = new ArrayList<>();
-        Gson gson = new Gson();
-        for (Goal goal : goalList) {
-            stringList.add(gson.toJson(goal));
-        }
-        return stringList;
-    }
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -788,46 +660,20 @@ public class MainActivity extends AppCompatActivity
         outState.putParcelableArrayList(BUNDLE_TROPHY_LIST,
                 (ArrayList<? extends Parcelable>) mTrophyListSave);
         outState.putParcelable(Constants.BUNDLE_TRACK_RECYCLER_LAYOUT, mTrackFragmentListStateSave);
-
-        // TODO Save list state <- fragment?
-        //mListState = mTabLayout.onSaveInstanceState();
-        //outState.putParcelable(LIST_STATE_KEY, mListState);
-
-        // Save the fragment's instance
-        /* TODO not working. Problem is fragmentadapter / view pager
-        getSupportFragmentManager().putFragment(outState, "TrackFragment",
-                mFixedTabsFragmentPagerAdapter.trackFragment);
-                */
     }
 
     private void restoreFromSavedInstanceState(Bundle savedInstanceState) {
         mIsRestoredFromState = true;
-
         sGoalList  = savedInstanceState.getParcelableArrayList(BUNDLE_GOAL_LIST);
         sTrophyList  = savedInstanceState.getParcelableArrayList(BUNDLE_TROPHY_LIST);
-        sTrackFragmentListState = savedInstanceState.getParcelable(Constants.BUNDLE_TRACK_RECYCLER_LAYOUT); // TODO not working now. Check later if loaded by fragment at all (var ready?)
+        sTrackFragmentListState = savedInstanceState.getParcelable(Constants.BUNDLE_TRACK_RECYCLER_LAYOUT);
         if (sGoalList != null) {
             mRestoredGoalListSize = sGoalList.size();
         }
         if (sTrophyList != null) {
             mRestoredTrophyListSize = sTrophyList.size();
         }
-        if (sFirebaseDatabase == null)
-        {
-            // initializeFirebaseDb(); // TODO check if needed
-        }
-        /*
-        //Restore the fragment's instance
-        if (mFixedTabsFragmentPagerAdapter == null)
-        {
-            TrackFragment trackFragment = (TrackFragment)getSupportFragmentManager().getFragment(savedInstanceState, "TrackFragment");
-            mFixedTabsFragmentPagerAdapter = new FixedTabsFragmentPagerAdapter(getSupportFragmentManager(), this, trackFragment);
-        }
-        */
-        //mListState = savedInstanceState.getParcelable(LIST_STATE_KEY);
-
     }
-
     //================================================================================
     // END Saving / restoring the state
     //================================================================================

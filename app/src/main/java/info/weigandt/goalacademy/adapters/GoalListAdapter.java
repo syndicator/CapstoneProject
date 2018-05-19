@@ -13,7 +13,6 @@ import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.classes.Config;
 import info.weigandt.goalacademy.classes.Goal;
 import info.weigandt.goalacademy.classes.GoalHelper;
-import info.weigandt.goalacademy.enums.GoalStatusPseudoEnum;
 
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
 
@@ -26,7 +25,7 @@ public class GoalListAdapter extends RecyclerView.Adapter<GoalListAdapter.TrackV
 
     // region Constructor
     public GoalListAdapter(Context context) {
-        super();    //  TODO needed?
+        super();
         this.mContext = context;
     }
     // endregion Constructor
@@ -111,18 +110,18 @@ public class GoalListAdapter extends RecyclerView.Adapter<GoalListAdapter.TrackV
             if (streakNumber < Config.NUMBER_FOR_BRONZE)
             {
                  eventsNeededToReachNextLevel = Config.NUMBER_FOR_BRONZE;
-                 nextLevel = GoalStatusPseudoEnum.BRONZE_EARNED_STRING;
+                 nextLevel = mContext.getResources().getString(R.id.BRONZE_EARNED_STRING);
             }
             else if (streakNumber < Config.NUMBER_FOR_SILVER) {
                  eventsNeededToReachNextLevel = Config.NUMBER_FOR_SILVER
                         - Config.NUMBER_FOR_BRONZE;
-                nextLevel = GoalStatusPseudoEnum.SILVER_EARNED_STRING;
+                nextLevel = mContext.getResources().getString(R.id.SILVER_EARNED_STRING);
                 subtractSmaller = Config.NUMBER_FOR_BRONZE;
             }
             else if (streakNumber < Config.NUMBER_FOR_GOLD) {
                  eventsNeededToReachNextLevel = Config.NUMBER_FOR_GOLD
                         - Config.NUMBER_FOR_SILVER;
-                nextLevel = GoalStatusPseudoEnum.GOLD_EARNED_STRING;
+                nextLevel = mContext.getResources().getString(R.id.GOLD_EARNED_STRING);
                 subtractSmaller = Config.NUMBER_FOR_SILVER;
             }
             int percentage = ((streakNumber-subtractSmaller)*100) / eventsNeededToReachNextLevel;

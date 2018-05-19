@@ -46,7 +46,7 @@ public class QuoteAsyncTaskLoader extends AsyncTaskLoader<Cursor> {
         try {
             return mContext.getContentResolver().query(
                     uri,
-                    null,   // TODO add return only 1 random quote
+                    null,
                     null,
                     null,
                     Config.LIMIT_QUOTES_STRING);

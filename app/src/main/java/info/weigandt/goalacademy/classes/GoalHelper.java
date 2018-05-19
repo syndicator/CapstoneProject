@@ -56,7 +56,7 @@ public class GoalHelper {
                     String yearsWeekString = weeklyEventCounter.getYearWeekString();
                     if (yearsWeekString.equals(currentlyDisplayedYearWeekString))
                     {
-                        int weekPassCounter = weeklyEventCounter.getWeekPassCounter();  // TODO this MUST be set to 0 as default in class, else this will crash!
+                        int weekPassCounter = weeklyEventCounter.getWeekPassCounter();
                         updatedCounter = GoalHelper.AddEventToCounter(weekPassCounter, clickedWeekday);
                         goal.getWeeklyEventCounterList().get(i).setWeekPassCounter(updatedCounter);
                         found = true;
@@ -88,7 +88,7 @@ public class GoalHelper {
                         goal.getWeeklyEventCounterList().get(i).setWeekPassCounter(cleanedPassCounter);
 
                         // add to FAIL list
-                        int weekFailCounter = weeklyEventCounter.getWeekFailCounter();  // TODO this MUST be set to 0 as default in class, else this will crash!
+                        int weekFailCounter = weeklyEventCounter.getWeekFailCounter();
                         updatedCounter = GoalHelper.AddEventToCounter(weekFailCounter, clickedWeekday);
                         goal.getWeeklyEventCounterList().get(i).setWeekFailCounter(updatedCounter);
                         found = true;
@@ -344,9 +344,11 @@ public class GoalHelper {
 
     public static int calculateNumberOfPassesGivenWeek(Goal goal, LocalDate week) {
         int totalPasses = 0;
-        for (Goal.WeeklyEventCounter weeklyEventCounter : goal.getWeeklyEventCounterList()) {
-            if (weeklyEventCounter.getYearWeekString().equals(convertToFirebaseString(week))) {
-                totalPasses += calculateNumberOfEvents(weeklyEventCounter.getWeekPassCounter());
+        if (goal.getWeeklyEventCounterList() != null) {
+            for (Goal.WeeklyEventCounter weeklyEventCounter : goal.getWeeklyEventCounterList()) {
+                if (weeklyEventCounter.getYearWeekString().equals(convertToFirebaseString(week))) {
+                    totalPasses += calculateNumberOfEvents(weeklyEventCounter.getWeekPassCounter());
+                }
             }
         }
         return totalPasses;

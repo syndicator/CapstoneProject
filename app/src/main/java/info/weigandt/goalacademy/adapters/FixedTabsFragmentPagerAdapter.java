@@ -44,23 +44,8 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
         switch (position) {
             case 0:
                 return TrackFragment.newInstance();
-                /*
-                if (trackFragment == null)
-                {
-                    return TrackFragment.newInstance();
-                }
-                else
-                {
-                    return this.trackFragment;
-                }
-                */
-                /* TODO tried to add a tag :/
-                mFragmentManager.beginTransaction()
-                        .add(R.id.fragment_track, fragment, Constants.TRACK_FRAGMENT_TAG)
-                        .commit();
-                        */
             case 1:
-                fragment = GoalsFragment.newInstance(null, null);
+                fragment = GoalsFragment.newInstance();
                 return fragment;
             case 2:
                 fragment = TrophiesFragment.newInstance(null, null);
@@ -70,15 +55,18 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
         }
     }
 
-    // Here we can finally safely save a reference to the created
-    // Fragment, no matter where it came from (either getItem() or
-    // FragmentManger). Simply save the returned Fragment from
-    // super.instantiateItem() into an appropriate reference depending
-    // on the ViewPager position.   ->     #loveIt :)
+    /**
+     * Here we can finally safely save a reference to the created
+     * Fragment, no matter where it came from (either getItem() or
+     * FragmentManger). Simply save the returned Fragment from
+     * super.instantiateItem() into an appropriate reference depending
+     * on the ViewPager position.   ->     #loveIt :)
+     * @param container
+     * @param position
+     * @return
+     */
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-
-
         Fragment createdFragment = (Fragment) super.instantiateItem(container, position);
         // save the appropriate reference depending on position
         switch (position) {
@@ -106,13 +94,6 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
         }
     }
 
-    public void updateViewsUpdateRecyclerViews() {
-        // not possible, null pointer
-        // trackFragment.updateRecyclerView();
-        // goalsFragment.upda
-        // TODO enter those fragments also
-    }
-
     public void updateViewsNotifyGoalInserted() {
         if (trackFragment != null) {
             trackFragment.updateViewNotifyGoalInserted();
@@ -123,7 +104,6 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
     }
 
     public void updateViewsNotifyGoalRemoved(int position) {
-        // TODO maybe not needed if listener is set??? hmmmmm
         trackFragment.updateViewNotifyGoalRemoved();
         goalsFragment.updateViewNotifyGoalRemoved();
 
@@ -140,8 +120,8 @@ public class FixedTabsFragmentPagerAdapter extends FragmentPagerAdapter {
         }
     }
 
-    public void updateGoalsFragmentNotifyGoalChanged(int position) {    // TODO check if  still in use
-        trackFragment.updateViewNotifyGoalChanged(position); // handled by button view logic also :/
+    public void updateGoalsFragmentNotifyGoalChanged(int position) {
+        trackFragment.updateViewNotifyGoalChanged(position);
         goalsFragment.updateViewNotifyGoalChanged(position);
     }
 

@@ -12,7 +12,7 @@
     <string name="saturday_short">Sat</string>
     <string name="sunday_short">Sun</string>
     <string name="fallback_motivation">Keep it up!</string>
-    <!-- TODO This is the test ad id!!!  -->
+    <!-- This is the test ad id!!!  -->
     <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
     <string name="fallback_streak_number">250</string>
     <string name="fallback_finished_percent">10%</string>
@@ -61,5 +61,7 @@
     <string name="BROADCAST_RECEIVED">BROADCAST received. %s</string>
     <string name="FIREBASE_ERROR_MESSAGE">Firebase DB error. Message: %s</string>
     <string name="FIREBASE_ERROR_DETAILS">Firebase DB error. Message: %s</string>
+    <string name="NEW_GOAL_TEXT">New goal</string>
+    <string name="FRAGMENT_EDIT_NAME">fragment_edit_name</string>
 
 </resources>

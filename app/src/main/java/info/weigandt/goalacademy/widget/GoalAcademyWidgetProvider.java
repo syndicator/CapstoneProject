@@ -109,10 +109,9 @@ public class GoalAcademyWidgetProvider extends AppWidgetProvider {
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent2, 0);
 
         // Set click handler to launch pending intent
-        views.setOnClickPendingIntent(R.id.ll_widget_goal_academy, pendingIntent);  // TODO add listener to items also later
+        views.setOnClickPendingIntent(R.id.ll_widget_goal_academy, pendingIntent);
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
-
     }
 
     /**
@@ -151,12 +150,6 @@ public class GoalAcademyWidgetProvider extends AppWidgetProvider {
                 Timber.w(Config.WIDGET_ERROR);
             }
         }
-
-        /*
-        AppWidgetManager mgr = AppWidgetManager.getInstance(context);
-        int[] appWidgetIds = mgr.getAppWidgetIds(new ComponentName(context, BakingAppWidgetProvider.class));
-        mgr.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_stack_view);
-        */
         super.onReceive(context, intent);
     }
 

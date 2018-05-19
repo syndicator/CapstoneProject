@@ -1,6 +1,5 @@
 package info.weigandt.goalacademy.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
@@ -36,21 +35,6 @@ import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
  * create an instance of this fragment.
  */
 public class GoalsFragment extends BaseFragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    // Firebase related
-    /* moved to mainActivity
-    private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mGoalsDatabaseReference;   // TODO: Adjust to correct node. users?
-    private ChildEventListener mGoalsEventListener;
-    */
-
     @BindView(R.id.rv_goals) RecyclerView mRecyclerView;
     @BindView(R.id.fab_add) FloatingActionButton mFloatingActionButtonAdd;
     @BindView(R.id.adView) AdView mAdView;
@@ -58,23 +42,9 @@ public class GoalsFragment extends BaseFragment {
     @BindView(R.id.goals_loading_indicator)
     ProgressBar mGoalsLoadingProgressBar;
 
-    //private TrackListAdapter mAdapter;
-    private RecyclerView.Adapter mAdapter;  // TODO is this sup  class enough?
+    private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    // Fragment Interaction Interface
-
-    /*
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    private OnFragmentInteractionListener mFragmentInteractionListener;
     private boolean mIsRestoredFromState;
 
     public GoalsFragment() {
@@ -84,28 +54,16 @@ public class GoalsFragment extends BaseFragment {
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment GoalsFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static GoalsFragment newInstance(String param1, String param2) {
+    public static GoalsFragment newInstance() {
         GoalsFragment fragment = new GoalsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
         if (savedInstanceState != null) {
             mIsRestoredFromState = true;
         }
@@ -114,16 +72,9 @@ public class GoalsFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_goals, container, false);
         ButterKnife.bind(this, view);
-
-
-        //initializeFirebase();
-        //loadFirebaseData();
         initializeAdapter();
-
-
         mFloatingActionButtonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -139,11 +90,6 @@ public class GoalsFragment extends BaseFragment {
 
     public void updateViewNotifyGoalInserted() {
         mAdapter.notifyItemInserted(sGoalList.size() - 1);
-        //  issues.remove(position);
-        //                    notifyItemRemoved(position);
-        //                    //this line below gives you the animation and also updates the
-        //                    //list items after the deleted item
-        //                    notifyItemRangeChanged(position, getItemCount());
     }
 
     public void updateViewNotifyGoalRemoved() {
@@ -173,15 +119,14 @@ public class GoalsFragment extends BaseFragment {
 
     private void showCustomFragmentDialog() {
         FragmentManager fm = getFragmentManager();
-        CustomDialogFragment customDialogFragment = CustomDialogFragment.newInstance("New goal TODO check code"); // TODO enter resource string here
+        CustomDialogFragment customDialogFragment = CustomDialogFragment.newInstance(getString(R.string.NEW_GOAL_TEXT));
         customDialogFragment.setCustomDialogFragmentListener(new CustomDialogFragment.CustomDialogFragmentListener() {
             @Override
             public void onDialogPositiveClick(Goal goal) {
-                // goalList.add(goal); // TODO enter proper data processing here (update view also)
                 FirebaseOperations.addGoalToDatabase(goal);
             }
         });
-        customDialogFragment.show(fm, "fragment_edit_name");
+        customDialogFragment.show(fm, getString(R.string.FRAGMENT_EDIT_NAME));
         //new CustomDialogFragment().show(getFragmentManager(), "CustomDialogFragment");
 
     }
@@ -192,10 +137,8 @@ public class GoalsFragment extends BaseFragment {
         // Using a linear layout manager
         mLayoutManager = new WrapLinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        // Set only if rv doesn't change size // TODO check if this setting is right
+        // Set only if rv doesn't change size
         mRecyclerView.setHasFixedSize(true);
-        // mAdapter.notifyDataSetChanged(); TODO: needed? (presumably not here)
-
     }
 
     @Override
@@ -205,22 +148,8 @@ public class GoalsFragment extends BaseFragment {
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        if (context instanceof OnFragmentInteractionListener) {
-            mFragmentInteractionListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
-        mFragmentInteractionListener = null; // TODO remove if no needed
     }
 
     @Override

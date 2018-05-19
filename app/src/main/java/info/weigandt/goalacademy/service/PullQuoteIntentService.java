@@ -52,7 +52,7 @@ public class PullQuoteIntentService extends IntentService implements PostRetrofi
 
     private void writeQuoteToContentProvider(String quoteText, String quoteAuthor) {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(QuotesContract.QuotesEntry.COLUMN_LINK, "Unique URL");    // TODO completely remove later from db model also
+        contentValues.put(QuotesContract.QuotesEntry.COLUMN_LINK, "Unique URL");
         contentValues.put(QuotesContract.QuotesEntry.COLUMN_TEXT, quoteText);
         contentValues.put(QuotesContract.QuotesEntry.COLUMN_AUTHOR, quoteAuthor);
         // Insert the content values via a ContentResolver

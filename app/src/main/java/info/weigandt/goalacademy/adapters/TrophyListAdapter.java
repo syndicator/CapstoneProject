@@ -16,7 +16,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.classes.GoalHelper;
-import info.weigandt.goalacademy.enums.GoalStatusPseudoEnum;
 
 import static info.weigandt.goalacademy.activities.MainActivity.sTrophyList;
 
@@ -29,7 +28,7 @@ public class TrophyListAdapter extends RecyclerView.Adapter<TrophyListAdapter.Tr
 
     // region Constructor
     public TrophyListAdapter(Context context) {
-        super();    //  TODO needed?
+        super();
         this.mContext = context;
     }
     // endregion Constructor
@@ -103,15 +102,15 @@ public class TrophyListAdapter extends RecyclerView.Adapter<TrophyListAdapter.Tr
          */
         void bind(final int listIndex) {
             mTextViewGoalName.setText(sTrophyList.get(listIndex).getGoalName());
-            if (sTrophyList.get(listIndex).getAward().equals(GoalStatusPseudoEnum.BRONZE_EARNED_STRING)) {
+            if (sTrophyList.get(listIndex).getAward().equals(mContext.getResources().getString(R.id.BRONZE_EARNED_STRING))) {
                 mImageViewAward.setImageResource(R.drawable.ic_trophy_bronze);
-                mImageViewAward.setContentDescription(GoalStatusPseudoEnum.BRONZE_EARNED_STRING);
-            } else if (sTrophyList.get(listIndex).getAward().equals(GoalStatusPseudoEnum.SILVER_EARNED_STRING)) {
+                mImageViewAward.setContentDescription(mContext.getResources().getString(R.id.BRONZE_EARNED_STRING));
+            } else if (sTrophyList.get(listIndex).getAward().equals(mContext.getResources().getString(R.id.SILVER_EARNED_STRING))) {
                 mImageViewAward.setImageResource(R.drawable.ic_trophy_silver);
-                mImageViewAward.setContentDescription(GoalStatusPseudoEnum.SILVER_EARNED_STRING);
-            } else if (sTrophyList.get(listIndex).getAward().equals(GoalStatusPseudoEnum.GOLD_EARNED_STRING)) {
+                mImageViewAward.setContentDescription(mContext.getResources().getString(R.id.SILVER_EARNED_STRING));
+            } else if (sTrophyList.get(listIndex).getAward().equals(mContext.getResources().getString(R.id.GOLD_EARNED_STRING))) {
                 mImageViewAward.setImageResource(R.drawable.ic_trophy_gold);
-                mImageViewAward.setContentDescription(GoalStatusPseudoEnum.GOLD_EARNED_STRING);
+                mImageViewAward.setContentDescription(mContext.getResources().getString(R.id.GOLD_EARNED_STRING));
             }
             mTextViewCompletionDate.setText(String.valueOf(sTrophyList.get(listIndex).getCompletionDate()));
             mImageButtonShare.setOnClickListener(new View.OnClickListener() {

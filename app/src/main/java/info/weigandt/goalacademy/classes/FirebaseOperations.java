@@ -1,12 +1,23 @@
 package info.weigandt.goalacademy.classes;
 
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalsDatabaseReference;
 import static info.weigandt.goalacademy.activities.MainActivity.sTrophiesDatabaseReference;
 
 public class FirebaseOperations {
+
+    public static FirebaseDatabase mDatabase;
+
+    public static FirebaseDatabase getFirebase() {
+        if (mDatabase == null) {
+            mDatabase = FirebaseDatabase.getInstance();
+            mDatabase.setPersistenceEnabled(true);
+        }
+        return mDatabase;
+    }
 
     public static void UpdateGoal(Goal goal) {
         String goalId = goal.getPushId();

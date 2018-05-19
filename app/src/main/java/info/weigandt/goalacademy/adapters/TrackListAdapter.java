@@ -15,7 +15,6 @@ import info.weigandt.goalacademy.R;
 import info.weigandt.goalacademy.classes.GoalHelper;
 import info.weigandt.goalacademy.classes.ThreeStatesButton;
 import info.weigandt.goalacademy.enums.EventStateEnum;
-import timber.log.Timber;
 
 import static info.weigandt.goalacademy.activities.MainActivity.sGoalList;
 import static info.weigandt.goalacademy.fragments.TrackFragment.sYearWeekString;
@@ -31,7 +30,7 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
 
     // region Constructor
     public TrackListAdapter(Context context, TrackListAdapterListener listener) {
-        super();    //  TODO needed?
+        super();
         this.mContext = context;
         this.onClickListener = listener;
     }
@@ -49,10 +48,7 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
         View view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
-
-
         TrackViewHolder trackViewHolder = new TrackViewHolder(view);
-        // trackViewHolder.enableAllButtons();
         return trackViewHolder;
     }
 

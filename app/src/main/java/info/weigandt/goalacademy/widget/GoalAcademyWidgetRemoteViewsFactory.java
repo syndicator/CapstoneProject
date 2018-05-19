@@ -41,8 +41,7 @@ public class GoalAcademyWidgetRemoteViewsFactory implements RemoteViewsService.R
     @Override
     public void onDataSetChanged()
     {
-        // TODO seems to be executed after onCreate
-
+        // seems to be executed after onCreate - also?
     }
 
     @Override
@@ -53,7 +52,7 @@ public class GoalAcademyWidgetRemoteViewsFactory implements RemoteViewsService.R
     @Override
     public int getCount() {
         if (sWidgetListItems != null) {
-            return sWidgetListItems.size(); // TODO enter number of list items here
+            return sWidgetListItems.size();
         }
         else {
             return 0;
@@ -81,7 +80,6 @@ public class GoalAcademyWidgetRemoteViewsFactory implements RemoteViewsService.R
     @Override
     public RemoteViews getLoadingView() {
         return null;
-        // TODO nice, implement this also
     }
 
     @Override
