@@ -18,9 +18,12 @@ import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -89,8 +92,8 @@ public class MainActivity extends AppCompatActivity
 
     @BindView(R.id.viewpager)
     ViewPager mViewPager;
-    @BindView(R.id.tablayout)
-    TabLayout mTabLayout;
+    @BindView(R.id.tablayout)    TabLayout mTabLayout;
+    @BindView(R.id.toolbar)    Toolbar mToolbar;
 
     private ChildEventListener mGoalsEventListener;
     private ChildEventListener mTrophiesEventListener;
@@ -116,6 +119,21 @@ public class MainActivity extends AppCompatActivity
         initializeTimber();
         initializeTabsAdapter();
         initializeFirebaseAuth();
+        initToolBar();
+    }
+
+    public void initToolBar() {
+        mToolbar.setTitle(R.string.app_name);
+        setSupportActionBar(mToolbar);
+        // mToolbar.setNavigationIcon(R.drawable.ic_trophy_gold);
+        mToolbar.setNavigationOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(MainActivity.this, "clicking the toolbar!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
     }
 
     private void initializeTimber() {
@@ -387,8 +405,8 @@ public class MainActivity extends AppCompatActivity
                 return super.onOptionsItemSelected(item);
         }
     }
-
     // endregion Menu
+
     @Override
     public void onGoalChangedByFragment(Goal goal) {
         FirebaseOperations.UpdateGoal(goal);

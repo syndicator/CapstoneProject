@@ -110,18 +110,18 @@ public class GoalListAdapter extends RecyclerView.Adapter<GoalListAdapter.TrackV
             if (streakNumber < Config.NUMBER_FOR_BRONZE)
             {
                  eventsNeededToReachNextLevel = Config.NUMBER_FOR_BRONZE;
-                 nextLevel = mContext.getResources().getString(R.id.BRONZE_EARNED_STRING);
+                 nextLevel = mContext.getResources().getString(R.string.BRONZE_EARNED_STRING);
             }
             else if (streakNumber < Config.NUMBER_FOR_SILVER) {
                  eventsNeededToReachNextLevel = Config.NUMBER_FOR_SILVER
                         - Config.NUMBER_FOR_BRONZE;
-                nextLevel = mContext.getResources().getString(R.id.SILVER_EARNED_STRING);
+                nextLevel = mContext.getResources().getString(R.string.SILVER_EARNED_STRING);
                 subtractSmaller = Config.NUMBER_FOR_BRONZE;
             }
             else if (streakNumber < Config.NUMBER_FOR_GOLD) {
                  eventsNeededToReachNextLevel = Config.NUMBER_FOR_GOLD
                         - Config.NUMBER_FOR_SILVER;
-                nextLevel = mContext.getResources().getString(R.id.GOLD_EARNED_STRING);
+                nextLevel = mContext.getResources().getString(R.string.GOLD_EARNED_STRING);
                 subtractSmaller = Config.NUMBER_FOR_SILVER;
             }
             int percentage = ((streakNumber-subtractSmaller)*100) / eventsNeededToReachNextLevel;

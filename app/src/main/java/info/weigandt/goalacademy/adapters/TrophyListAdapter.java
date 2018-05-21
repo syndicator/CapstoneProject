@@ -102,15 +102,15 @@ public class TrophyListAdapter extends RecyclerView.Adapter<TrophyListAdapter.Tr
          */
         void bind(final int listIndex) {
             mTextViewGoalName.setText(sTrophyList.get(listIndex).getGoalName());
-            if (sTrophyList.get(listIndex).getAward().equals(mContext.getResources().getString(R.id.BRONZE_EARNED_STRING))) {
+            if (sTrophyList.get(listIndex).getAward().equals(mContext.getResources().getString(R.string.BRONZE_EARNED_STRING))) {
                 mImageViewAward.setImageResource(R.drawable.ic_trophy_bronze);
-                mImageViewAward.setContentDescription(mContext.getResources().getString(R.id.BRONZE_EARNED_STRING));
-            } else if (sTrophyList.get(listIndex).getAward().equals(mContext.getResources().getString(R.id.SILVER_EARNED_STRING))) {
+                mImageViewAward.setContentDescription(mContext.getResources().getString(R.string.BRONZE_EARNED_STRING));
+            } else if (sTrophyList.get(listIndex).getAward().equals(mContext.getResources().getString(R.string.SILVER_EARNED_STRING))) {
                 mImageViewAward.setImageResource(R.drawable.ic_trophy_silver);
-                mImageViewAward.setContentDescription(mContext.getResources().getString(R.id.SILVER_EARNED_STRING));
-            } else if (sTrophyList.get(listIndex).getAward().equals(mContext.getResources().getString(R.id.GOLD_EARNED_STRING))) {
+                mImageViewAward.setContentDescription(mContext.getResources().getString(R.string.SILVER_EARNED_STRING));
+            } else if (sTrophyList.get(listIndex).getAward().equals(mContext.getResources().getString(R.string.GOLD_EARNED_STRING))) {
                 mImageViewAward.setImageResource(R.drawable.ic_trophy_gold);
-                mImageViewAward.setContentDescription(mContext.getResources().getString(R.id.GOLD_EARNED_STRING));
+                mImageViewAward.setContentDescription(mContext.getResources().getString(R.string.GOLD_EARNED_STRING));
             }
             mTextViewCompletionDate.setText(String.valueOf(sTrophyList.get(listIndex).getCompletionDate()));
             mImageButtonShare.setOnClickListener(new View.OnClickListener() {

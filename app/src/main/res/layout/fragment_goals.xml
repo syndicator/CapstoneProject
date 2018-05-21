@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1CB4B5"
     android:orientation="vertical"
     tools:context=".fragments.GoalsFragment">
 
@@ -16,9 +15,12 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:layout_marginLeft="@dimen/pad_1"
+            android:layout_marginRight="@dimen/pad_1"
             android:stretchColumns="1">
 
             <TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+                android:background="@color/background_dark"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -77,7 +79,10 @@
                     android:textDirection="locale" />
 
             </TableRow>
-
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/white_smoke"/>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -85,9 +90,9 @@
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/rv_goals"
+                    android:background="@color/background_dark"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="#444444"
                     android:scrollbars="vertical" />
 
                 <ProgressBar
@@ -108,7 +113,8 @@
             android:layout_gravity="start"
             android:layout_marginEnd="@dimen/pad_3"
             android:layout_marginStart="@dimen/pad_3"
-            android:background="@color/cardview_light_background"
+            android:background="@color/white_smoke"
+            android:textColor="@color/text_dark"
             android:paddingBottom="@dimen/pad_2"
             android:paddingEnd="@dimen/pad_1"
             android:paddingStart="@dimen/pad_1"
@@ -128,19 +134,4 @@
             app:adUnitId="@string/banner_ad_unit_id" />
 
     </LinearLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_add"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_gravity="bottom|right"
-        android:layout_marginBottom="@dimen/fab_margin"
-        android:layout_marginEnd="@dimen/fab_margin"
-        android:layout_marginRight="24dp"
-        android:contentDescription="@string/description_add_new_goal"
-        android:elevation="@dimen/fab_elevation"
-        android:src="@drawable/ic_add"
-        app:borderWidth="0dp"
-        app:pressedTranslationZ="6dp" />
-
 </FrameLayout>

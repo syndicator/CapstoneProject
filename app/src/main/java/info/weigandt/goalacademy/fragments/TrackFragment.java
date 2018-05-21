@@ -1,10 +1,13 @@
 package info.weigandt.goalacademy.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,6 +31,7 @@ import info.weigandt.goalacademy.adapters.TrackListAdapter;
 import info.weigandt.goalacademy.classes.AlertDialogFactory;
 import info.weigandt.goalacademy.classes.Config;
 import info.weigandt.goalacademy.classes.Constants;
+import info.weigandt.goalacademy.classes.FirebaseOperations;
 import info.weigandt.goalacademy.classes.Goal;
 import info.weigandt.goalacademy.classes.GoalHelper;
 import info.weigandt.goalacademy.classes.ThreeStatesButton;
@@ -64,6 +68,9 @@ public class TrackFragment extends BaseFragment {
     ImageButton mIncreaseWeekButton;
     @BindView(R.id.button_week_decrease)
     ImageButton mDecreaseWeekButton;
+    @BindView(R.id.fab_add)
+    FloatingActionButton mFloatingActionButtonAdd;
+
     @BindView(R.id.track_loading_indicator)
     ProgressBar mTrackLoadingProgressBar;
 
@@ -109,6 +116,12 @@ public class TrackFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_track, container, false);
         ButterKnife.bind(this, view);
+        mFloatingActionButtonAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showCustomFragmentDialog();
+            }
+        });
 
 
         if (!mIsRestoredFromState) {
@@ -152,7 +165,19 @@ public class TrackFragment extends BaseFragment {
         }
         return view;
     }
+    private void showCustomFragmentDialog() {
+        FragmentManager fm = getFragmentManager();
+        CustomDialogFragment customDialogFragment = CustomDialogFragment.newInstance(getString(R.string.NEW_GOAL_TEXT));
+        customDialogFragment.setCustomDialogFragmentListener(new CustomDialogFragment.CustomDialogFragmentListener() {
+            @Override
+            public void onDialogPositiveClick(Goal goal) {
+                FirebaseOperations.addGoalToDatabase(goal);
+            }
+        });
+        customDialogFragment.show(fm, getString(R.string.FRAGMENT_EDIT_NAME));
+        //new CustomDialogFragment().show(getFragmentManager(), "CustomDialogFragment");
 
+    }
     private boolean isSafeClick() {
         // Mis-clicking prevention, using threshold of 100 ms
         if (SystemClock.elapsedRealtime() - mLastClickTime < 100){
@@ -176,6 +201,7 @@ public class TrackFragment extends BaseFragment {
             mTrackLoadingProgressBar.setVisibility(View.VISIBLE);
         }
     }
+
 
     public void setDisplayedWeek(LocalDate displayedWeek) {
         mDisplayedWeek = displayedWeek;
@@ -290,6 +316,7 @@ public class TrackFragment extends BaseFragment {
 
     }
 
+    @SuppressLint("ResourceType")
     private void calculateStatusOfGoal(Goal goal, EventStateEnum eventState) {
         //////// region PASSED  ////////////////////////
         if (eventState.equals(EventStateEnum.PASS)) {
@@ -299,7 +326,7 @@ public class TrackFragment extends BaseFragment {
                 //  but may be useful in a future version
                 goal.setStatus(GoalStatusPseudoEnum.GOLD_EARNED);
                 // Invoke parent activity to handle the goal completion. We send the final award also.
-                mFragmentInteractionListener.onGoalCompleted(goal, getContext().getResources().getString(R.id.GOLD_EARNED_STRING));
+                mFragmentInteractionListener.onGoalCompleted(goal, getContext().getResources().getString(R.string.GOLD_EARNED_STRING));
 
             } else if (award == GoalStatusPseudoEnum.SILVER_EARNED) {
                 goal.setStatus(GoalStatusPseudoEnum.SILVER_EARNED);
@@ -332,23 +359,23 @@ public class TrackFragment extends BaseFragment {
                     String awardName;
                     int award = GoalHelper.calculateFinalAward(goal);
                     if (award == GoalStatusPseudoEnum.GOLD_EARNED) {
-                        awardName = getContext().getResources().getString(R.id.GOLD_EARNED_STRING);
+                        awardName = getContext().getResources().getString(R.string.GOLD_EARNED_STRING);
                         goal.setStatus(GoalStatusPseudoEnum.GOLD_EARNED);
                         // Invoke parent activity to handle the goal completion. We send the final award also.
-                        mFragmentInteractionListener.onGoalCompleted(goal, getContext().getResources().getString(R.id.GOLD_EARNED_STRING));
+                        mFragmentInteractionListener.onGoalCompleted(goal, getContext().getResources().getString(R.string.GOLD_EARNED_STRING));
 
                     } else if (award == GoalStatusPseudoEnum.SILVER_EARNED) {
-                        awardName = getContext().getResources().getString(R.id.SILVER_EARNED_STRING);
+                        awardName = getContext().getResources().getString(R.string.SILVER_EARNED_STRING);
                         goal.setStatus(GoalStatusPseudoEnum.SILVER_EARNED);
                         // Invoke parent activity to handle the goal completion. We send the final award also.
-                        mFragmentInteractionListener.onGoalCompleted(goal, getContext().getResources().getString(R.id.SILVER_EARNED_STRING));
+                        mFragmentInteractionListener.onGoalCompleted(goal, getContext().getResources().getString(R.string.SILVER_EARNED_STRING));
                     } else if (award == GoalStatusPseudoEnum.BRONZE_EARNED) {
-                        awardName = getContext().getResources().getString(R.id.BRONZE_EARNED_STRING);
+                        awardName = getContext().getResources().getString(R.string.BRONZE_EARNED_STRING);
                         goal.setStatus(GoalStatusPseudoEnum.BRONZE_EARNED);
                         // Invoke parent activity to handle the goal completion. We send the final award also.
-                        mFragmentInteractionListener.onGoalCompleted(goal, getContext().getResources().getString(R.id.BRONZE_EARNED_STRING));
+                        mFragmentInteractionListener.onGoalCompleted(goal, getContext().getResources().getString(R.string.BRONZE_EARNED_STRING));
                     } else {
-                        awardName = getContext().getResources().getString(R.id.BEGINNER_STRING);
+                        awardName = getContext().getResources().getString(R.string.BEGINNER_STRING);
                         mFragmentInteractionListener.onGoalFailed(goal);
                     }
 
@@ -369,23 +396,23 @@ public class TrackFragment extends BaseFragment {
                 int award = GoalHelper.calculateFinalAward(goal);
                 String awardName;
                 if (award == GoalStatusPseudoEnum.GOLD_EARNED) {
-                    awardName = getContext().getResources().getString(R.id.GOLD_EARNED_STRING);
+                    awardName = getContext().getResources().getString(R.string.GOLD_EARNED_STRING);
                     goal.setStatus(GoalStatusPseudoEnum.GOLD_EARNED);
                     // Invoke parent activity to handle the goal completion. We send the final award also.
-                    mFragmentInteractionListener.onGoalCompleted(goal, getContext().getResources().getString(R.id.GOLD_EARNED_STRING));
+                    mFragmentInteractionListener.onGoalCompleted(goal, getContext().getResources().getString(R.string.GOLD_EARNED_STRING));
                 } else if (award == GoalStatusPseudoEnum.SILVER_EARNED) {
-                    awardName = getContext().getResources().getString(R.id.SILVER_EARNED_STRING);
+                    awardName = getContext().getResources().getString(R.string.SILVER_EARNED_STRING);
                     goal.setStatus(GoalStatusPseudoEnum.SILVER_EARNED);
                     // Invoke parent activity to handle the goal completion. We send the final award also.
-                    mFragmentInteractionListener.onGoalCompleted(goal, getContext().getResources().getString(R.id.SILVER_EARNED_STRING));
+                    mFragmentInteractionListener.onGoalCompleted(goal, getContext().getResources().getString(R.string.SILVER_EARNED_STRING));
                 } else if (award == GoalStatusPseudoEnum.BRONZE_EARNED) {
-                    awardName = getContext().getResources().getString(R.id.BRONZE_EARNED_STRING);
+                    awardName = getContext().getResources().getString(R.string.BRONZE_EARNED_STRING);
                     goal.setStatus(GoalStatusPseudoEnum.BRONZE_EARNED);
                     // Invoke parent activity to handle the goal completion. We send the final award also.
-                    mFragmentInteractionListener.onGoalCompleted(goal, getContext().getResources().getString(R.id.BRONZE_EARNED_STRING));
+                    mFragmentInteractionListener.onGoalCompleted(goal, getContext().getResources().getString(R.string.BRONZE_EARNED_STRING));
                 } else {
                     // Failed without any award. No trophy generated.
-                    awardName = getContext().getResources().getString(R.id.BEGINNER_STRING);
+                    awardName = getContext().getResources().getString(R.string.BEGINNER_STRING);
                     mFragmentInteractionListener.onGoalFailed(goal);
                 }
                 AlertDialog alertDialog = AlertDialogFactory.createFailDialog(awardName, getActivity());

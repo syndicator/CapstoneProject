@@ -1,58 +1,83 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_track"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#1CB4B5"
-    android:orientation="vertical"
-    tools:context=".fragments.TrackFragment">
+    android:layout_height="match_parent">
 
     <LinearLayout
-        android:layoutDirection="ltr"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/fragment_week_margin_top"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <ImageButton
-            android:id="@+id/button_week_decrease"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/description_week_decrease"
-            android:src="@drawable/ic_chevron_left" />
-
-        <Button
-            android:id="@+id/button_current_week"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/description_current_week"
-            android:text="@string/fallback_week_number"
-            android:textSize="@dimen/font_size_week_number" />
-
-        <ImageButton
-            android:id="@+id/button_week_increase"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/description_week_increase"
-            android:src="@drawable/ic_chevron_right" />
-    </LinearLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_track"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#444444"
-        android:scrollbars="vertical" />
-        <ProgressBar
-            android:id="@+id/track_loading_indicator"
-            android:layout_width="96dp"
-            android:layout_height="96dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="@dimen/pad_3"
-            android:visibility="invisible" />
-</RelativeLayout>
-</LinearLayout>
+        android:orientation="vertical"
+        tools:context=".fragments.TrackFragment">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/fragment_week_margin_top"
+            android:gravity="center"
+            android:layoutDirection="ltr"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/button_week_decrease"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/description_week_decrease"
+                android:src="@drawable/ic_chevron_left" />
+
+            <Button
+                android:id="@+id/button_current_week"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/description_current_week"
+                android:text="@string/fallback_week_number"
+                android:textSize="@dimen/font_size_week_number" />
+
+            <ImageButton
+                android:id="@+id/button_week_increase"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/description_week_increase"
+                android:src="@drawable/ic_chevron_right" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_marginBottom="@dimen/rv_to_bottom_margin"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ProgressBar
+                android:id="@+id/track_loading_indicator"
+                android:layout_width="@dimen/loading_indicator"
+                android:layout_height="@dimen/loading_indicator"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/pad_3"
+                android:visibility="invisible" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_track"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:background="@color/background_dark"
+                android:scrollbars="vertical" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_add"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="@dimen/fab_margin"
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginRight="24dp"
+        android:contentDescription="@string/description_add_new_goal"
+        android:elevation="@dimen/fab_elevation"
+        android:src="@drawable/ic_add"
+        app:borderWidth="0dp"
+        app:pressedTranslationZ="6dp" />
+</FrameLayout>

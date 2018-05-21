@@ -21,31 +21,34 @@
         android:text="@string/fallback_trackname" />
 
     <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:paddingStart="@dimen/pad_0"
+        android:paddingLeft="@dimen/pad_0"
+        android:paddingEnd="@dimen/pad_0"
+        android:paddingRight="@dimen/pad_0"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#ffffff"
+
         android:shrinkColumns="*"
         android:stretchColumns="*">
 
         <!-- Row 0 with 7 columns -->
         <!--- Note: Arabic calendar also displays weekdays ltr! -->
         <TableRow
+            android:background="@drawable/cell_shape"                android:gravity="center"
             android:layoutDirection="ltr"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-
-            android:gravity="center_horizontal">
+            android:layout_height="wrap_content">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:background="#b0b0b0"
                 android:paddingEnd="@dimen/pad_0"
                 android:paddingLeft="@dimen/pad_0"
                 android:paddingRight="@dimen/pad_0"
                 android:paddingStart="@dimen/pad_0"
                 android:text="@string/monday_short"
+                android:textColor="@color/text_dark"
                 android:textAlignment="viewStart"
                 android:textDirection="locale" />
 
@@ -53,7 +56,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:background="#b0b0b0"
+                android:textColor="@color/text_dark"
                 android:paddingEnd="@dimen/pad_0"
                 android:paddingLeft="@dimen/pad_0"
                 android:paddingRight="@dimen/pad_0"
@@ -66,8 +69,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:background="#b0b0b0"
-                android:paddingEnd="@dimen/pad_0"
+                android:textColor="@color/text_dark"                android:paddingEnd="@dimen/pad_0"
                 android:paddingLeft="@dimen/pad_0"
                 android:paddingRight="@dimen/pad_0"
                 android:paddingStart="@dimen/pad_0"
@@ -81,8 +83,7 @@
                 android:layout_gravity="start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#b0b0b0"
-                android:paddingEnd="@dimen/pad_0"
+                android:textColor="@color/text_dark"                android:paddingEnd="@dimen/pad_0"
                 android:paddingLeft="@dimen/pad_0"
                 android:paddingRight="@dimen/pad_0"
                 android:paddingStart="@dimen/pad_0"
@@ -94,8 +95,7 @@
                 android:layout_gravity="start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#b0b0b0"
-                android:paddingEnd="@dimen/pad_0"
+                android:textColor="@color/text_dark"                android:paddingEnd="@dimen/pad_0"
                 android:paddingLeft="@dimen/pad_0"
                 android:paddingRight="@dimen/pad_0"
                 android:paddingStart="@dimen/pad_0"
@@ -107,8 +107,7 @@
                 android:layout_gravity="start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#b0b0b0"
-                android:paddingEnd="@dimen/pad_0"
+                android:textColor="@color/text_dark"                android:paddingEnd="@dimen/pad_0"
                 android:paddingLeft="@dimen/pad_0"
                 android:paddingRight="@dimen/pad_0"
                 android:paddingStart="@dimen/pad_0"
@@ -120,8 +119,7 @@
                 android:layout_gravity="start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#b0b0b0"
-                android:paddingEnd="@dimen/pad_0"
+                android:textColor="@color/text_dark"                android:paddingEnd="@dimen/pad_0"
                 android:paddingLeft="@dimen/pad_0"
                 android:paddingRight="@dimen/pad_0"
                 android:paddingStart="@dimen/pad_0"
@@ -147,7 +145,7 @@
             <info.weigandt.goalacademy.classes.ThreeStatesButton
                 android:id="@+id/tsb_1"
                 android:layout_weight="1"
-                android:background="#dcdcdc"
+                android:background="@drawable/cell_shape"
                 android:gravity="center"
                 android:padding="20dip"
                 android:textColor="#000000" />
@@ -155,40 +153,35 @@
             <info.weigandt.goalacademy.classes.ThreeStatesButton
                 android:id="@+id/tsb_2"
                 android:layout_weight="1"
-                android:background="#dcdcdc"
-                android:gravity="center"
+                android:background="@drawable/cell_shape"                android:gravity="center"
                 android:padding="20dip"
                 android:textColor="#000000" />
 
             <info.weigandt.goalacademy.classes.ThreeStatesButton
                 android:id="@+id/tsb_3"
                 android:layout_weight="1"
-                android:background="#dcdcdc"
-                android:gravity="center"
+                android:background="@drawable/cell_shape"                android:gravity="center"
                 android:padding="20dip"
                 android:textColor="#000000" />
 
             <info.weigandt.goalacademy.classes.ThreeStatesButton
                 android:id="@+id/tsb_4"
                 android:layout_weight="1"
-                android:background="#dcdcdc"
-                android:gravity="center"
+                android:background="@drawable/cell_shape"                android:gravity="center"
                 android:padding="20dip"
                 android:textColor="#000000" />
 
             <info.weigandt.goalacademy.classes.ThreeStatesButton
                 android:id="@+id/tsb_5"
                 android:layout_weight="1"
-                android:background="#dcdcdc"
-                android:gravity="center"
+                android:background="@drawable/cell_shape"                android:gravity="center"
                 android:padding="20dip"
                 android:textColor="#000000" />
 
             <info.weigandt.goalacademy.classes.ThreeStatesButton
                 android:id="@+id/tsb_6"
                 android:layout_weight="1"
-                android:background="#dcdcdc"
-                android:gravity="center"
+                android:background="@drawable/cell_shape"                android:gravity="center"
                 android:padding="20dip"
                 android:textColor="#000000" />
         </TableRow>

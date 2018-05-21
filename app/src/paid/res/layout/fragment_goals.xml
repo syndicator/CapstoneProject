@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1CB4B5"
     android:orientation="vertical"
     tools:context=".fragments.GoalsFragment">
 
@@ -11,13 +10,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
         <TableLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:layout_marginLeft="@dimen/pad_1"
+            android:layout_marginRight="@dimen/pad_1"
             android:stretchColumns="1">
 
             <TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+                android:background="@color/background_dark"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -26,29 +29,60 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="start"
                     android:layout_weight="1"
-                    android:text="@string/goal" />
+                    android:paddingEnd="@dimen/pad_0"
+                    android:paddingLeft="@dimen/pad_0"
+                    android:paddingRight="@dimen/pad_0"
+                    android:paddingStart="@dimen/pad_0"
+                    android:text="@string/goal"
+                    android:textAlignment="viewStart"
+                    android:textDirection="locale" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="start"
                     android:layout_weight="1"
-                    android:text="@string/streak" />
+                    android:paddingEnd="@dimen/pad_0"
+                    android:paddingLeft="@dimen/pad_0"
+                    android:paddingRight="@dimen/pad_0"
+                    android:paddingStart="@dimen/pad_0"
+                    android:text="@string/streak"
+                    android:textAlignment="viewStart"
+                    android:textDirection="locale" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="start"
                     android:layout_weight="1"
-                    android:text="@string/completion" />
+                    android:paddingEnd="@dimen/pad_0"
+                    android:paddingLeft="@dimen/pad_0"
+                    android:paddingRight="@dimen/pad_0"
+                    android:paddingStart="@dimen/pad_0"
+                    android:text="@string/completion"
+                    android:textAlignment="viewStart"
+                    android:textDirection="locale" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="start"
                     android:layout_weight="1"
-                    android:text="@string/next_level" />
+                    android:paddingEnd="@dimen/pad_0"
+                    android:paddingLeft="@dimen/pad_0"
+                    android:paddingRight="@dimen/pad_0"
+                    android:paddingStart="@dimen/pad_0"
+                    android:text="@string/next_level"
+                    android:textAlignment="viewStart"
+                    android:textDirection="locale" />
 
             </TableRow>
-
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/white_smoke"/>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -56,9 +90,9 @@
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/rv_goals"
+                    android:background="@color/background_dark"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="#444444"
                     android:scrollbars="vertical" />
 
                 <ProgressBar
@@ -70,29 +104,23 @@
                     android:visibility="invisible" />
             </RelativeLayout>
         </TableLayout>
+
         <TextView
             android:id="@+id/tv_quote"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_alignBottom="@id/rv_goals"
-            android:layout_marginLeft="@dimen/pad_3"
-            android:layout_marginRight="@dimen/pad_3"
-            android:background="@color/cardview_light_background"
-            android:text="@string/fallback_motivation" />
-
+            android:layout_gravity="start"
+            android:layout_marginEnd="@dimen/pad_3"
+            android:layout_marginStart="@dimen/pad_3"
+            android:background="@color/white_smoke"
+            android:textColor="@color/text_dark"
+            android:paddingBottom="@dimen/pad_2"
+            android:paddingEnd="@dimen/pad_1"
+            android:paddingStart="@dimen/pad_1"
+            android:paddingTop="@dimen/pad_1"
+            android:text="@string/fallback_motivation"
+            android:textAlignment="viewStart"
+            android:textDirection="locale" />
     </LinearLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_add"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_marginBottom="@dimen/fab_margin"
-        android:layout_marginEnd="@dimen/fab_margin"
-        android:layout_marginRight="24dp"
-        android:layout_gravity="bottom|right"
-        android:elevation="@dimen/fab_elevation"
-        android:src="@drawable/ic_add"
-        app:borderWidth="0dp"
-        app:pressedTranslationZ="6dp" />
-
 </FrameLayout>

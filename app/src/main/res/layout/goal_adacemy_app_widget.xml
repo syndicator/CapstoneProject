@@ -3,7 +3,7 @@
     android:id="@+id/ll_widget_goal_academy"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorWhite"
+    android:background="@color/white"
     android:orientation="vertical">
 
     <FrameLayout
@@ -13,11 +13,11 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="@dimen/widget_title_min_height"
-            android:background="@color/colorPrimary"
+            android:background="@color/primary"
             android:gravity="center"
             android:text="@string/title_collection_widget"
             android:textAllCaps="true"
-            android:textColor="@color/colorWhite"
+            android:textColor="@color/white"
             android:textSize="18dp" />
     </FrameLayout>
 
@@ -29,7 +29,7 @@
             android:id="@+id/widgetListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorWhite"
+            android:background="@color/white"
             android:divider="#eeeeee"
             android:dividerHeight="1dp"
             tools:listitem="@layout/collection_widget_list_item" />

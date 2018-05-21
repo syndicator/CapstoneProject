@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GoalAcademy</string>
+    <string name="app_name">Goal Academy</string>
     <!-- Category name for track tab [CHAR LIMIT=20] -->
     <string name="category_track">Track</string>
     <string name="fallback_week_number">Week #</string>
@@ -16,9 +16,9 @@
     <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
     <string name="fallback_streak_number">250</string>
     <string name="fallback_finished_percent">10%</string>
-    <string name="fallback_next_level">Bronce</string>
+    <string name="fallback_next_level">Bronze</string>
     <string name="streak">Streak</string>
-    <string name="completion">Stage completion</string>
+    <string name="completion">Stage done</string>
     <string name="next_level">Next Level</string>
     <string name="goal">Goal</string>
     <string name="award">Award</string>
@@ -63,5 +63,9 @@
     <string name="FIREBASE_ERROR_DETAILS">Firebase DB error. Message: %s</string>
     <string name="NEW_GOAL_TEXT">New goal</string>
     <string name="FRAGMENT_EDIT_NAME">fragment_edit_name</string>
+    <string name="GOLD_EARNED_STRING">Gold</string>
+    <string name="SILVER_EARNED_STRING">Silver</string>
+    <string name="BRONZE_EARNED_STRING">Bronze</string>
+    <string name="BEGINNER_STRING">Beginner</string>
 
 </resources>

@@ -10,4 +10,5 @@ public class Constants {
     public static final String SERIALIZED_WIDGET_DATA = "SERIALIZED_WIDGET_DATA";
 
     public static final String API_ERROR_TEXT = "Error while calling API. %s";
+    public static final String QUOTE_TEXT = "QUOTE_TEXT";
 }
